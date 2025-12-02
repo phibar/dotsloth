@@ -244,7 +244,14 @@ export function getEnvFilesStatus(githubRoot: string = PATHS.githubRoot): EnvFil
       status = 'synced'
     } else if (hasLocalFile && file.inIcloud) {
       // Both exist - check for conflict
-      status = localHash && icloudHash && localHash !== icloudHash ? 'conflict' : 'regular-file';
+      if (!localHash || !icloudHash) {
+        // If we can't read one of the files, treat as conflict
+        status = 'conflict'
+      } else if (localHash !== icloudHash) {
+        status = 'conflict'
+      } else {
+        status = 'regular-file'
+      }
     } else if (hasLocalFile && !file.inIcloud) {
       status = 'unsynced'
     } else if (!hasLocalFile && file.inIcloud) {

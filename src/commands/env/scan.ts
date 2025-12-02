@@ -37,14 +37,22 @@ static override flags = {
     this.log(chalk.bold(`\n🔍 Found ${envFiles.length} .env file(s):\n`))
 
     for (const envFile of envFiles) {
-      const status = envFile.backedUp ? chalk.green('✓ backed up') : chalk.yellow('○ not backed up')
+      let status: string
+      if (envFile.isSymlinked) {
+        status = chalk.green('✓ synced (symlink)')
+      } else if (envFile.inIcloud) {
+        status = chalk.yellow('○ in iCloud (not linked)')
+      } else {
+        status = chalk.red('● not synced')
+      }
+
       this.log(`  ${chalk.cyan(envFile.relativePath)} ${status}`)
     }
 
-    const notBackedUp = envFiles.filter((f) => !f.backedUp)
-    if (notBackedUp.length > 0) {
+    const notSynced = envFiles.filter((f) => !f.isSymlinked)
+    if (notSynced.length > 0) {
       this.log('')
-      this.log(chalk.dim(`Run 'dotsloth env backup' to backup ${notBackedUp.length} file(s) to iCloud`))
+      this.log(chalk.dim(`Run 'dotsloth env sync' to sync ${notSynced.length} file(s) to iCloud`))
     }
 
     this.log('')

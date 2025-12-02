@@ -21,21 +21,34 @@ const ENV_FILE_PATTERNS = new Set([
 export interface EnvFile {
   /** Absolute path to the env file in the project */
   absolutePath: string
-  /** Whether a backup exists in iCloud */
-  backedUp: boolean
   /** Name of the env file (e.g., ".env", ".env.local") */
   fileName: string
+  /** Path to the iCloud source file */
+  icloudPath: string
+  /** Whether the file exists in iCloud (source of truth) */
+  inIcloud: boolean
+  /** Whether the local path is a symlink pointing to iCloud */
+  isSymlinked: boolean
   /** Path relative to github root (e.g., "my-org/my-repo/.env") */
   relativePath: string
 }
 
 export interface EnvFileStatus extends EnvFile {
-  /** Hash of the local file content */
+  /** True if local is a regular file (not symlink) */
+  hasLocalFile: boolean
+  /** Hash of the iCloud file content */
+  icloudHash?: string
+  /** Hash of the local file content (only for regular files) */
   localHash?: string
-  /** Hash of the backed up file content */
-  remoteHash?: string
-  /** Whether local and backup are in sync */
-  synced: boolean
+  /** Status of the env file */
+  status: 'conflict' | 'orphaned' | 'regular-file' | 'synced' | 'unsynced'
+}
+
+export interface SyncResult {
+  action: 'conflict' | 'created' | 'linked' | 'skipped'
+  envFile: EnvFile
+  error?: string
+  success: boolean
 }
 
 /**
@@ -68,7 +81,7 @@ function shouldSkipDirectory(name: string): boolean {
 }
 
 /**
- * Recursively scan a directory for .env files
+ * Recursively scan a directory for .env files (including symlinks)
  */
 function scanDirectory(dir: string, envFiles: string[]): void {
   let entries: fs.Dirent[]
@@ -86,14 +99,31 @@ function scanDirectory(dir: string, envFiles: string[]): void {
       if (!shouldSkipDirectory(entry.name)) {
         scanDirectory(fullPath, envFiles)
       }
-    } else if (entry.isFile() && ENV_FILE_PATTERNS.has(entry.name)) {
+    } else if ((entry.isFile() || entry.isSymbolicLink()) && ENV_FILE_PATTERNS.has(entry.name)) {
       envFiles.push(fullPath)
     }
   }
 }
 
 /**
- * Scan the github root for all .env files
+ * Check if a path is a symlink pointing to the expected iCloud path
+ */
+function isValidSymlink(localPath: string, expectedIcloudPath: string): boolean {
+  try {
+    const stat = fs.lstatSync(localPath)
+    if (!stat.isSymbolicLink()) {
+      return false
+    }
+
+    const target = fs.readlinkSync(localPath)
+    return target === expectedIcloudPath
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Scan the github root for all .env files (both regular files and symlinks)
  */
 export function scanForEnvFiles(githubRoot: string = PATHS.githubRoot): EnvFile[] {
   const envFilePaths: string[] = []
@@ -107,133 +137,27 @@ export function scanForEnvFiles(githubRoot: string = PATHS.githubRoot): EnvFile[
   return envFilePaths.map((absolutePath) => {
     const relativePath = relative(githubRoot, absolutePath)
     const fileName = relativePath.split('/').pop() ?? ''
-    const projectPath = relativePath.replace(`/${fileName}`, '')
-    const backupPath = getEnvFilePath(projectPath, fileName)
+    const projectPath = dirname(relativePath)
+    const icloudPath = getEnvFilePath(projectPath, fileName)
+
+    const inIcloud = fs.existsSync(icloudPath)
+    const isSymlinked = isValidSymlink(absolutePath, icloudPath)
 
     return {
       absolutePath,
-      backedUp: fs.existsSync(backupPath),
       fileName,
+      icloudPath,
+      inIcloud,
+      isSymlinked,
       relativePath,
     }
   })
 }
 
 /**
- * Get the status of all env files (with sync information)
+ * List all env files stored in iCloud (source of truth)
  */
-export function getEnvFilesStatus(githubRoot: string = PATHS.githubRoot): EnvFileStatus[] {
-  const envFiles = scanForEnvFiles(githubRoot)
-
-  return envFiles.map((envFile) => {
-    const projectPath = dirname(envFile.relativePath)
-    const backupPath = getEnvFilePath(projectPath, envFile.fileName)
-
-    let localHash: string | undefined
-    let remoteHash: string | undefined
-    let synced = false
-
-    try {
-      const localContent = fs.readFileSync(envFile.absolutePath, 'utf8')
-      localHash = hashContent(localContent)
-    } catch {
-      // File might have been deleted
-    }
-
-    if (envFile.backedUp) {
-      try {
-        const remoteContent = fs.readFileSync(backupPath, 'utf8')
-        remoteHash = hashContent(remoteContent)
-      } catch {
-        // Backup might have been deleted
-      }
-    }
-
-    if (localHash && remoteHash) {
-      synced = localHash === remoteHash
-    }
-
-    return {
-      ...envFile,
-      localHash,
-      remoteHash,
-      synced,
-    }
-  })
-}
-
-/**
- * Backup an env file to iCloud
- */
-export function backupEnvFile(envFile: EnvFile): {backupPath: string; success: boolean} {
-  const projectPath = dirname(envFile.relativePath)
-  const backupPath = getEnvFilePath(projectPath, envFile.fileName)
-
-  try {
-    // Ensure the directory exists
-    fs.mkdirSync(dirname(backupPath), {recursive: true})
-
-    // Copy the file
-    fs.copyFileSync(envFile.absolutePath, backupPath)
-
-    return {backupPath, success: true}
-  } catch {
-    return {backupPath, success: false}
-  }
-}
-
-/**
- * Backup all env files to iCloud
- */
-export function backupAllEnvFiles(
-  githubRoot: string = PATHS.githubRoot,
-): {backed: number; failed: number; results: Array<{envFile: EnvFile; success: boolean}>} {
-  const envFiles = scanForEnvFiles(githubRoot)
-  const results: Array<{envFile: EnvFile; success: boolean}> = []
-  let backed = 0
-  let failed = 0
-
-  for (const envFile of envFiles) {
-    const {success} = backupEnvFile(envFile)
-    results.push({envFile, success})
-    if (success) {
-      backed++
-    } else {
-      failed++
-    }
-  }
-
-  return {backed, failed, results}
-}
-
-/**
- * Restore an env file from iCloud to its project location
- */
-export function restoreEnvFile(envFile: EnvFile): {restored: boolean; targetPath: string} {
-  const projectPath = dirname(envFile.relativePath)
-  const backupPath = getEnvFilePath(projectPath, envFile.fileName)
-
-  if (!fs.existsSync(backupPath)) {
-    return {restored: false, targetPath: envFile.absolutePath}
-  }
-
-  try {
-    // Ensure the target directory exists
-    fs.mkdirSync(dirname(envFile.absolutePath), {recursive: true})
-
-    // Copy the file
-    fs.copyFileSync(backupPath, envFile.absolutePath)
-
-    return {restored: true, targetPath: envFile.absolutePath}
-  } catch {
-    return {restored: false, targetPath: envFile.absolutePath}
-  }
-}
-
-/**
- * List all backed up env files from iCloud
- */
-export function listBackedUpEnvFiles(): EnvFile[] {
+export function listIcloudEnvFiles(): EnvFile[] {
   const envFilesDir = PATHS.icloudEnvFiles
   const envFiles: EnvFile[] = []
 
@@ -241,7 +165,7 @@ export function listBackedUpEnvFiles(): EnvFile[] {
     return []
   }
 
-  function scanBackupDirectory(dir: string): void {
+  function scanIcloudDirectory(dir: string): void {
     let entries: fs.Dirent[]
     try {
       entries = fs.readdirSync(dir, {withFileTypes: true})
@@ -253,47 +177,281 @@ export function listBackedUpEnvFiles(): EnvFile[] {
       const fullPath = join(dir, entry.name)
 
       if (entry.isDirectory()) {
-        scanBackupDirectory(fullPath)
+        scanIcloudDirectory(fullPath)
       } else if (entry.isFile() && ENV_FILE_PATTERNS.has(entry.name)) {
         const relativePath = relative(envFilesDir, fullPath)
         const absolutePath = join(PATHS.githubRoot, relativePath)
 
+        const isSymlinked = isValidSymlink(absolutePath, fullPath)
+
         envFiles.push({
           absolutePath,
-          backedUp: true,
           fileName: entry.name,
+          icloudPath: fullPath,
+          inIcloud: true,
+          isSymlinked,
           relativePath,
         })
       }
     }
   }
 
-  scanBackupDirectory(envFilesDir)
+  scanIcloudDirectory(envFilesDir)
   return envFiles
 }
 
 /**
- * Restore all backed up env files from iCloud
+ * Get comprehensive status of all env files
  */
-export function restoreAllEnvFiles(): {
-  failed: number
-  restored: number
-  results: Array<{envFile: EnvFile; success: boolean}>
-} {
-  const backedUpFiles = listBackedUpEnvFiles()
-  const results: Array<{envFile: EnvFile; success: boolean}> = []
-  let restored = 0
-  let failed = 0
+export function getEnvFilesStatus(githubRoot: string = PATHS.githubRoot): EnvFileStatus[] {
+  // Get files from both sources
+  const localFiles = scanForEnvFiles(githubRoot)
+  const icloudFiles = listIcloudEnvFiles()
 
-  for (const envFile of backedUpFiles) {
-    const {restored: success} = restoreEnvFile(envFile)
-    results.push({envFile, success})
-    if (success) {
-      restored++
+  // Build a map of all files by relative path
+  const fileMap = new Map<string, EnvFileStatus>()
+
+  // Process local files
+  for (const file of localFiles) {
+    let status: EnvFileStatus['status'] = 'unsynced'
+    let localHash: string | undefined
+    let icloudHash: string | undefined
+    let hasLocalFile = false
+
+    try {
+      const stat = fs.lstatSync(file.absolutePath)
+      hasLocalFile = !stat.isSymbolicLink()
+
+      if (hasLocalFile) {
+        const content = fs.readFileSync(file.absolutePath, 'utf8')
+        localHash = hashContent(content)
+      }
+    } catch {
+      // File might have been deleted
+    }
+
+    if (file.inIcloud) {
+      try {
+        const content = fs.readFileSync(file.icloudPath, 'utf8')
+        icloudHash = hashContent(content)
+      } catch {
+        // iCloud file might have been deleted
+      }
+    }
+
+    // Determine status
+    if (file.isSymlinked && file.inIcloud) {
+      status = 'synced'
+    } else if (hasLocalFile && file.inIcloud) {
+      // Both exist - check for conflict
+      status = localHash && icloudHash && localHash !== icloudHash ? 'conflict' : 'regular-file';
+    } else if (hasLocalFile && !file.inIcloud) {
+      status = 'unsynced'
+    } else if (!hasLocalFile && file.inIcloud) {
+      status = 'synced' // Symlink or orphaned
+    }
+
+    fileMap.set(file.relativePath, {
+      ...file,
+      hasLocalFile,
+      icloudHash,
+      localHash,
+      status,
+    })
+  }
+
+  // Add iCloud-only files (orphaned - exist in iCloud but no symlink locally)
+  for (const file of icloudFiles) {
+    if (!fileMap.has(file.relativePath)) {
+      let icloudHash: string | undefined
+      try {
+        const content = fs.readFileSync(file.icloudPath, 'utf8')
+        icloudHash = hashContent(content)
+      } catch {
+        // iCloud file might have been deleted
+      }
+
+      fileMap.set(file.relativePath, {
+        ...file,
+        hasLocalFile: false,
+        icloudHash,
+        localHash: undefined,
+        status: 'orphaned',
+      })
+    }
+  }
+
+  return [...fileMap.values()]
+}
+
+/**
+ * Sync a single env file: move to iCloud and create symlink
+ */
+export function syncEnvFile(envFile: EnvFile, force = false): SyncResult {
+  const {absolutePath, icloudPath} = envFile
+
+  try {
+    // Check if already synced
+    if (envFile.isSymlinked && envFile.inIcloud) {
+      return {action: 'skipped', envFile, success: true}
+    }
+
+    // Check if local file exists and is not a symlink
+    let hasLocalFile = false
+    let localContent: string | undefined
+
+    try {
+      const stat = fs.lstatSync(absolutePath)
+      if (stat.isSymbolicLink()) {
+        // Remove invalid symlink
+        fs.unlinkSync(absolutePath)
+      } else {
+        hasLocalFile = true
+        localContent = fs.readFileSync(absolutePath, 'utf8')
+      }
+    } catch {
+      // Local file doesn't exist
+    }
+
+    // Check if iCloud file exists
+    let icloudContent: string | undefined
+    if (envFile.inIcloud) {
+      try {
+        icloudContent = fs.readFileSync(icloudPath, 'utf8')
+      } catch {
+        // iCloud file might have been deleted
+      }
+    }
+
+    // Handle conflict: both local and iCloud exist with different content
+    if (hasLocalFile && icloudContent && localContent !== icloudContent && !force) {
+      return {
+        action: 'conflict',
+        envFile,
+        error: 'Local file and iCloud file have different content. Use --force to overwrite iCloud.',
+        success: false,
+      }
+    }
+
+    // Ensure iCloud directory exists
+    fs.mkdirSync(dirname(icloudPath), {recursive: true})
+
+    // If local file exists, move it to iCloud (or skip if iCloud already has same content)
+    if (hasLocalFile && localContent) {
+      if (!icloudContent || force) {
+        // Write local content to iCloud
+        fs.writeFileSync(icloudPath, localContent, 'utf8')
+      }
+
+      // Remove local file
+      fs.unlinkSync(absolutePath)
+    }
+
+    // If no iCloud file exists and no local file, this is an orphaned reference
+    if (!fs.existsSync(icloudPath)) {
+      return {
+        action: 'skipped',
+        envFile,
+        error: 'No source file found',
+        success: false,
+      }
+    }
+
+    // Create symlink
+    fs.symlinkSync(icloudPath, absolutePath)
+
+    return {
+      action: hasLocalFile ? 'created' : 'linked',
+      envFile,
+      success: true,
+    }
+  } catch (error) {
+    return {
+      action: 'skipped',
+      envFile,
+      error: error instanceof Error ? error.message : String(error),
+      success: false,
+    }
+  }
+}
+
+/**
+ * Sync all env files: move to iCloud and create symlinks
+ */
+export function syncAllEnvFiles(
+  githubRoot: string = PATHS.githubRoot,
+  force = false,
+): {conflicts: number; failed: number; results: SyncResult[]; synced: number} {
+  const envFiles = scanForEnvFiles(githubRoot)
+  const results: SyncResult[] = []
+  let synced = 0
+  let failed = 0
+  let conflicts = 0
+
+  for (const envFile of envFiles) {
+    const result = syncEnvFile(envFile, force)
+    results.push(result)
+
+    if (result.success) {
+      if (result.action !== 'skipped') {
+        synced++
+      }
+    } else if (result.action === 'conflict') {
+      conflicts++
     } else {
       failed++
     }
   }
 
-  return {failed, restored, results}
+  return {conflicts, failed, results, synced}
+}
+
+/**
+ * Link orphaned iCloud env files to their project locations
+ */
+export function linkOrphanedEnvFiles(): SyncResult[] {
+  const icloudFiles = listIcloudEnvFiles()
+  const results: SyncResult[] = []
+
+  for (const envFile of icloudFiles) {
+    if (!envFile.isSymlinked) {
+      // Check if local path exists
+      try {
+        const stat = fs.lstatSync(envFile.absolutePath)
+        if (stat.isSymbolicLink()) {
+          // Remove invalid symlink
+          fs.unlinkSync(envFile.absolutePath)
+        } else {
+          // Local file exists - skip (conflict)
+          results.push({
+            action: 'conflict',
+            envFile,
+            error: 'Local file exists',
+            success: false,
+          })
+          continue
+        }
+      } catch {
+        // Local file doesn't exist - good
+      }
+
+      // Ensure parent directory exists
+      fs.mkdirSync(dirname(envFile.absolutePath), {recursive: true})
+
+      // Create symlink
+      try {
+        fs.symlinkSync(envFile.icloudPath, envFile.absolutePath)
+        results.push({action: 'linked', envFile, success: true})
+      } catch (error) {
+        results.push({
+          action: 'skipped',
+          envFile,
+          error: error instanceof Error ? error.message : String(error),
+          success: false,
+        })
+      }
+    }
+  }
+
+  return results
 }

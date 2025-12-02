@@ -1,10 +1,10 @@
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 
-import {listBackedUpEnvFiles} from '../../lib/env.js'
+import {listIcloudEnvFiles} from '../../lib/env.js'
 
 export default class EnvList extends Command {
-  static override description = 'List all backed up .env files in iCloud'
+  static override description = 'List all .env files stored in iCloud (source of truth)'
 static override examples = [
     '<%= config.bin %> <%= command.id %>',
     '<%= config.bin %> <%= command.id %> --json',
@@ -16,7 +16,7 @@ static override flags = {
   public async run(): Promise<void> {
     const {flags} = await this.parse(EnvList)
 
-    const envFiles = listBackedUpEnvFiles()
+    const envFiles = listIcloudEnvFiles()
 
     if (flags.json) {
       this.log(JSON.stringify(envFiles, null, 2))
@@ -24,19 +24,24 @@ static override flags = {
     }
 
     if (envFiles.length === 0) {
-      this.log(chalk.yellow('No .env files backed up in iCloud'))
-      this.log(chalk.dim("Run 'dotsloth env backup' to backup your .env files"))
+      this.log(chalk.yellow('No .env files in iCloud'))
+      this.log(chalk.dim("Run 'dotsloth env sync' to sync your .env files"))
       return
     }
 
-    this.log(chalk.bold(`\n🔐 Backed up .env files (${envFiles.length}):\n`))
+    this.log(chalk.bold(`\n🔐 .env files in iCloud (${envFiles.length}):\n`))
 
     for (const envFile of envFiles) {
-      this.log(`  ${chalk.cyan(envFile.relativePath)}`)
+      const status = envFile.isSymlinked ? chalk.green('✓ linked') : chalk.yellow('○ orphaned')
+      this.log(`  ${chalk.cyan(envFile.relativePath)} ${status}`)
     }
 
-    this.log('')
-    this.log(chalk.dim("Use 'dotsloth env restore' to restore files to projects"))
+    const orphaned = envFiles.filter((f) => !f.isSymlinked)
+    if (orphaned.length > 0) {
+      this.log('')
+      this.log(chalk.dim(`Run 'dotsloth env sync' to create symlinks for ${orphaned.length} orphaned file(s)`))
+    }
+
     this.log('')
   }
 }

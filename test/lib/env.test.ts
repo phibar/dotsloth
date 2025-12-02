@@ -4,11 +4,10 @@ import * as fs from 'node:fs'
 import {join} from 'node:path'
 
 import {
-  backupEnvFile,
   getEnvFilesStatus,
-  listBackedUpEnvFiles,
-  restoreEnvFile,
+  listIcloudEnvFiles,
   scanForEnvFiles,
+  syncEnvFile,
 } from '../../src/lib/env.js'
 import {getEnvFilePath, PATHS} from '../../src/lib/paths.js'
 
@@ -62,10 +61,11 @@ describe('env', () => {
       expect(dotEnvFile?.relativePath).to.equal('my-org/my-repo/.env')
     })
 
-    it('should mark files as not backed up initially', () => {
+    it('should mark files as not synced initially', () => {
       const envFiles = scanForEnvFiles(testGithubRoot)
 
-      expect(envFiles.every((f) => f.backedUp === false)).to.be.true
+      expect(envFiles.every((f) => f.isSymlinked === false)).to.be.true
+      expect(envFiles.every((f) => f.inIcloud === false)).to.be.true
     })
 
     it('should return empty array for non-existent directory', () => {
@@ -74,81 +74,73 @@ describe('env', () => {
     })
   })
 
-  describe('backupEnvFile', () => {
-    it('should backup an env file to iCloud', () => {
+  describe('syncEnvFile', () => {
+    it('should move env file to iCloud and create symlink', () => {
       const envFiles = scanForEnvFiles(testGithubRoot)
       const dotEnvFile = envFiles.find((f) => f.fileName === '.env')
 
-      const result = backupEnvFile(dotEnvFile!)
+      const result = syncEnvFile(dotEnvFile!)
 
       expect(result.success).to.be.true
-      expect(fs.existsSync(result.backupPath)).to.be.true
+      expect(result.action).to.equal('created')
 
-      // Verify content matches
-      const originalContent = fs.readFileSync(dotEnvFile!.absolutePath, 'utf8')
-      const backupContent = fs.readFileSync(result.backupPath, 'utf8')
-      expect(backupContent).to.equal(originalContent)
+      // Verify iCloud file exists with correct content
+      expect(fs.existsSync(dotEnvFile!.icloudPath)).to.be.true
+      const icloudContent = fs.readFileSync(dotEnvFile!.icloudPath, 'utf8')
+      expect(icloudContent).to.equal('API_KEY=test123')
+
+      // Verify local path is now a symlink
+      const stat = fs.lstatSync(dotEnvFile!.absolutePath)
+      expect(stat.isSymbolicLink()).to.be.true
+
+      // Verify symlink points to iCloud
+      const target = fs.readlinkSync(dotEnvFile!.absolutePath)
+      expect(target).to.equal(dotEnvFile!.icloudPath)
+    })
+
+    it('should skip already synced files', () => {
+      const envFiles = scanForEnvFiles(testGithubRoot)
+      const dotEnvFile = envFiles.find((f) => f.fileName === '.env')
+
+      // File should already be synced from previous test
+      const result = syncEnvFile(dotEnvFile!)
+
+      expect(result.success).to.be.true
+      expect(result.action).to.equal('skipped')
     })
   })
 
   describe('getEnvFilesStatus', () => {
-    it('should show synced status for backed up files', () => {
+    it('should show synced status for symlinked files', () => {
       const status = getEnvFilesStatus(testGithubRoot)
       const dotEnvStatus = status.find((f) => f.fileName === '.env')
 
-      expect(dotEnvStatus?.backedUp).to.be.true
-      expect(dotEnvStatus?.synced).to.be.true
+      expect(dotEnvStatus?.isSymlinked).to.be.true
+      expect(dotEnvStatus?.status).to.equal('synced')
     })
 
-    it('should show out of sync when file changes', () => {
-      // Modify the local file
-      const localPath = join(testGithubRoot, 'my-org', 'my-repo', '.env')
-      fs.writeFileSync(localPath, 'API_KEY=changed')
-
+    it('should show unsynced status for regular files', () => {
       const status = getEnvFilesStatus(testGithubRoot)
-      const dotEnvStatus = status.find((f) => f.fileName === '.env')
+      const dotEnvLocalStatus = status.find((f) => f.fileName === '.env.local')
 
-      expect(dotEnvStatus?.synced).to.be.false
-
-      // Restore original content
-      fs.writeFileSync(localPath, 'API_KEY=test123')
+      expect(dotEnvLocalStatus?.isSymlinked).to.be.false
+      expect(dotEnvLocalStatus?.status).to.equal('unsynced')
     })
   })
 
-  describe('listBackedUpEnvFiles', () => {
-    it('should list all backed up env files', () => {
-      // First backup all files
-      const envFiles = scanForEnvFiles(testGithubRoot)
-      for (const file of envFiles) {
-        backupEnvFile(file)
-      }
+  describe('listIcloudEnvFiles', () => {
+    it('should list env files in iCloud', () => {
+      const icloudFiles = listIcloudEnvFiles()
 
-      const backedUp = listBackedUpEnvFiles()
-
-      expect(backedUp.length).to.be.greaterThanOrEqual(2)
+      expect(icloudFiles.length).to.be.greaterThanOrEqual(1)
+      expect(icloudFiles.map((f) => f.fileName)).to.include('.env')
     })
-  })
 
-  describe('restoreEnvFile', () => {
-    it('should restore an env file from iCloud', () => {
-      const localPath = join(testGithubRoot, 'my-org', 'my-repo', '.env')
-      const originalContent = fs.readFileSync(localPath, 'utf8')
+    it('should show symlink status for iCloud files', () => {
+      const icloudFiles = listIcloudEnvFiles()
+      const dotEnvFile = icloudFiles.find((f) => f.fileName === '.env')
 
-      // Delete the local file
-      fs.unlinkSync(localPath)
-      expect(fs.existsSync(localPath)).to.be.false
-
-      // Restore from backup
-      const backedUp = listBackedUpEnvFiles()
-      const dotEnvBackup = backedUp.find((f) => f.fileName === '.env')
-
-      const result = restoreEnvFile(dotEnvBackup!)
-
-      expect(result.restored).to.be.true
-      expect(fs.existsSync(localPath)).to.be.true
-
-      const restoredContent = fs.readFileSync(localPath, 'utf8')
-      expect(restoredContent).to.equal(originalContent)
+      expect(dotEnvFile?.isSymlinked).to.be.true
     })
   })
 

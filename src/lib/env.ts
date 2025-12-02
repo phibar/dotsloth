@@ -1,5 +1,6 @@
+import {createHash} from 'node:crypto'
 import * as fs from 'node:fs'
-import {join, relative} from 'node:path'
+import {dirname, join, relative} from 'node:path'
 
 import {getEnvFilePath, PATHS} from './paths.js'
 
@@ -38,40 +39,32 @@ export interface EnvFileStatus extends EnvFile {
 }
 
 /**
- * Simple hash function for comparing file contents
+ * Hash function for comparing file contents using SHA-256
  */
 function hashContent(content: string): string {
-  let hash = 0
-  for (const char of content) {
-    const charCode = char.codePointAt(0) ?? 0
-    // Use multiplication instead of bitwise operations
-    hash = Math.imul(31, hash) + charCode
-    hash = Math.trunc(hash)
-  }
-
-  return hash.toString(16)
+  return createHash('sha256').update(content).digest('hex')
 }
 
 /**
  * Check if a directory should be skipped during scanning
  */
 function shouldSkipDirectory(name: string): boolean {
-  const skipDirs = [
-    'node_modules',
+  const skipDirs = new Set([
     '.git',
-    'dist',
-    'build',
     '.next',
     '.nuxt',
     '.output',
-    'coverage',
-    '__pycache__',
-    'venv',
     '.venv',
-    'vendor',
+    '__pycache__',
+    'build',
+    'coverage',
+    'dist',
+    'node_modules',
     'target',
-  ]
-  return skipDirs.includes(name) || name.startsWith('.')
+    'vendor',
+    'venv',
+  ])
+  return skipDirs.has(name)
 }
 
 /**
@@ -133,7 +126,7 @@ export function getEnvFilesStatus(githubRoot: string = PATHS.githubRoot): EnvFil
   const envFiles = scanForEnvFiles(githubRoot)
 
   return envFiles.map((envFile) => {
-    const projectPath = envFile.relativePath.replace(`/${envFile.fileName}`, '')
+    const projectPath = dirname(envFile.relativePath)
     const backupPath = getEnvFilePath(projectPath, envFile.fileName)
 
     let localHash: string | undefined
@@ -173,13 +166,12 @@ export function getEnvFilesStatus(githubRoot: string = PATHS.githubRoot): EnvFil
  * Backup an env file to iCloud
  */
 export function backupEnvFile(envFile: EnvFile): {backupPath: string; success: boolean} {
-  const projectPath = envFile.relativePath.replace(`/${envFile.fileName}`, '')
+  const projectPath = dirname(envFile.relativePath)
   const backupPath = getEnvFilePath(projectPath, envFile.fileName)
 
   try {
     // Ensure the directory exists
-    const backupDir = backupPath.replace(`/${envFile.fileName}`, '')
-    fs.mkdirSync(backupDir, {recursive: true})
+    fs.mkdirSync(dirname(backupPath), {recursive: true})
 
     // Copy the file
     fs.copyFileSync(envFile.absolutePath, backupPath)
@@ -218,7 +210,7 @@ export function backupAllEnvFiles(
  * Restore an env file from iCloud to its project location
  */
 export function restoreEnvFile(envFile: EnvFile): {restored: boolean; targetPath: string} {
-  const projectPath = envFile.relativePath.replace(`/${envFile.fileName}`, '')
+  const projectPath = dirname(envFile.relativePath)
   const backupPath = getEnvFilePath(projectPath, envFile.fileName)
 
   if (!fs.existsSync(backupPath)) {
@@ -227,8 +219,7 @@ export function restoreEnvFile(envFile: EnvFile): {restored: boolean; targetPath
 
   try {
     // Ensure the target directory exists
-    const targetDir = envFile.absolutePath.replace(`/${envFile.fileName}`, '')
-    fs.mkdirSync(targetDir, {recursive: true})
+    fs.mkdirSync(dirname(envFile.absolutePath), {recursive: true})
 
     // Copy the file
     fs.copyFileSync(backupPath, envFile.absolutePath)

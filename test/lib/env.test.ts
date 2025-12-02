@@ -1,4 +1,5 @@
 import {expect} from 'chai'
+import {randomUUID} from 'node:crypto'
 import * as fs from 'node:fs'
 import {join} from 'node:path'
 
@@ -12,7 +13,7 @@ import {
 import {getEnvFilePath, PATHS} from '../../src/lib/paths.js'
 
 describe('env', () => {
-  const testDir = '/tmp/dotsloth-test-' + Date.now()
+  const testDir = `/tmp/dotsloth-test-${randomUUID()}`
   const testGithubRoot = join(testDir, 'github')
   const testIcloudEnvFiles = join(testDir, 'icloud-envfiles')
 

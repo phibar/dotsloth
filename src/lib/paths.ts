@@ -19,6 +19,10 @@ export const PATHS = {
     home,
     'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/allowed_signers',
   ),
+  icloudEnvFiles: path.join(
+    home,
+    'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/envfiles',
+  ),
 
   // Local paths
   localConfig: path.join(home, '.config/dotsloth'),
@@ -46,4 +50,14 @@ export function getOrgRepoPath(orgName: string): string {
 
 export function getIcloudDotfilePath(filename: string): string {
   return path.join(PATHS.icloudDotfiles, filename)
+}
+
+/**
+ * Get the iCloud path for a project's env file.
+ * The path mirrors the project's relative location from the github root.
+ * @param projectRelativePath - The project path relative to the github root (e.g., "my-org/my-repo")
+ * @param envFileName - The name of the env file (e.g., ".env", ".env.local")
+ */
+export function getEnvFilePath(projectRelativePath: string, envFileName: string): string {
+  return path.join(PATHS.icloudEnvFiles, projectRelativePath, envFileName)
 }

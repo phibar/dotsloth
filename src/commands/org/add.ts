@@ -119,6 +119,5 @@ export default class OrgAdd extends Command {
     this.log(chalk.dim(`  Username: ${username}`))
     this.log(chalk.dim(`  Path: ${orgPath}`))
     this.log('')
-    this.log(chalk.dim('Note: Run "dotsloth init" or "dotsloth sync" to update ~/.gitconfig'))
   }
 }

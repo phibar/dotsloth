@@ -97,6 +97,5 @@ export default class OrgRemove extends Command {
 
     this.log('')
     this.log(chalk.green(`✓ Organization '${org.name}' removed`))
-    this.log(chalk.dim('Note: Run "dotsloth sync" to update ~/.gitconfig'))
   }
 }

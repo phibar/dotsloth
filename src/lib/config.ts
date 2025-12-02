@@ -3,7 +3,8 @@ import * as path from 'node:path'
 
 import type {DevSlothConfig, Organization} from '../types/index.js'
 import {DevSlothConfigSchema} from '../types/index.js'
-import {getOrgGitconfigPath, PATHS} from './paths.js'
+import {generateMainGitconfig} from './git.js'
+import {getIcloudDotfilePath, getOrgGitconfigPath, PATHS} from './paths.js'
 
 /**
  * Generate and write org gitconfig file (keeps gitconfig in sync with config.json)
@@ -25,6 +26,24 @@ export function syncAllOrgGitconfigs(config: DevSlothConfig): void {
   for (const org of config.organizations) {
     syncOrgGitconfig(org)
   }
+}
+
+/**
+ * Perform a full sync: update all org gitconfigs and regenerate main gitconfig
+ * This should be called whenever organizations are added, updated, or removed
+ */
+export function runFullSync(config: DevSlothConfig): void {
+  // Ensure iCloud directories exist
+  ensureIcloudStructure()
+
+  // Sync all org gitconfigs
+  syncAllOrgGitconfigs(config)
+
+  // Regenerate main gitconfig with updated includeIf patterns
+  const userName = config.organizations.length > 0 ? config.organizations[0].gitUsername : 'Your Name'
+  const gitconfigContent = generateMainGitconfig(config, userName)
+  const icloudGitconfig = getIcloudDotfilePath('gitconfig')
+  fs.writeFileSync(icloudGitconfig, gitconfigContent, 'utf8')
 }
 
 /**
@@ -115,13 +134,14 @@ export function addOrganization(org: Organization): DevSlothConfig {
     (o) => o.name.toLowerCase() === org.name.toLowerCase(),
   )
 
-  if (existingIndex >= 0) {
+  if (existingIndex !== -1) {
     config.organizations[existingIndex] = org
   } else {
     config.organizations.push(org)
   }
 
   saveConfig(config)
+  runFullSync(config)
   return config
 }
 
@@ -139,6 +159,7 @@ export function removeOrganization(orgName: string): DevSlothConfig | null {
   )
 
   saveConfig(config)
+  runFullSync(config)
   return config
 }
 

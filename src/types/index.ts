@@ -42,3 +42,13 @@ export interface SymlinkStatus {
   isValid: boolean
   error?: string
 }
+
+export interface DaemonState {
+  intervalMs: number
+  lastSyncTime: string | null
+  pid: number | null
+  running: boolean
+  startedAt: string | null
+}
+
+export const DEFAULT_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000 // 24 hours

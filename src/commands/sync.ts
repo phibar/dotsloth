@@ -142,30 +142,31 @@ static override flags = {
         for (const result of results) {
           if (result.action === 'skipped' && result.success) {
             this.log(chalk.dim(`  ${result.envFile.relativePath} (already synced)`))
-          } else switch (result.action) {
- case 'conflict': {
-            this.log(chalk.yellow('!') + ` ${result.envFile.relativePath} (conflict)`)
-          
- break;
- }
-
- case 'created': {
-            this.log(chalk.green('✓') + ` ${result.envFile.relativePath}`)
-          
- break;
- }
-
- case 'linked': {
-            this.log(chalk.green('✓') + ` ${result.envFile.relativePath} (linked)`)
-          
- break;
- }
-
- default: { if (!result.success) {
-            this.log(chalk.red('✗') + ` ${result.envFile.relativePath}: ${result.error}`)
+            continue
           }
- }
- }
+
+          switch (result.action) {
+            case 'conflict': {
+              this.log(chalk.yellow('!') + ` ${result.envFile.relativePath} (conflict)`)
+              break
+            }
+
+            case 'created': {
+              this.log(chalk.green('✓') + ` ${result.envFile.relativePath}`)
+              break
+            }
+
+            case 'linked': {
+              this.log(chalk.green('✓') + ` ${result.envFile.relativePath} (linked)`)
+              break
+            }
+
+            default: {
+              if (!result.success) {
+                this.log(chalk.red('✗') + ` ${result.envFile.relativePath}: ${result.error}`)
+              }
+            }
+          }
         }
 
         if (synced > 0) {

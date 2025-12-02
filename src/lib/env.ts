@@ -99,7 +99,11 @@ function scanDirectory(dir: string, envFiles: string[]): void {
       if (!shouldSkipDirectory(entry.name)) {
         scanDirectory(fullPath, envFiles)
       }
-    } else if ((entry.isFile() || entry.isSymbolicLink()) && ENV_FILE_PATTERNS.has(entry.name)) {
+    } else if (
+      (entry.isFile() || entry.isSymbolicLink()) &&
+      ENV_FILE_PATTERNS.has(entry.name) &&
+      !entry.name.endsWith('.example')
+    ) {
       envFiles.push(fullPath)
     }
   }
@@ -178,7 +182,7 @@ export function listIcloudEnvFiles(): EnvFile[] {
 
       if (entry.isDirectory()) {
         scanIcloudDirectory(fullPath)
-      } else if (entry.isFile() && ENV_FILE_PATTERNS.has(entry.name)) {
+      } else if (entry.isFile() && ENV_FILE_PATTERNS.has(entry.name) && !entry.name.endsWith('.example')) {
         const relativePath = relative(envFilesDir, fullPath)
         const absolutePath = join(PATHS.githubRoot, relativePath)
 
@@ -244,14 +248,11 @@ export function getEnvFilesStatus(githubRoot: string = PATHS.githubRoot): EnvFil
       status = 'synced'
     } else if (hasLocalFile && file.inIcloud) {
       // Both exist - check for conflict
-      if (!localHash || !icloudHash) {
-        // If we can't read one of the files, treat as conflict
-        status = 'conflict'
-      } else if (localHash !== icloudHash) {
-        status = 'conflict'
-      } else {
-        status = 'regular-file'
-      }
+      status =
+        localHash && icloudHash && localHash === icloudHash
+          ? // If we can't read one of the files or they differ, treat as conflict
+            'regular-file'
+          : 'conflict'
     } else if (hasLocalFile && !file.inIcloud) {
       status = 'unsynced'
     } else if (!hasLocalFile && file.inIcloud) {

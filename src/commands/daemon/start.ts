@@ -79,8 +79,8 @@ export default class DaemonStart extends Command {
       process.on('SIGINT', cleanup)
       process.on('SIGTERM', cleanup)
 
-      // Keep process running
-      await new Promise(() => {})
+      // Keep process running indefinitely
+      await new Promise<never>(() => {})
     } else {
       // Spawn daemon in background
       this.log(chalk.bold('\n🦥 Starting dotsloth daemon...\n'))

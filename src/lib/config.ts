@@ -179,7 +179,7 @@ export function findOrgByPath(repoPath: string): Organization | null {
  * Ensure iCloud directory structure exists
  */
 export function ensureIcloudStructure(): void {
-  const dirs = [PATHS.icloudDotsloth, PATHS.icloudDotfiles, PATHS.icloudOrganizations]
+  const dirs = [PATHS.icloudDotsloth, PATHS.icloudDotfiles, PATHS.icloudOrganizations, PATHS.icloudEnvFiles]
 
   for (const dir of dirs) {
     fs.mkdirSync(dir, {recursive: true})

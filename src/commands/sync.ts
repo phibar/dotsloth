@@ -1,19 +1,17 @@
-import * as fs from 'node:fs'
-
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
+import * as fs from 'node:fs'
 
 import {isIcloudAccessible, loadConfig, saveConfig} from '../lib/config.js'
+import {linkOrphanedEnvFiles, scanForEnvFiles, syncAllEnvFiles} from '../lib/env.js'
 import {generateMainGitconfig, readPublicKey, writeAllowedSigners, writeOrgGitconfig} from '../lib/git.js'
-import {getIcloudDotfilePath} from '../lib/paths.js'
+import {getIcloudDotfilePath, PATHS} from '../lib/paths.js'
 import {createSymlink} from '../lib/symlink.js'
 
 export default class Sync extends Command {
   static override description = 'Sync configurations from iCloud Drive'
-
-  static override examples = ['<%= config.bin %> <%= command.id %>']
-
-  static override flags = {
+static override examples = ['<%= config.bin %> <%= command.id %>']
+static override flags = {
     'dry-run': Flags.boolean({description: 'Show what would be synced without making changes'}),
     force: Flags.boolean({char: 'f', description: 'Force overwrite local files'}),
   }
@@ -87,9 +85,9 @@ export default class Sync extends Command {
       }
     }
 
-    // Verify/create symlinks
+    // Verify/create symlinks for dotfiles
     this.log('')
-    this.log(chalk.bold('Symlinks:'))
+    this.log(chalk.bold('Dotfile symlinks:'))
 
     for (const syncedFile of config.syncedFiles) {
       if (!fs.existsSync(syncedFile.source)) {
@@ -101,9 +99,9 @@ export default class Sync extends Command {
         this.log(chalk.dim(`  Would link: ${syncedFile.target} → ${syncedFile.source}`))
       } else {
         const result = await createSymlink({
+          backup: !flags.force,
           source: syncedFile.source,
           target: syncedFile.target,
-          backup: !flags.force,
         })
 
         if (result.isValid) {
@@ -111,6 +109,80 @@ export default class Sync extends Command {
         } else {
           this.log(chalk.red('✗') + ` ${result.target}: ${result.error}`)
         }
+      }
+    }
+
+    // Sync .env files to iCloud
+    this.log('')
+    this.log(chalk.bold('Environment files (.env):'))
+
+    const githubRoot = config.paths.githubRoot ?? PATHS.githubRoot
+
+    if (flags['dry-run']) {
+      const envFiles = scanForEnvFiles(githubRoot)
+      if (envFiles.length === 0) {
+        this.log(chalk.dim('  No .env files found'))
+      } else {
+        for (const envFile of envFiles) {
+          if (envFile.isSymlinked) {
+            this.log(chalk.dim(`  ${envFile.relativePath} (already synced)`))
+          } else if (envFile.inIcloud) {
+            this.log(chalk.yellow(`  ${envFile.relativePath} (conflict)`))
+          } else {
+            this.log(chalk.cyan(`  ${envFile.relativePath} → iCloud`))
+          }
+        }
+      }
+    } else {
+      const {conflicts, results, synced} = syncAllEnvFiles(githubRoot, flags.force)
+
+      if (results.length === 0) {
+        this.log(chalk.dim('  No .env files found'))
+      } else {
+        for (const result of results) {
+          if (result.action === 'skipped' && result.success) {
+            this.log(chalk.dim(`  ${result.envFile.relativePath} (already synced)`))
+            continue
+          }
+
+          switch (result.action) {
+            case 'conflict': {
+              this.log(chalk.yellow('!') + ` ${result.envFile.relativePath} (conflict)`)
+              break
+            }
+
+            case 'created': {
+              this.log(chalk.green('✓') + ` ${result.envFile.relativePath}`)
+              break
+            }
+
+            case 'linked': {
+              this.log(chalk.green('✓') + ` ${result.envFile.relativePath} (linked)`)
+              break
+            }
+
+            default: {
+              if (!result.success) {
+                this.log(chalk.red('✗') + ` ${result.envFile.relativePath}: ${result.error}`)
+              }
+            }
+          }
+        }
+
+        if (synced > 0) {
+          this.log(chalk.dim(`  Synced ${synced} file(s)`))
+        }
+
+        if (conflicts > 0) {
+          this.log(chalk.dim(`  ${conflicts} conflict(s) - use --force to overwrite`))
+        }
+      }
+
+      // Link orphaned iCloud env files
+      const orphanResults = linkOrphanedEnvFiles()
+      const linkedOrphans = orphanResults.filter((r) => r.success)
+      if (linkedOrphans.length > 0) {
+        this.log(chalk.dim(`  Linked ${linkedOrphans.length} orphaned file(s)`))
       }
     }
 

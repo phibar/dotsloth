@@ -5,7 +5,6 @@ import {isDaemonRunning, loadDaemonState, markDaemonStopped} from '../../lib/dae
 
 export default class DaemonStop extends Command {
   static override description = 'Stop the periodic sync daemon'
-
   static override examples = ['<%= config.bin %> <%= command.id %>']
 
   public async run(): Promise<void> {

@@ -5,7 +5,6 @@ import {formatInterval, isDaemonRunning, loadDaemonState} from '../../lib/daemon
 
 export default class DaemonStatus extends Command {
   static override description = 'Show the status of the periodic sync daemon'
-
   static override examples = ['<%= config.bin %> <%= command.id %>']
 
   public async run(): Promise<void> {

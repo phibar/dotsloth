@@ -8,15 +8,12 @@ export default class SecretAdd extends Command {
   static override args = {
     name: Args.string({description: 'Secret name (e.g., AWS_ACCESS_KEY_ID)', required: true}),
   }
-
-  static override description = 'Add or update a secret in macOS Keychain'
-
-  static override examples = [
+static override description = 'Add or update a secret in macOS Keychain'
+static override examples = [
     '<%= config.bin %> <%= command.id %> AWS_ACCESS_KEY_ID',
     '<%= config.bin %> <%= command.id %> OPENAI_API_KEY --value sk-...',
   ]
-
-  static override flags = {
+static override flags = {
     value: Flags.string({char: 'v', description: 'Secret value (not recommended - use prompt instead)'}),
   }
 
@@ -29,10 +26,10 @@ export default class SecretAdd extends Command {
     const existing = getSecret(name)
     if (existing) {
       const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
-        type: 'confirm',
-        name: 'confirm',
-        message: `Secret '${name}' already exists. Overwrite?`,
         initial: false,
+        message: `Secret '${name}' already exists. Overwrite?`,
+        name: 'confirm',
+        type: 'confirm',
       })
 
       if (!confirm) {
@@ -42,12 +39,12 @@ export default class SecretAdd extends Command {
     }
 
     // Get value
-    let value = flags.value
+    let {value} = flags
     if (!value) {
       const response = await Enquirer.prompt<{value: string}>({
-        type: 'password',
-        name: 'value',
         message: `Enter value for ${name}:`,
+        name: 'value',
+        type: 'password',
       })
       value = response.value
     }

@@ -20,7 +20,7 @@ export function addSecret(name: string, value: string): void {
 /**
  * Get a secret value from the macOS Keychain
  */
-export function getSecret(name: string): string | null {
+export function getSecret(name: string): null | string {
   try {
     const result = execSync(`security find-generic-password -a "${KEYCHAIN_ACCOUNT}" -s "${name}" -w`, {
       encoding: 'utf-8',

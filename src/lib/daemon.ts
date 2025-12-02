@@ -1,8 +1,7 @@
 import * as fs from 'node:fs'
 import {dirname} from 'node:path'
 
-import type {DaemonState} from '../types/index.js'
-import {DEFAULT_SYNC_INTERVAL_MS} from '../types/index.js'
+import {type DaemonState, DEFAULT_SYNC_INTERVAL_MS} from '../types/index.js'
 import {PATHS} from './paths.js'
 
 const DAEMON_STATE_FILE = PATHS.localState

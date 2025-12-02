@@ -4,36 +4,36 @@ import * as path from 'node:path'
 const home = os.homedir()
 
 export const PATHS = {
-  home,
+  defaultSshKey: path.join(home, '.ssh/id_ed25519'),
 
-  // iCloud paths
-  icloudDrive: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs'),
-  icloudDotsloth: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth'),
-  icloudConfig: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/config.json'),
-  icloudDotfiles: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/dotfiles'),
-  icloudOrganizations: path.join(
-    home,
-    'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/organizations',
-  ),
+  defaultSshPubKey: path.join(home, '.ssh/id_ed25519.pub'),
+  // Dotfile targets
+  gitconfig: path.join(home, '.gitconfig'),
+  githubRoot: path.join(home, 'github'),
+  home,
   icloudAllowedSigners: path.join(
     home,
     'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/allowed_signers',
   ),
+  icloudConfig: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/config.json'),
 
+  icloudDotfiles: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/dotfiles'),
+  icloudDotsloth: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth'),
+  // iCloud paths
+  icloudDrive: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs'),
+
+  icloudOrganizations: path.join(
+    home,
+    'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/organizations',
+  ),
   // Local paths
   localConfig: path.join(home, '.config/dotsloth'),
   localState: path.join(home, '.config/dotsloth/state.json'),
-  githubRoot: path.join(home, 'github'),
 
-  // Dotfile targets
-  gitconfig: path.join(home, '.gitconfig'),
-  zprofile: path.join(home, '.zprofile'),
   sshConfig: path.join(home, '.ssh/config'),
-
   // SSH
   sshDir: path.join(home, '.ssh'),
-  defaultSshKey: path.join(home, '.ssh/id_ed25519'),
-  defaultSshPubKey: path.join(home, '.ssh/id_ed25519.pub'),
+  zprofile: path.join(home, '.zprofile'),
 } as const
 
 export function getOrgGitconfigPath(orgName: string): string {

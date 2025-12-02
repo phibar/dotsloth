@@ -1,28 +1,25 @@
-import * as path from 'node:path'
-
 import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
 import {execSync} from 'node:child_process'
+import * as path from 'node:path'
+
+import type {Organization} from '../types/index.js'
 
 import {addOrganization, getOrganization, loadConfig} from '../lib/config.js'
 import {ensureOrgDirectory, parseGitUrl, writeOrgGitconfig} from '../lib/git.js'
-import type {Organization} from '../types/index.js'
 
 export default class Clone extends Command {
   static override args = {
     url: Args.string({description: 'Repository URL to clone', required: true}),
   }
-
-  static override description = 'Clone a repository to the correct organization folder'
-
-  static override examples = [
+static override description = 'Clone a repository to the correct organization folder'
+static override examples = [
     '<%= config.bin %> <%= command.id %> git@github.com:ExRam/SomeRepo.git',
     '<%= config.bin %> <%= command.id %> https://github.com/ipfs/kubo',
     '<%= config.bin %> <%= command.id %> git@github.com:fork/repo.git --org ExRam',
   ]
-
-  static override flags = {
+static override flags = {
     org: Flags.string({char: 'o', description: 'Override organization (use a different org than detected)'}),
   }
 
@@ -51,37 +48,37 @@ export default class Clone extends Command {
       this.log(chalk.yellow(`Organization '${orgName}' not configured`))
 
       const {action} = await Enquirer.prompt<{action: string}>({
-        type: 'select',
-        name: 'action',
-        message: 'What would you like to do?',
         choices: [
-          {name: 'create', message: `Create '${orgName}' organization`},
-          {name: 'select', message: 'Select existing organization'},
-          {name: 'skip', message: 'Clone without organization config'},
+          {message: `Create '${orgName}' organization`, name: 'create'},
+          {message: 'Select existing organization', name: 'select'},
+          {message: 'Clone without organization config', name: 'skip'},
         ],
+        message: 'What would you like to do?',
+        name: 'action',
+        type: 'select',
       })
 
       if (action === 'create') {
         // Prompt for org details
         const {email} = await Enquirer.prompt<{email: string}>({
-          type: 'input',
-          name: 'email',
           message: 'Git email for this organization:',
+          name: 'email',
+          type: 'input',
           validate: (input) => (input.includes('@') ? true : 'Invalid email'),
         })
 
         const {username} = await Enquirer.prompt<{username: string}>({
-          type: 'input',
-          name: 'username',
           message: 'Git username for this organization:',
+          name: 'username',
+          type: 'input',
           validate: (input) => (input.length > 0 ? true : 'Username required'),
         })
 
         const newOrg: Organization = {
-          name: orgName,
           folderName: orgName,
           gitEmail: email,
           gitUsername: username,
+          name: orgName,
         }
 
         addOrganization(newOrg)
@@ -95,10 +92,10 @@ export default class Clone extends Command {
         }
 
         const {selectedOrg} = await Enquirer.prompt<{selectedOrg: string}>({
-          type: 'select',
-          name: 'selectedOrg',
+          choices: config.organizations.map((o) => ({message: `${o.name} (${o.gitEmail})`, name: o.name})),
           message: 'Select organization:',
-          choices: config.organizations.map((o) => ({name: o.name, message: `${o.name} (${o.gitEmail})`})),
+          name: 'selectedOrg',
+          type: 'select',
         })
 
         org = getOrganization(selectedOrg)

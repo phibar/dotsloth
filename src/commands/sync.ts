@@ -1,7 +1,6 @@
-import * as fs from 'node:fs'
-
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
+import * as fs from 'node:fs'
 
 import {isIcloudAccessible, loadConfig, saveConfig} from '../lib/config.js'
 import {generateMainGitconfig, readPublicKey, writeAllowedSigners, writeOrgGitconfig} from '../lib/git.js'
@@ -10,10 +9,8 @@ import {createSymlink} from '../lib/symlink.js'
 
 export default class Sync extends Command {
   static override description = 'Sync configurations from iCloud Drive'
-
-  static override examples = ['<%= config.bin %> <%= command.id %>']
-
-  static override flags = {
+static override examples = ['<%= config.bin %> <%= command.id %>']
+static override flags = {
     'dry-run': Flags.boolean({description: 'Show what would be synced without making changes'}),
     force: Flags.boolean({char: 'f', description: 'Force overwrite local files'}),
   }
@@ -101,9 +98,9 @@ export default class Sync extends Command {
         this.log(chalk.dim(`  Would link: ${syncedFile.target} → ${syncedFile.source}`))
       } else {
         const result = await createSymlink({
+          backup: !flags.force,
           source: syncedFile.source,
           target: syncedFile.target,
-          backup: !flags.force,
         })
 
         if (result.isValid) {

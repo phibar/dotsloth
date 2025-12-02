@@ -4,26 +4,26 @@ import * as path from 'node:path'
 import type {SymlinkStatus} from '../types/index.js'
 
 export interface SymlinkConfig {
+  backup?: boolean
   source: string
   target: string
-  backup?: boolean
 }
 
 /**
  * Create a symlink from target to source
  */
 export async function createSymlink(config: SymlinkConfig): Promise<SymlinkStatus> {
-  const {source, target, backup = true} = config
+  const {backup = true, source, target} = config
 
   try {
     // Check if source exists in iCloud
     if (!fs.existsSync(source)) {
       return {
-        source,
-        target,
+        error: `Source file does not exist: ${source}`,
         exists: false,
         isValid: false,
-        error: `Source file does not exist: ${source}`,
+        source,
+        target,
       }
     }
 
@@ -36,10 +36,10 @@ export async function createSymlink(config: SymlinkConfig): Promise<SymlinkStatu
         if (currentSource === source) {
           // Already correctly linked
           return {
-            source,
-            target,
             exists: true,
             isValid: true,
+            source,
+            target,
           }
         }
 
@@ -67,18 +67,18 @@ export async function createSymlink(config: SymlinkConfig): Promise<SymlinkStatu
     fs.symlinkSync(source, target)
 
     return {
-      source,
-      target,
       exists: true,
       isValid: true,
+      source,
+      target,
     }
   } catch (error) {
     return {
-      source,
-      target,
+      error: error instanceof Error ? error.message : String(error),
       exists: false,
       isValid: false,
-      error: error instanceof Error ? error.message : String(error),
+      source,
+      target,
     }
   }
 }
@@ -92,11 +92,11 @@ export function checkSymlink(source: string, target: string): SymlinkStatus {
 
     if (!stat.isSymbolicLink()) {
       return {
-        source,
-        target,
+        error: 'Target exists but is not a symlink',
         exists: true,
         isValid: false,
-        error: 'Target exists but is not a symlink',
+        source,
+        target,
       }
     }
 
@@ -104,29 +104,29 @@ export function checkSymlink(source: string, target: string): SymlinkStatus {
     const isValid = actualSource === source
 
     return {
-      source,
-      target,
+      error: isValid ? undefined : `Symlink points to wrong source: ${actualSource}`,
       exists: true,
       isValid,
-      error: isValid ? undefined : `Symlink points to wrong source: ${actualSource}`,
+      source,
+      target,
     }
   } catch (error: unknown) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       return {
-        source,
-        target,
+        error: 'Symlink does not exist',
         exists: false,
         isValid: false,
-        error: 'Symlink does not exist',
+        source,
+        target,
       }
     }
 
     return {
-      source,
-      target,
+      error: error instanceof Error ? error.message : String(error),
       exists: false,
       isValid: false,
-      error: error instanceof Error ? error.message : String(error),
+      source,
+      target,
     }
   }
 }

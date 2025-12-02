@@ -1,8 +1,7 @@
-import {spawn} from 'node:child_process'
-import {fileURLToPath} from 'node:url'
-
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
+import {spawn} from 'node:child_process'
+import {fileURLToPath} from 'node:url'
 
 import {
   formatInterval,
@@ -14,13 +13,11 @@ import {
 
 export default class DaemonStart extends Command {
   static override description = 'Start the periodic sync daemon'
-
   static override examples = [
     '<%= config.bin %> <%= command.id %>',
     '<%= config.bin %> <%= command.id %> --interval 12h',
     '<%= config.bin %> <%= command.id %> --interval 1d',
   ]
-
   static override flags = {
     foreground: Flags.boolean({
       char: 'f',
@@ -73,7 +70,7 @@ export default class DaemonStart extends Command {
       const cleanup = () => {
         clearInterval(interval)
         this.log('\n' + chalk.dim('Daemon stopped'))
-        process.exit(0)
+        this.exit(0)
       }
 
       process.on('SIGINT', cleanup)

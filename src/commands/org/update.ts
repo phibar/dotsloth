@@ -2,23 +2,21 @@ import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
 
-import {addOrganization, loadConfig} from '../../lib/config.js'
 import type {Organization} from '../../types/index.js'
+
+import {addOrganization, loadConfig} from '../../lib/config.js'
 
 export default class OrgUpdate extends Command {
   static override args = {
     name: Args.string({description: 'Organization name to update'}),
   }
-
-  static override description = 'Update an organization configuration'
-
-  static override examples = [
+static override description = 'Update an organization configuration'
+static override examples = [
     '<%= config.bin %> <%= command.id %>',
     '<%= config.bin %> <%= command.id %> ExRam',
     '<%= config.bin %> <%= command.id %> ExRam --email new@email.com',
   ]
-
-  static override flags = {
+static override flags = {
     email: Flags.string({char: 'e', description: 'New git email'}),
     username: Flags.string({char: 'u', description: 'New git username'}),
   }
@@ -35,13 +33,13 @@ export default class OrgUpdate extends Command {
     let orgName = args.name
     if (!orgName) {
       const {selectedOrg} = await Enquirer.prompt<{selectedOrg: string}>({
-        type: 'select',
-        name: 'selectedOrg',
-        message: 'Select organization to update:',
         choices: config.organizations.map((o) => ({
-          name: o.name,
           message: `${o.name} (${o.gitEmail})`,
+          name: o.name,
         })),
+        message: 'Select organization to update:',
+        name: 'selectedOrg',
+        type: 'select',
       })
       orgName = selectedOrg
     }
@@ -62,11 +60,11 @@ export default class OrgUpdate extends Command {
     let newEmail = flags.email
     if (!newEmail) {
       const response = await Enquirer.prompt<{email: string}>({
-        type: 'input',
-        name: 'email',
-        message: 'Git email:',
         initial: org.gitEmail,
-        validate: (input) => {
+        message: 'Git email:',
+        name: 'email',
+        type: 'input',
+        validate(input) {
           if (input.length === 0) return 'Email is required'
           if (!input.includes('@')) return 'Invalid email format'
           return true
@@ -79,10 +77,10 @@ export default class OrgUpdate extends Command {
     let newUsername = flags.username
     if (!newUsername) {
       const response = await Enquirer.prompt<{username: string}>({
-        type: 'input',
-        name: 'username',
-        message: 'Git username:',
         initial: org.gitUsername,
+        message: 'Git username:',
+        name: 'username',
+        type: 'input',
         validate: (input) => (input.length > 0 ? true : 'Username is required'),
       })
       newUsername = response.username
@@ -108,6 +106,7 @@ export default class OrgUpdate extends Command {
     if (newEmail !== org.gitEmail) {
       this.log(chalk.dim(`  Email: ${org.gitEmail} → ${newEmail}`))
     }
+
     if (newUsername !== org.gitUsername) {
       this.log(chalk.dim(`  Username: ${org.gitUsername} → ${newUsername}`))
     }

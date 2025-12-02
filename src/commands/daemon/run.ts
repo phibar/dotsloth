@@ -1,12 +1,7 @@
+import {Command, Flags} from '@oclif/core'
 import * as fs from 'node:fs'
 
-import {Command, Flags} from '@oclif/core'
-
-import {
-  markDaemonStopped,
-  parseInterval,
-  updateLastSyncTime,
-} from '../../lib/daemon.js'
+import {markDaemonStopped, parseInterval, updateLastSyncTime} from '../../lib/daemon.js'
 import {PATHS} from '../../lib/paths.js'
 
 export default class DaemonRun extends Command {
@@ -28,7 +23,7 @@ export default class DaemonRun extends Command {
     // Set up graceful shutdown
     const cleanup = () => {
       markDaemonStopped()
-      process.exit(0)
+      this.exit(0)
     }
 
     process.on('SIGINT', cleanup)

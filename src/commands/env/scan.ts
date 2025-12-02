@@ -3,6 +3,7 @@ import chalk from 'chalk'
 
 import {loadConfig} from '../../lib/config.js'
 import {scanForEnvFiles} from '../../lib/env.js'
+import {PATHS} from '../../lib/paths.js'
 
 export default class EnvScan extends Command {
   static override description = 'Scan github folder for .env files'
@@ -18,7 +19,7 @@ static override flags = {
     const {flags} = await this.parse(EnvScan)
 
     const config = loadConfig()
-    const githubRoot = config?.paths.githubRoot
+    const githubRoot = config?.paths.githubRoot ?? PATHS.githubRoot
 
     const envFiles = scanForEnvFiles(githubRoot)
 

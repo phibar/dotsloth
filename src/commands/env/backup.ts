@@ -3,6 +3,7 @@ import chalk from 'chalk'
 
 import {loadConfig} from '../../lib/config.js'
 import {backupAllEnvFiles, scanForEnvFiles} from '../../lib/env.js'
+import {PATHS} from '../../lib/paths.js'
 
 export default class EnvBackup extends Command {
   static override description = 'Backup .env files to iCloud for secure storage and sync'
@@ -18,7 +19,7 @@ static override flags = {
     await this.parse(EnvBackup)
 
     const config = loadConfig()
-    const githubRoot = config?.paths.githubRoot
+    const githubRoot = config?.paths.githubRoot ?? PATHS.githubRoot
 
     this.log(chalk.bold('\n🦥 dotsloth env backup\n'))
 

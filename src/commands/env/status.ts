@@ -20,7 +20,7 @@ static override flags = {
     const {flags} = await this.parse(EnvStatus)
 
     const config = loadConfig()
-    const githubRoot = config?.paths.githubRoot
+    const githubRoot = config?.paths.githubRoot ?? PATHS.githubRoot
 
     const envFilesStatus = getEnvFilesStatus(githubRoot)
     const backedUpFiles = listBackedUpEnvFiles()

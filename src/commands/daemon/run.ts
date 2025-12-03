@@ -1,7 +1,7 @@
 import {Command, Flags} from '@oclif/core'
 import * as fs from 'node:fs'
 
-import {markDaemonStopped, parseInterval, updateLastSyncTime} from '../../lib/daemon.js'
+import {markDaemonStarted, markDaemonStopped, parseInterval, updateLastSyncTime} from '../../lib/daemon.js'
 import {PATHS} from '../../lib/paths.js'
 
 export default class DaemonRun extends Command {
@@ -14,11 +14,15 @@ export default class DaemonRun extends Command {
     }),
   }
   static override hidden = true
+  private syncInProgress = false
 
   public async run(): Promise<void> {
     const {flags} = await this.parse(DaemonRun)
 
     const intervalMs = parseInterval(flags.interval)
+    
+    // Register daemon in state file
+    markDaemonStarted(process.pid, intervalMs)
 
     // Set up graceful shutdown
     const cleanup = () => {
@@ -32,8 +36,13 @@ export default class DaemonRun extends Command {
     // Run initial sync
     await this.runSync()
 
-    // Set up periodic sync
+    // Set up periodic sync with overlap protection
     setInterval(async () => {
+      if (this.syncInProgress) {
+        this.logError('Previous sync still in progress, skipping this interval')
+        return
+      }
+
       await this.runSync()
     }, intervalMs)
 
@@ -54,6 +63,7 @@ export default class DaemonRun extends Command {
   }
 
   private async runSync(): Promise<void> {
+    this.syncInProgress = true
     try {
       // Dynamically import and run sync command
       const {default: Sync} = await import('../sync.js')
@@ -63,6 +73,8 @@ export default class DaemonRun extends Command {
     } catch (error) {
       // Log error but continue - daemon should keep running even if sync fails
       this.logError(error instanceof Error ? error.message : String(error))
+    } finally {
+      this.syncInProgress = false
     }
   }
 }

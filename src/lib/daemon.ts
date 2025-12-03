@@ -128,7 +128,8 @@ export function parseInterval(interval: string): number {
 }
 
 /**
- * Format milliseconds to human-readable interval
+ * Format milliseconds to human-readable interval.
+ * Rounds to the nearest whole hour or day.
  */
 export function formatInterval(ms: number): string {
   const hours = ms / (60 * 60 * 1000)
@@ -136,5 +137,5 @@ export function formatInterval(ms: number): string {
     return `${hours / 24}d`
   }
 
-  return `${hours}h`
+  return `${Math.round(hours)}h`
 }

@@ -8,6 +8,7 @@ import {
   isDaemonRunning,
   loadDaemonState,
   markDaemonStarted,
+  markDaemonStopped,
   parseInterval,
 } from '../../lib/daemon.js'
 
@@ -61,14 +62,26 @@ export default class DaemonStart extends Command {
       // Run initial sync
       await this.runSync()
 
-      // Set up periodic sync
+      // Set up periodic sync with overlap protection
+      let syncInProgress = false
       const interval = setInterval(async () => {
-        await this.runSync()
+        if (syncInProgress) {
+          this.log(chalk.yellow('Previous sync still in progress, skipping this interval'))
+          return
+        }
+
+        syncInProgress = true
+        try {
+          await this.runSync()
+        } finally {
+          syncInProgress = false
+        }
       }, intervalMs)
 
       // Handle graceful shutdown
       const cleanup = () => {
         clearInterval(interval)
+        markDaemonStopped()
         this.log('\n' + chalk.dim('Daemon stopped'))
         this.exit(0)
       }

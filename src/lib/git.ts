@@ -2,6 +2,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 import type {DevSlothConfig, Organization} from '../types/index.js'
+
 import {getOrgGitconfigPath, PATHS} from './paths.js'
 
 /**
@@ -11,49 +12,20 @@ export function generateMainGitconfig(config: DevSlothConfig, userName: string):
   const lines: string[] = []
 
   // User section
-  lines.push('[user]')
-  lines.push(`    name = ${userName}`)
+  lines.push('[user]', `    name = ${userName}`)
   if (config.sshSigning.enabled) {
     lines.push(`    signingkey = ${config.sshSigning.defaultKeyPath}.pub`)
   }
 
-  lines.push('')
-
-  // Core section
-  lines.push('[core]')
-  lines.push('    autocrlf = input')
-  lines.push('')
-
-  // Init section
-  lines.push('[init]')
-  lines.push('    defaultBranch = main')
-  lines.push('')
-
-  // Pull section
-  lines.push('[pull]')
-  lines.push('    rebase = true')
-  lines.push('')
+  lines.push('', '[core]', '    autocrlf = input', '', '[init]', '    defaultBranch = main', '', '[pull]', '    rebase = true', '')
 
   // SSH signing configuration
   if (config.sshSigning.enabled) {
-    lines.push('[gpg]')
-    lines.push('    format = ssh')
-    lines.push('')
-    lines.push('[gpg "ssh"]')
-    lines.push(`    allowedSignersFile = ${PATHS.icloudAllowedSigners}`)
-    lines.push('')
-    lines.push('[commit]')
-    lines.push('    gpgsign = true')
-    lines.push('')
-    lines.push('[tag]')
-    lines.push('    gpgsign = true')
-    lines.push('')
+    lines.push('[gpg]', '    format = ssh', '', '[gpg "ssh"]', `    allowedSignersFile = ${PATHS.icloudAllowedSigners}`, '', '[commit]', '    gpgsign = true', '', '[tag]', '    gpgsign = true', '')
   }
 
   // Credential helper
-  lines.push('[credential]')
-  lines.push('    helper = osxkeychain')
-  lines.push('')
+  lines.push('[credential]', '    helper = osxkeychain', '')
 
   // Organization includes
   if (config.organizations.length > 0) {
@@ -61,9 +33,7 @@ export function generateMainGitconfig(config: DevSlothConfig, userName: string):
     for (const org of config.organizations) {
       const orgPath = path.join(config.paths.githubRoot, org.folderName)
       const gitconfigPath = getOrgGitconfigPath(org.name)
-      lines.push(`[includeIf "gitdir:${orgPath}/"]`)
-      lines.push(`    path = ${gitconfigPath}`)
-      lines.push('')
+      lines.push(`[includeIf "gitdir:${orgPath}/"]`, `    path = ${gitconfigPath}`, '')
     }
   }
 
@@ -76,9 +46,7 @@ export function generateMainGitconfig(config: DevSlothConfig, userName: string):
 export function generateOrgGitconfig(org: Organization): string {
   const lines: string[] = []
 
-  lines.push('[user]')
-  lines.push(`    name = ${org.gitUsername}`)
-  lines.push(`    email = ${org.gitEmail}`)
+  lines.push('[user]', `    name = ${org.gitUsername}`, `    email = ${org.gitEmail}`)
 
   return lines.join('\n')
 }
@@ -139,9 +107,9 @@ export function writeAllowedSigners(config: DevSlothConfig, publicKey: string): 
 /**
  * Read public key from file
  */
-export function readPublicKey(keyPath: string): string | null {
+export function readPublicKey(keyPath: string): null | string {
   try {
-    return fs.readFileSync(keyPath, 'utf-8').trim()
+    return fs.readFileSync(keyPath, 'utf8').trim()
   } catch {
     return null
   }
@@ -150,7 +118,7 @@ export function readPublicKey(keyPath: string): string | null {
 /**
  * Parse a git remote URL to extract org and repo
  */
-export function parseGitUrl(url: string): {host: string; org: string; repo: string} | null {
+export function parseGitUrl(url: string): null | {host: string; org: string; repo: string} {
   // SSH format: git@github.com:ExRam/repo.git
   const sshMatch = url.match(/git@([^:]+):([^/]+)\/(.+?)(?:\.git)?$/)
   if (sshMatch) {

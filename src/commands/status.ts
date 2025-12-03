@@ -8,10 +8,8 @@ import {checkSymlinks} from '../lib/symlink.js'
 
 export default class Status extends Command {
   static override description = 'Show current dotsloth configuration status'
-
-  static override examples = ['<%= config.bin %> <%= command.id %>']
-
-  static override flags = {
+static override examples = ['<%= config.bin %> <%= command.id %>']
+static override flags = {
     verbose: Flags.boolean({char: 'v', description: 'Show detailed status'}),
   }
 

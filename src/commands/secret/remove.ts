@@ -8,12 +8,9 @@ export default class SecretRemove extends Command {
   static override args = {
     name: Args.string({description: 'Secret name to remove', required: true}),
   }
-
-  static override description = 'Remove a secret from Keychain'
-
-  static override examples = ['<%= config.bin %> <%= command.id %> AWS_ACCESS_KEY_ID']
-
-  static override flags = {
+static override description = 'Remove a secret from Keychain'
+static override examples = ['<%= config.bin %> <%= command.id %> AWS_ACCESS_KEY_ID']
+static override flags = {
     force: Flags.boolean({char: 'f', description: 'Skip confirmation'}),
   }
 
@@ -31,10 +28,10 @@ export default class SecretRemove extends Command {
     // Confirm deletion
     if (!flags.force) {
       const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
-        type: 'confirm',
-        name: 'confirm',
-        message: `Are you sure you want to delete '${name}'?`,
         initial: false,
+        message: `Are you sure you want to delete '${name}'?`,
+        name: 'confirm',
+        type: 'confirm',
       })
 
       if (!confirm) {

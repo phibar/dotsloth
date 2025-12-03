@@ -2,6 +2,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 import type {DevSlothConfig, Organization} from '../types/index.js'
+
 import {DevSlothConfigSchema} from '../types/index.js'
 import {getOrgGitconfigPath, PATHS} from './paths.js'
 
@@ -32,14 +33,13 @@ export function syncAllOrgGitconfigs(config: DevSlothConfig): void {
  */
 export function getDefaultConfig(): DevSlothConfig {
   return {
-    version: 1,
     organizations: [],
-    sshSigning: {
-      enabled: true,
-      defaultKeyPath: PATHS.defaultSshKey,
-    },
     paths: {
       githubRoot: PATHS.githubRoot,
+    },
+    sshSigning: {
+      defaultKeyPath: PATHS.defaultSshKey,
+      enabled: true,
     },
     syncedFiles: [
       {
@@ -55,6 +55,7 @@ export function getDefaultConfig(): DevSlothConfig {
         target: PATHS.sshConfig,
       },
     ],
+    version: 1,
   }
 }
 
@@ -74,7 +75,7 @@ export function loadConfig(autoSync = true): DevSlothConfig | null {
   }
 
   try {
-    const content = fs.readFileSync(PATHS.icloudConfig, 'utf-8')
+    const content = fs.readFileSync(PATHS.icloudConfig, 'utf8')
     const data = JSON.parse(content)
     const config = DevSlothConfigSchema.parse(data)
 
@@ -115,10 +116,10 @@ export function addOrganization(org: Organization): DevSlothConfig {
     (o) => o.name.toLowerCase() === org.name.toLowerCase(),
   )
 
-  if (existingIndex >= 0) {
-    config.organizations[existingIndex] = org
-  } else {
+  if (existingIndex === -1) {
     config.organizations.push(org)
+  } else {
+    config.organizations[existingIndex] = org
   }
 
   saveConfig(config)
@@ -145,7 +146,7 @@ export function removeOrganization(orgName: string): DevSlothConfig | null {
 /**
  * Get organization by name
  */
-export function getOrganization(orgName: string): Organization | null {
+export function getOrganization(orgName: string): null | Organization {
   const config = loadConfig()
   if (!config) {
     return null
@@ -157,7 +158,7 @@ export function getOrganization(orgName: string): Organization | null {
 /**
  * Find organization by folder path
  */
-export function findOrgByPath(repoPath: string): Organization | null {
+export function findOrgByPath(repoPath: string): null | Organization {
   const config = loadConfig()
   if (!config) {
     return null

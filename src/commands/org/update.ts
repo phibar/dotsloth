@@ -4,6 +4,7 @@ import Enquirer from 'enquirer'
 
 import type {Organization} from '../../types/index.js'
 
+import {autoSync} from '../../lib/autosync.js'
 import {addOrganization, loadConfig} from '../../lib/config.js'
 
 export default class OrgUpdate extends Command {
@@ -110,5 +111,8 @@ static override flags = {
     if (newUsername !== org.gitUsername) {
       this.log(chalk.dim(`  Username: ${org.gitUsername} → ${newUsername}`))
     }
+
+    this.log('')
+    await autoSync(this.log.bind(this))
   }
 }

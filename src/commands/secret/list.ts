@@ -5,8 +5,7 @@ import {listSecretNames} from '../../lib/keychain.js'
 
 export default class SecretList extends Command {
   static override description = 'List all secret names stored in Keychain'
-
-  static override examples = ['<%= config.bin %> <%= command.id %>']
+static override examples = ['<%= config.bin %> <%= command.id %>']
 
   public async run(): Promise<void> {
     const names = listSecretNames()

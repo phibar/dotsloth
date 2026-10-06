@@ -1,17 +1,14 @@
-import * as fs from 'node:fs'
-
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
+import * as fs from 'node:fs'
 
 import {loadConfig} from '../../lib/config.js'
 import {getOrgRepoPath} from '../../lib/paths.js'
 
 export default class OrgList extends Command {
   static override description = 'List configured organizations'
-
-  static override examples = ['<%= config.bin %> <%= command.id %>']
-
-  static override flags = {
+static override examples = ['<%= config.bin %> <%= command.id %>']
+static override flags = {
     json: Flags.boolean({description: 'Output as JSON'}),
   }
 

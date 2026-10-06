@@ -20,10 +20,10 @@ export function addSecret(name: string, value: string): void {
 /**
  * Get a secret value from the macOS Keychain
  */
-export function getSecret(name: string): string | null {
+export function getSecret(name: string): null | string {
   try {
     const result = execSync(`security find-generic-password -a "${KEYCHAIN_ACCOUNT}" -s "${name}" -w`, {
-      encoding: 'utf-8',
+      encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'pipe'],
     })
     return result.trim()
@@ -53,7 +53,7 @@ export function listSecretNames(): string[] {
   try {
     // Use security dump-keychain and parse for dotsloth entries
     const result = execSync('security dump-keychain 2>/dev/null', {
-      encoding: 'utf-8',
+      encoding: 'utf8',
       maxBuffer: 50 * 1024 * 1024, // 50MB buffer for large keychains
     })
 
@@ -116,7 +116,7 @@ export function addSshKeyToKeychain(keyPath: string): void {
 export function listSshKeys(): string[] {
   try {
     const result = execSync('ssh-add -l', {
-      encoding: 'utf-8',
+      encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'pipe'],
     })
     return result

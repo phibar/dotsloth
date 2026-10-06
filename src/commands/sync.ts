@@ -1,7 +1,6 @@
-import * as fs from 'node:fs'
-
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
+import * as fs from 'node:fs'
 
 import {isIcloudAccessible, loadConfig, saveConfig} from '../lib/config.js'
 import {generateMainGitconfig, readPublicKey, writeAllowedSigners, writeOrgGitconfig} from '../lib/git.js'
@@ -10,10 +9,8 @@ import {createSymlink} from '../lib/symlink.js'
 
 export default class Sync extends Command {
   static override description = 'Sync configurations from iCloud Drive'
-
-  static override examples = ['<%= config.bin %> <%= command.id %>']
-
-  static override flags = {
+static override examples = ['<%= config.bin %> <%= command.id %>']
+static override flags = {
     'dry-run': Flags.boolean({description: 'Show what would be synced without making changes'}),
     force: Flags.boolean({char: 'f', description: 'Force overwrite local files'}),
   }
@@ -63,7 +60,7 @@ export default class Sync extends Command {
     const icloudGitconfig = getIcloudDotfilePath('gitconfig')
 
     if (!flags['dry-run']) {
-      fs.writeFileSync(icloudGitconfig, gitconfigContent, 'utf-8')
+      fs.writeFileSync(icloudGitconfig, gitconfigContent, 'utf8')
     }
 
     this.log(chalk.green('✓') + ' Generated gitconfig with includeIf patterns')
@@ -100,10 +97,13 @@ export default class Sync extends Command {
       if (flags['dry-run']) {
         this.log(chalk.dim(`  Would link: ${syncedFile.target} → ${syncedFile.source}`))
       } else {
+        // Sequential on purpose: each link reports its own line, and parallel
+        // filesystem mutation would interleave the backup messages.
+        // eslint-disable-next-line no-await-in-loop
         const result = await createSymlink({
+          backup: !flags.force,
           source: syncedFile.source,
           target: syncedFile.target,
-          backup: !flags.force,
         })
 
         if (result.isValid) {

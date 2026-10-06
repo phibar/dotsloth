@@ -32,7 +32,7 @@ function isSecretLine(line: string): boolean {
 /**
  * Parse an export line to extract name and value
  */
-function parseExportLine(line: string): {name: string; value: string} | null {
+function parseExportLine(line: string): null | {name: string; value: string} {
   // Match: export NAME=value or export NAME="value" or export NAME='value'
   const match = line.match(/^export\s+([A-Za-z_][A-Za-z0-9_]*)=(.*)$/)
   if (!match) return null

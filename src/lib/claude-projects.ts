@@ -13,8 +13,8 @@ export const PROJECTS_DIR = path.join(CLAUDE_DIR, 'projects')
  * non-alphanumeric character replaced by a dash.
  *
  * Verified against this machine, including the awkward cases:
- *   /Users/phibar/github/metatrom-ag/.github-private
- *     -> -Users-phibar-github-metatrom-ag--github-private   (the dot doubles the dash)
+ *   /Users/phibar/github/phibar/.github-private
+ *     -> -Users-phibar-github-phibar--github-private   (the dot doubles the dash)
  *   /Users/phibar/github/phibar-work/phibar.work
  *     -> -Users-phibar-github-phibar-work-phibar-work
  */
@@ -32,7 +32,7 @@ export function slugify(absolutePath: string): string {
  * each, and match. That is why sync is keyed by git remote rather than by slug.
  */
 export interface ClaudeProject {
-  /** "ExRam/ExRam.Taxikomm24.Backend" — stable across machines */
+  /** "phibar/dotsloth" — stable across machines */
   key: null | string
   /** Absolute checkout path on this machine */
   localPath: string

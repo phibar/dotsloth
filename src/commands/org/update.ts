@@ -14,8 +14,8 @@ export default class OrgUpdate extends Command {
 static override description = 'Update an organization configuration'
 static override examples = [
     '<%= config.bin %> <%= command.id %>',
-    '<%= config.bin %> <%= command.id %> ExRam',
-    '<%= config.bin %> <%= command.id %> ExRam --email new@email.com',
+    '<%= config.bin %> <%= command.id %> phibar',
+    '<%= config.bin %> <%= command.id %> phibar --email new@email.com',
   ]
 static override flags = {
     email: Flags.string({char: 'e', description: 'New git email'}),

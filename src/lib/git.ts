@@ -119,7 +119,7 @@ export function readPublicKey(keyPath: string): null | string {
  * Parse a git remote URL to extract org and repo
  */
 export function parseGitUrl(url: string): null | {host: string; org: string; repo: string} {
-  // SSH format: git@github.com:ExRam/repo.git
+  // SSH format: git@github.com:phibar/repo.git
   const sshMatch = url.match(/git@([^:]+):([^/]+)\/(.+?)(?:\.git)?$/)
   if (sshMatch) {
     return {
@@ -129,7 +129,7 @@ export function parseGitUrl(url: string): null | {host: string; org: string; rep
     }
   }
 
-  // HTTPS format: https://github.com/ExRam/repo.git
+  // HTTPS format: https://github.com/phibar/repo.git
   const httpsMatch = url.match(/https?:\/\/([^/]+)\/([^/]+)\/(.+?)(?:\.git)?$/)
   if (httpsMatch) {
     return {

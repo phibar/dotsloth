@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.1.2
+
+### Patch Changes
+
+- [#43](https://github.com/phibar/dotsloth/pull/43) [`d9342ed`](https://github.com/phibar/dotsloth/commit/d9342edeca7b94fb1bb502e5ff6a83d78ac650f2) Thanks [@phibar](https://github.com/phibar)! - Fix the README badges, which pointed at the unscoped `dotsloth` package and rendered as "package not found". Adds a LICENSE file to match the MIT license already declared in package.json.
+
 ## 0.1.1
 
 ### Patch Changes

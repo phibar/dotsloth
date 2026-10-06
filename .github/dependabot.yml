@@ -1,0 +1,34 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+    groups:
+      # Production dependencies ship to users, so they are grouped on their own
+      # and get a patch release. Minor and patch only - majors come as their
+      # own PR so a breaking change is never bundled with routine updates.
+      production:
+        dependency-type: production
+        update-types: [minor, patch]
+      # Dev tooling never reaches users, so it is batched into one PR to keep
+      # the noise down and publishes nothing.
+      development:
+        dependency-type: development
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns: ["*"]

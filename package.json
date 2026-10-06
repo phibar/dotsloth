@@ -27,15 +27,15 @@
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10",
     "@types/node": "^26.6.4",
-    "chai": "^4",
-    "eslint": "^9",
-    "eslint-config-oclif": "^6",
+    "chai": "^6.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-oclif": "^6.0.179",
     "eslint-config-prettier": "^10",
-    "mocha": "^11.8.0",
-    "oclif": "^4",
+    "mocha": "^12.0.3",
+    "oclif": "^6.0.2",
     "shx": "^0.4.0",
     "ts-node": "^10",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=18.0.0"

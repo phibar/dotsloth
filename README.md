@@ -5,9 +5,12 @@ dotsloth
 environment — git identities, dotfiles, secrets, env files and Claude Code
 config — in sync across machines via iCloud Drive and the macOS Keychain.
 
+[![npm](https://img.shields.io/npm/v/@phibar/dotsloth)](https://www.npmjs.com/package/@phibar/dotsloth)
+[![downloads](https://img.shields.io/npm/dw/@phibar/dotsloth)](https://www.npmjs.com/package/@phibar/dotsloth)
+[![release](https://img.shields.io/github/actions/workflow/status/phibar/dotsloth/release.yml?branch=main&label=release)](https://github.com/phibar/dotsloth/actions/workflows/release.yml)
+[![node](https://img.shields.io/node/v/@phibar/dotsloth)](https://nodejs.org)
+[![license](https://img.shields.io/npm/l/@phibar/dotsloth)](./LICENSE)
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/dotsloth.svg)](https://npmjs.org/package/dotsloth)
-[![Downloads/week](https://img.shields.io/npm/dw/dotsloth.svg)](https://npmjs.org/package/dotsloth)
 
 ## What it does
 

@@ -3,17 +3,20 @@ import {expect} from 'chai'
 import {slugify} from '../../src/lib/claude-projects.js'
 
 /**
- * These are the real directory names observed under ~/.claude/projects.
  * The mapping is lossy, so getting it right in the forward direction is the
- * only thing standing between memory sync and silently mis-filing it.
+ * only thing standing between memory sync and silently mis-filing it. Each
+ * case below pins one character class that collapses to a dash.
  */
 describe('claude-projects slugify', () => {
   const cases: Array<[string, string]> = [
-    ['/Users/phibar/github/ExRam/ExRam.Taxikomm24.Backend', '-Users-phibar-github-ExRam-ExRam-Taxikomm24-Backend'],
-    // A leading dot doubles the dash — the directory is ".github-private"
-    ['/Users/phibar/github/metatrom-ag/.github-private', '-Users-phibar-github-metatrom-ag--github-private'],
+    // A dot inside a repo name collapses to a dash like any other separator
+    ['/Users/phibar/github/phibar/dotsloth.cli', '-Users-phibar-github-phibar-dotsloth-cli'],
+    // A leading dot doubles the dash - the directory is ".github-private"
+    ['/Users/phibar/github/phibar/.github-private', '-Users-phibar-github-phibar--github-private'],
+    // Hyphenated org plus dotted repo: the ambiguous case
     ['/Users/phibar/github/phibar-work/phibar.work', '-Users-phibar-github-phibar-work-phibar-work'],
     ['/Users/phibar/github/phibar/coins', '-Users-phibar-github-phibar-coins'],
+    // Spaces and tildes outside the github root
     [
       '/Users/phibar/Library/Mobile Documents/com~apple~CloudDocs/phibar.work',
       '-Users-phibar-Library-Mobile-Documents-com-apple-CloudDocs-phibar-work',

@@ -34,7 +34,7 @@ export const SKIP_DIRS = new Set([
 export interface EnvFile {
   /** Absolute path on this machine */
   absolutePath: string
-  /** Org folder name, e.g. "metatrom-ag" */
+  /** Org folder name, e.g. "phibar-work" */
   org: string
   /** Path inside the repo, e.g. "apps/web/.env" */
   relativePath: string

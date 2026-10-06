@@ -16,9 +16,9 @@ export default class Clone extends Command {
   }
 static override description = 'Clone a repository to the correct organization folder'
 static override examples = [
-    '<%= config.bin %> <%= command.id %> git@github.com:ExRam/SomeRepo.git',
+    '<%= config.bin %> <%= command.id %> git@github.com:phibar/some-repo.git',
     '<%= config.bin %> <%= command.id %> https://github.com/ipfs/kubo',
-    '<%= config.bin %> <%= command.id %> git@github.com:fork/repo.git --org ExRam',
+    '<%= config.bin %> <%= command.id %> git@github.com:fork/repo.git --org phibar',
   ]
 static override flags = {
     org: Flags.string({char: 'o', description: 'Override organization (use a different org than detected)'}),

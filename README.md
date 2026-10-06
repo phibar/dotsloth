@@ -31,8 +31,8 @@ config — in sync across machines via iCloud Drive and the macOS Keychain.
 ```sh
 npm install -g @phibar/dotsloth
 dotsloth init
-dotsloth org add ExRam --email you@exram.de --username you
-dotsloth clone git@github.com:ExRam/some-repo.git
+dotsloth org add phibar --email you@phibar.work --username phibar
+dotsloth clone git@github.com:phibar/some-repo.git
 ```
 
 ## Reinstalling your Mac

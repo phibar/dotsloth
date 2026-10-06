@@ -12,12 +12,12 @@ import {getOrgRepoPath} from '../../lib/paths.js'
 
 export default class OrgAdd extends Command {
   static override args = {
-    name: Args.string({description: 'Organization name (e.g., ExRam)'}),
+    name: Args.string({description: 'Organization name (e.g., phibar)'}),
   }
 static override description = 'Add a new organization configuration'
 static override examples = [
     '<%= config.bin %> <%= command.id %>',
-    '<%= config.bin %> <%= command.id %> ExRam --email philipp@exram.de --username phibar',
+    '<%= config.bin %> <%= command.id %> phibar --email you@phibar.work --username phibar',
   ]
 static override flags = {
     email: Flags.string({char: 'e', description: 'Git email for this organization'}),

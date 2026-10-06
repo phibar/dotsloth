@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.1.1
+
+### Patch Changes
+
+- [#39](https://github.com/phibar/dotsloth/pull/39) [`2574244`](https://github.com/phibar/dotsloth/commit/2574244a63e74fd1300fc1c69f095bb7ce5a2ab9) Thanks [@phibar](https://github.com/phibar)! - Use `phibar` as the organization in all command examples and help text, replacing names from unrelated organizations.
+
 ## 0.1.0
 
 ### Minor Changes

@@ -3,6 +3,7 @@ import chalk from 'chalk'
 import Enquirer from 'enquirer'
 import * as fs from 'node:fs'
 
+import {autoSync} from '../../lib/autosync.js'
 import {loadConfig, removeOrganization} from '../../lib/config.js'
 import {deleteOrgGitconfig} from '../../lib/git.js'
 import {getOrgRepoPath} from '../../lib/paths.js'
@@ -93,6 +94,6 @@ static override flags = {
 
     this.log('')
     this.log(chalk.green(`✓ Organization '${org.name}' removed`))
-    this.log(chalk.dim('Note: Run "dotsloth sync" to update ~/.gitconfig'))
+    await autoSync(this.log.bind(this))
   }
 }

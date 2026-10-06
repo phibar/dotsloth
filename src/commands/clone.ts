@@ -6,6 +6,7 @@ import * as path from 'node:path'
 
 import type {Organization} from '../types/index.js'
 
+import {autoSync} from '../lib/autosync.js'
 import {addOrganization, getOrganization, loadConfig} from '../lib/config.js'
 import {ensureOrgDirectory, parseGitUrl, writeOrgGitconfig} from '../lib/git.js'
 
@@ -111,6 +112,10 @@ static override flags = {
     // Ensure org directory exists
     const orgPath = ensureOrgDirectory(orgName, config.paths.githubRoot)
     const repoPath = path.join(orgPath, parsed.repo)
+
+    // Sync first: the includeIf identity must exist in ~/.gitconfig *before*
+    // git creates the repo, otherwise the first commit gets the wrong author (#1).
+    await autoSync(this.log.bind(this), {quiet: true})
 
     this.log('')
     this.log(chalk.bold('Cloning...'))

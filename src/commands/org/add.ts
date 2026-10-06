@@ -5,6 +5,7 @@ import * as fs from 'node:fs'
 
 import type {Organization} from '../../types/index.js'
 
+import {autoSync} from '../../lib/autosync.js'
 import {addOrganization, ensureIcloudStructure, loadConfig} from '../../lib/config.js'
 import {writeOrgGitconfig} from '../../lib/git.js'
 import {getOrgRepoPath} from '../../lib/paths.js'
@@ -116,6 +117,6 @@ static override flags = {
     this.log(chalk.dim(`  Username: ${username}`))
     this.log(chalk.dim(`  Path: ${orgPath}`))
     this.log('')
-    this.log(chalk.dim('Note: Run "dotsloth init" or "dotsloth sync" to update ~/.gitconfig'))
+    await autoSync(this.log.bind(this))
   }
 }

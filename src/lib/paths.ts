@@ -21,6 +21,7 @@ export const PATHS = {
   icloudDotsloth: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth'),
   // iCloud paths
   icloudDrive: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs'),
+  icloudEnvs: path.join(home, 'Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/envs'),
 
   icloudOrganizations: path.join(
     home,

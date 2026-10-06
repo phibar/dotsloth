@@ -74,6 +74,9 @@
       },
       "secret": {
         "description": "Manage secrets in macOS Keychain"
+      },
+      "env": {
+        "description": "Manage machine-local env files (.env and friends)"
       }
     }
   },

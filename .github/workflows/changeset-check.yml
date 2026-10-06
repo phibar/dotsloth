@@ -11,8 +11,6 @@ permissions:
 
 jobs:
   check:
-    # The release PR bumps the version itself and never carries a changeset.
-    if: ${{ github.head_ref != 'changeset-release/main' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,52 +23,117 @@ jobs:
 
       - run: npm ci
 
-      - name: Does this PR carry a changeset?
+      - name: Does this PR add a changeset?
         id: status
-        run: |
-          set -uo pipefail
-          git fetch --quiet origin "${BASE_REF}"
-          if npx changeset status --since "origin/${BASE_REF}" > status.txt 2>&1; then
-            # `status` exits 0 whether or not changesets exist, so read the output.
-            if grep -qi "no changesets" status.txt; then
-              echo "found=false" >> "$GITHUB_OUTPUT"
-            else
-              echo "found=true" >> "$GITHUB_OUTPUT"
-            fi
-          else
-            echo "found=false" >> "$GITHUB_OUTPUT"
-          fi
-          cat status.txt
         env:
           BASE_REF: ${{ github.base_ref }}
+          LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        run: |
+          set -uo pipefail
+          git fetch --quiet origin "$BASE_REF"
+
+          # Count .changeset/*.md files ADDED by this PR. Checking the diff
+          # rather than `changeset status` is deliberate: an intentionally
+          # empty changeset (npm run changeset -- --empty) bumps nothing, so
+          # `status` reports no packages and would wrongly fail the check.
+          added=$(git diff --name-only --diff-filter=A "origin/${BASE_REF}...HEAD" -- '.changeset/*.md' \
+                  | grep -v '/README.md$' | wc -l | tr -d ' ')
+          echo "added=$added" >> "$GITHUB_OUTPUT"
+
+          if echo "$LABELS" | grep -q '"skip-changeset"'; then
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skipped=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "changeset files added: $added"
+
+      - name: What version would this publish?
+        id: preview
+        if: ${{ steps.status.outputs.added != '0' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -uo pipefail
+          current=$(node -p "require('./package.json').version")
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+
+          # Apply the versions exactly as the release will, then read the
+          # result and throw the changes away. This is the real calculation
+          # rather than a guess from this PR's bump type: several changesets
+          # can be pending at once and the highest bump wins.
+          npx changeset version >/dev/null 2>&1 || true
+          next=$(node -p "require('./package.json').version")
+          git checkout -- . 2>/dev/null || true
+          git clean -qfd .changeset CHANGELOG.md 2>/dev/null || true
+
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+
+          if [ "$current" = "$next" ]; then
+            echo "kind=none" >> "$GITHUB_OUTPUT"
+          else
+            IFS=. read -r cm cn cp <<< "$current"
+            IFS=. read -r nm nn np <<< "$next"
+            if   [ "$nm" != "$cm" ]; then echo "kind=major" >> "$GITHUB_OUTPUT"
+            elif [ "$nn" != "$cn" ]; then echo "kind=minor" >> "$GITHUB_OUTPUT"
+            else                          echo "kind=patch" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+          echo "$current -> $next"
 
       - name: Comment on the PR
+        if: ${{ always() }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
-          FOUND: ${{ steps.status.outputs.found }}
+          ADDED: ${{ steps.status.outputs.added }}
+          SKIPPED: ${{ steps.status.outputs.skipped }}
+          CURRENT: ${{ steps.preview.outputs.current }}
+          NEXT: ${{ steps.preview.outputs.next }}
+          KIND: ${{ steps.preview.outputs.kind }}
         run: |
           set -euo pipefail
           marker="<!-- changeset-status -->"
 
-          if [ "$FOUND" = "true" ]; then
+          if [ "$SKIPPED" = "true" ]; then
             body="$marker
-          **Changeset found.** This PR will be included in the next \`Version Packages\` release PR."
-          else
+          **Changeset check skipped** via the \`skip-changeset\` label. Merging publishes nothing."
+          elif [ "$ADDED" = "0" ]; then
             body="$marker
-          **No changeset.** If this PR changes anything a user would notice, add one:
+          ### No changeset - this PR cannot be merged
+
+          Every merge to \`main\` publishes a release, so each PR has to say how the version should move:
 
           \`\`\`sh
           npm run changeset
           \`\`\`
 
-          Pick \`patch\`, \`minor\` or \`major\`, write a one-line summary, and commit the generated file.
-          Refactors, CI and docs changes do not need one — run \`npm run changeset -- --empty\` to say so deliberately.
+          Pick \`patch\`, \`minor\` or \`major\`, write a one-line summary, commit the generated file.
 
-          This check is informational and does not block merging."
+          **No user-facing change?** (refactor, CI, docs)
+
+          \`\`\`sh
+          npm run changeset -- --empty
+          \`\`\`
+
+          That records the decision deliberately and publishes nothing. In a genuine emergency, the \`skip-changeset\` label bypasses this check."
+          elif [ "$KIND" = "none" ]; then
+            body="$marker
+          **Empty changeset.** Merging publishes nothing and leaves the version at \`$CURRENT\`."
+          else
+            body="$marker
+          ### Merging this PR publishes \`v$NEXT\`
+
+          | | |
+          |---|---|
+          | Current | \`$CURRENT\` |
+          | **Next** | **\`$NEXT\`** ($KIND) |
+
+          Goes to npm as \`@phibar/dotsloth@$NEXT\` with a matching GitHub release, automatically on merge.
+
+          <sub>Calculated by actually running \`changeset version\`, so it accounts for every changeset currently pending on \`main\`, not just this PR's.</sub>"
           fi
 
-          # Update the existing comment rather than adding one per push.
           id=$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" --paginate \
                 --jq "[.[] | select(.body | startswith(\"$marker\"))] | .[0].id // empty")
 
@@ -79,3 +142,9 @@ jobs:
           else
             gh api -X POST "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" -f body="$body" >/dev/null
           fi
+
+      - name: Require a changeset
+        if: ${{ steps.status.outputs.skipped != 'true' && steps.status.outputs.added == '0' }}
+        run: |
+          echo "::error::This PR adds no changeset. Run 'npm run changeset' (or '--empty' for no user-facing change)."
+          exit 1

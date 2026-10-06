@@ -80,6 +80,9 @@
       },
       "daemon": {
         "description": "Manage the periodic background sync"
+      },
+      "claude": {
+        "description": "Share Claude Code settings, memory and history between machines"
       }
     }
   },

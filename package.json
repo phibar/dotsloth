@@ -1,7 +1,7 @@
 {
   "name": "@phibar/dotsloth",
   "description": "Sync your dots, be a sloth - Dev environment sync CLI for macOS",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "phibar",
   "bin": {
     "dotsloth": "./bin/run.js",

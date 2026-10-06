@@ -28,10 +28,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Deliberately no registry-url. setup-node would then write an .npmrc
+      # containing //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN} and set
+      # NODE_AUTH_TOKEN to its placeholder "XXXXX-XXXXX-XXXXX-XXXXX" when no
+      # token is supplied. npm finds that explicit (garbage) credential, uses
+      # it, and never falls back to OIDC - which is exactly how the 0.1.0
+      # publish failed with E404. npm already defaults to registry.npmjs.org,
+      # and package.json carries publishConfig.access=public.
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          registry-url: https://registry.npmjs.org
 
       # Trusted publishing needs npm >= 11.5.1. lts/* currently ships a newer
       # npm than that, but if it ever resolves lower the failure surfaces as an
@@ -140,7 +146,19 @@ jobs:
         # NODE_AUTH_TOKEN. npm also attaches a provenance attestation
         # automatically on this path, linking the package to this exact commit
         # and workflow run.
-        run: npx changeset publish
+        run: |
+          set -euo pipefail
+          # Fail loudly rather than silently falling back to a stale
+          # credential: any configured _authToken means OIDC gets bypassed,
+          # which is exactly how the 0.1.0 publish failed. npm prints an empty
+          # string when the key is unset.
+          token=$(npm config get //registry.npmjs.org/:_authToken 2>/dev/null | tr -d '[:space:]')
+          if [ -n "$token" ] && [ "$token" != "undefined" ] && [ "$token" != "null" ]; then
+            echo "::error::An npm _authToken is configured, so OIDC would be bypassed. Remove registry-url / NODE_AUTH_TOKEN from this job."
+            exit 1
+          fi
+          echo "No npm token configured - publishing over OIDC as $(npm -v)."
+          npx changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

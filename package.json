@@ -12,18 +12,18 @@
   },
   "bugs": "https://github.com/phibar/dotsloth/issues",
   "dependencies": {
-    "@oclif/core": "^4",
-    "@oclif/plugin-help": "^6",
-    "chalk": "^5",
+    "@oclif/core": "^5.1.2",
+    "@oclif/plugin-help": "^7.0.2",
+    "chalk": "^6.0.1",
     "enquirer": "^2",
-    "zod": "^3"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
     "@eslint/compat": "^2.1.1",
     "@oclif/prettier-config": "^0.2.1",
-    "@oclif/test": "^4",
+    "@oclif/test": "^5.0.1",
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10",
     "@types/node": "^26.6.4",

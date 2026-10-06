@@ -16,6 +16,9 @@ concurrency:
 
 permissions:
   contents: write
+  # Required for npm trusted publishing: lets the job mint an OIDC token that
+  # npm exchanges for short-lived publish credentials. No npm token involved.
+  id-token: write
 
 jobs:
   release:
@@ -29,6 +32,21 @@ jobs:
         with:
           node-version: lts/*
           registry-url: https://registry.npmjs.org
+
+      # Trusted publishing needs npm >= 11.5.1. lts/* currently ships a newer
+      # npm than that, but if it ever resolves lower the failure surfaces as an
+      # opaque auth error at publish time, so make it explicit and self-healing.
+      - name: Ensure npm supports trusted publishing
+        run: |
+          set -euo pipefail
+          required=11.5.1
+          current=$(npm -v)
+          lowest=$(printf '%s\n%s\n' "$required" "$current" | sort -V | head -1)
+          if [ "$lowest" != "$required" ]; then
+            echo "npm $current is older than $required - upgrading for OIDC support."
+            npm install -g npm@latest
+          fi
+          echo "npm $(npm -v) (node $(node -v))"
 
       - run: npm ci
 
@@ -118,10 +136,13 @@ jobs:
 
       - name: Publish to npm
         if: ${{ steps.npm.outputs.needed == 'true' }}
+        # Authenticated by OIDC via npm trusted publishing - deliberately no
+        # NODE_AUTH_TOKEN. npm also attaches a provenance attestation
+        # automatically on this path, linking the package to this exact commit
+        # and workflow run.
         run: npx changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Push tags and create the GitHub release
         if: ${{ steps.npm.outputs.needed == 'true' }}

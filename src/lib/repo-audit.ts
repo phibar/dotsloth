@@ -2,6 +2,8 @@ import {execFileSync} from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
+import {isEnvFile} from './env.js'
+
 export type BranchRisk = 'local-only' | 'merged' | 'unknown'
 
 export interface BranchFinding {
@@ -115,7 +117,18 @@ export interface AuditOptions {
 }
 
 export function auditRepo(repoPath: string, options: AuditOptions = {}): RepoAudit {
-  const dirty = git(repoPath, ['status', '--porcelain']).split('\n').filter(Boolean).length
+  // An untracked file that the env store already backs up is not at risk, and
+  // counting it here as well as under "env files" meant doctor could never
+  // reach zero: backing it up cleared one line and left the other standing.
+  const dirty = git(repoPath, ['status', '--porcelain'])
+    .split('\n')
+    .filter(Boolean)
+    .filter((line) => {
+      const untracked = line.startsWith('??')
+      if (!untracked) return true
+      const name = path.basename(line.slice(3).trim())
+      return !isEnvFile(name)
+    }).length
   const stashes = git(repoPath, ['stash', 'list']).split('\n').filter(Boolean).length
 
   const refs = git(repoPath, ['for-each-ref', '--format=%(refname:short)\t%(upstream:short)\t%(upstream:track)', 'refs/heads'])

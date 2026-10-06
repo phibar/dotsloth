@@ -54,7 +54,14 @@ jobs:
           fi
           echo "npm $(npm -v) (node $(node -v))"
 
-      - run: npm ci
+      # npm install, not npm ci. The eslint-config-oclif tree pulls
+      # @unrs/resolver-binding-* whose nested @emnapi optional dependencies
+      # resolve differently per platform: a lockfile generated on macOS omits
+      # the Linux entries and `npm ci` fails on the runner, while one
+      # generated with --package-lock-only omits the macOS entries and fails
+      # locally. `npm ci --omit=optional` fails on both. npm install resolves
+      # correctly everywhere, which is why the test matrix has always passed.
+      - run: npm install --no-audit --no-fund
 
       - name: Any changesets pending?
         id: pending

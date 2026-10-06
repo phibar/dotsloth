@@ -88,27 +88,57 @@ export interface SessionFile {
   storePath: string
 }
 
+/**
+ * Every session file for a project, from the local directory and the store.
+ *
+ * Both sides are unioned deliberately. Listing only the local directory meant
+ * `pull` iterated an empty tree on a fresh machine and restored nothing - the
+ * one scenario history sync exists for.
+ */
 export function sessionFiles(project: ClaudeProject, now = Date.now()): SessionFile[] {
   if (!project.key) return []
-  const files: SessionFile[] = []
 
-  let entries: fs.Dirent[]
-  try {
-    entries = fs.readdirSync(project.projectDir, {withFileTypes: true})
-  } catch {
-    return files
+  const storeDir = path.join(SESSIONS_STORE, project.key)
+  const names = new Set<string>()
+
+  for (const dir of [project.projectDir, storeDir]) {
+    try {
+      for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
+        if (entry.isFile() && entry.name.endsWith('.jsonl')) names.add(entry.name)
+      }
+    } catch {
+      // Directory absent: expected for the store before a first push, and for
+      // the local project dir on a machine that has not opened this repo yet.
+    }
   }
 
-  for (const entry of entries) {
-    if (!entry.isFile() || !entry.name.endsWith('.jsonl')) continue
-    const localPath = path.join(project.projectDir, entry.name)
-    const {mtimeMs} = fs.statSync(localPath)
+  const files: SessionFile[] = []
+  for (const name of names) {
+    const localPath = path.join(project.projectDir, name)
+    const storePath = path.join(storeDir, name)
+
+    // Age and liveness describe the local file. A file that exists only in
+    // the store is not being written here, so it is never "active" and its
+    // age comes from the stored copy.
+    let mtimeMs: number
+    let active = false
+    try {
+      mtimeMs = fs.statSync(localPath).mtimeMs
+      active = now - mtimeMs < ACTIVE_SESSION_MINUTES * 60 * 1000
+    } catch {
+      try {
+        mtimeMs = fs.statSync(storePath).mtimeMs
+      } catch {
+        continue
+      }
+    }
+
     files.push({
-      active: now - mtimeMs < ACTIVE_SESSION_MINUTES * 60 * 1000,
+      active,
       ageDays: (now - mtimeMs) / (24 * 60 * 60 * 1000),
       localPath,
-      name: entry.name,
-      storePath: path.join(SESSIONS_STORE, project.key, entry.name),
+      name,
+      storePath,
     })
   }
 

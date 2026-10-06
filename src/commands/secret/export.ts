@@ -6,10 +6,8 @@ import {generateExportStatements} from '../../lib/secrets.js'
 
 export default class SecretExport extends Command {
   static override description = 'Export all secrets (for debugging/migration)'
-
-  static override examples = ['<%= config.bin %> <%= command.id %>']
-
-  static override flags = {
+static override examples = ['<%= config.bin %> <%= command.id %>']
+static override flags = {
     format: Flags.string({
       char: 'f',
       default: 'shell',

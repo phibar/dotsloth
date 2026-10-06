@@ -1,8 +1,7 @@
-import * as fs from 'node:fs'
-
 import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
+import * as fs from 'node:fs'
 
 import {loadConfig, removeOrganization} from '../../lib/config.js'
 import {deleteOrgGitconfig} from '../../lib/git.js'
@@ -12,12 +11,9 @@ export default class OrgRemove extends Command {
   static override args = {
     name: Args.string({description: 'Organization name to remove', required: true}),
   }
-
-  static override description = 'Remove an organization configuration'
-
-  static override examples = ['<%= config.bin %> <%= command.id %> ExRam']
-
-  static override flags = {
+static override description = 'Remove an organization configuration'
+static override examples = ['<%= config.bin %> <%= command.id %> ExRam']
+static override flags = {
     'delete-repos': Flags.boolean({description: 'Also delete the repository folder'}),
     force: Flags.boolean({char: 'f', description: 'Skip confirmation'}),
   }
@@ -56,10 +52,10 @@ export default class OrgRemove extends Command {
       }
 
       const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
-        type: 'confirm',
-        name: 'confirm',
-        message,
         initial: false,
+        message,
+        name: 'confirm',
+        type: 'confirm',
       })
 
       if (!confirm) {
@@ -74,21 +70,21 @@ export default class OrgRemove extends Command {
 
     // Optionally delete repos folder
     if (flags['delete-repos'] && fs.existsSync(orgPath)) {
-      if (!flags.force) {
+      if (flags.force) {
+        fs.rmSync(orgPath, {force: true, recursive: true})
+        this.log(chalk.dim(`Deleted: ${orgPath}`))
+      } else {
         const {confirmDelete} = await Enquirer.prompt<{confirmDelete: boolean}>({
-          type: 'confirm',
-          name: 'confirmDelete',
-          message: chalk.red(`DELETE ${orgPath} and all ${repoCount} repos? This cannot be undone!`),
           initial: false,
+          message: chalk.red(`DELETE ${orgPath} and all ${repoCount} repos? This cannot be undone!`),
+          name: 'confirmDelete',
+          type: 'confirm',
         })
 
         if (confirmDelete) {
-          fs.rmSync(orgPath, {recursive: true, force: true})
+          fs.rmSync(orgPath, {force: true, recursive: true})
           this.log(chalk.dim(`Deleted: ${orgPath}`))
         }
-      } else {
-        fs.rmSync(orgPath, {recursive: true, force: true})
-        this.log(chalk.dim(`Deleted: ${orgPath}`))
       }
     }
 

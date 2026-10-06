@@ -6,10 +6,8 @@ export default class SecretGet extends Command {
   static override args = {
     name: Args.string({description: 'Secret name to retrieve', required: true}),
   }
-
-  static override description = 'Get a secret value from Keychain'
-
-  static override examples = ['<%= config.bin %> <%= command.id %> AWS_ACCESS_KEY_ID']
+static override description = 'Get a secret value from Keychain'
+static override examples = ['<%= config.bin %> <%= command.id %> AWS_ACCESS_KEY_ID']
 
   public async run(): Promise<void> {
     const {args} = await this.parse(SecretGet)

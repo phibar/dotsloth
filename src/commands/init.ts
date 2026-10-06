@@ -1,8 +1,7 @@
-import * as fs from 'node:fs'
-
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
+import * as fs from 'node:fs'
 
 import {
   configExists,
@@ -20,10 +19,8 @@ import {createSymlink} from '../lib/symlink.js'
 
 export default class Init extends Command {
   static override description = 'Initialize dotsloth on this machine'
-
-  static override examples = ['<%= config.bin %> <%= command.id %>']
-
-  static override flags = {
+static override examples = ['<%= config.bin %> <%= command.id %>']
+static override flags = {
     force: Flags.boolean({char: 'f', description: 'Overwrite existing configuration'}),
     'skip-secrets': Flags.boolean({description: 'Skip secrets extraction from zprofile'}),
     'skip-ssh': Flags.boolean({description: 'Skip SSH keychain setup'}),
@@ -68,9 +65,9 @@ export default class Init extends Command {
       userName = config.organizations[0].gitUsername
     } else {
       const response = await Enquirer.prompt<{name: string}>({
-        type: 'input',
-        name: 'name',
         message: 'Your name (for git commits):',
+        name: 'name',
+        type: 'input',
         validate: (input) => (input.length > 0 ? true : 'Name is required'),
       })
       userName = response.name
@@ -78,7 +75,7 @@ export default class Init extends Command {
 
     // Handle secrets extraction from zprofile
     if (!flags['skip-secrets'] && fs.existsSync(PATHS.zprofile)) {
-      const zprofileContent = fs.readFileSync(PATHS.zprofile, 'utf-8')
+      const zprofileContent = fs.readFileSync(PATHS.zprofile, 'utf8')
       const secretCount = countSecrets(zprofileContent)
 
       if (secretCount > 0) {
@@ -86,10 +83,10 @@ export default class Init extends Command {
         this.log(chalk.yellow(`Found ${secretCount} secret(s) in your .zprofile`))
 
         const {extractSecrets: shouldExtract} = await Enquirer.prompt<{extractSecrets: boolean}>({
-          type: 'confirm',
-          name: 'extractSecrets',
-          message: 'Extract secrets to iCloud Keychain?',
           initial: true,
+          message: 'Extract secrets to iCloud Keychain?',
+          name: 'extractSecrets',
+          type: 'confirm',
         })
 
         if (shouldExtract) {
@@ -107,7 +104,7 @@ export default class Init extends Command {
 
           // Write clean zprofile to iCloud
           const icloudZprofile = getIcloudDotfilePath('zprofile')
-          fs.writeFileSync(icloudZprofile, cleanContent, 'utf-8')
+          fs.writeFileSync(icloudZprofile, cleanContent, 'utf8')
           this.log(chalk.green('✓') + ` Extracted ${secrets.length} secret(s) to Keychain`)
           this.log(chalk.green('✓') + ' Created clean zprofile in iCloud')
         }
@@ -119,8 +116,8 @@ export default class Init extends Command {
     if (!fs.existsSync(icloudZprofile)) {
       if (fs.existsSync(PATHS.zprofile)) {
         // Copy existing zprofile
-        const content = fs.readFileSync(PATHS.zprofile, 'utf-8')
-        fs.writeFileSync(icloudZprofile, content, 'utf-8')
+        const content = fs.readFileSync(PATHS.zprofile, 'utf8')
+        fs.writeFileSync(icloudZprofile, content, 'utf8')
         this.log(chalk.green('✓') + ' Copied zprofile to iCloud')
       } else {
         // Create minimal zprofile
@@ -130,7 +127,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # Load secrets from iCloud Keychain
 eval "$(dotsloth secret load)"
 `
-        fs.writeFileSync(icloudZprofile, minimalZprofile, 'utf-8')
+        fs.writeFileSync(icloudZprofile, minimalZprofile, 'utf8')
         this.log(chalk.green('✓') + ' Created minimal zprofile in iCloud')
       }
     }
@@ -138,7 +135,7 @@ eval "$(dotsloth secret load)"
     // Generate and save main gitconfig
     const gitconfigContent = generateMainGitconfig(config, userName)
     const icloudGitconfig = getIcloudDotfilePath('gitconfig')
-    fs.writeFileSync(icloudGitconfig, gitconfigContent, 'utf-8')
+    fs.writeFileSync(icloudGitconfig, gitconfigContent, 'utf8')
     this.log(chalk.green('✓') + ' Generated gitconfig in iCloud')
 
     // Write org gitconfigs
@@ -155,8 +152,8 @@ eval "$(dotsloth secret load)"
     if (!fs.existsSync(icloudSshConfig)) {
       if (fs.existsSync(PATHS.sshConfig)) {
         // Copy existing ssh config
-        const content = fs.readFileSync(PATHS.sshConfig, 'utf-8')
-        fs.writeFileSync(icloudSshConfig, content, 'utf-8')
+        const content = fs.readFileSync(PATHS.sshConfig, 'utf8')
+        fs.writeFileSync(icloudSshConfig, content, 'utf8')
         this.log(chalk.green('✓') + ' Copied SSH config to iCloud')
       } else {
         // Create minimal SSH config
@@ -171,7 +168,7 @@ Host github.com
     User git
     IdentityFile ~/.ssh/id_ed25519
 `
-        fs.writeFileSync(icloudSshConfig, minimalSshConfig, 'utf-8')
+        fs.writeFileSync(icloudSshConfig, minimalSshConfig, 'utf8')
         this.log(chalk.green('✓') + ' Created SSH config in iCloud')
       }
     }
@@ -193,10 +190,13 @@ Host github.com
     this.log(chalk.bold('Creating symlinks...'))
 
     for (const syncedFile of config.syncedFiles) {
+      // Sequential on purpose: each link reports its own line, and parallel
+      // filesystem mutation would interleave the backup messages.
+      // eslint-disable-next-line no-await-in-loop
       const result = await createSymlink({
+        backup: true,
         source: syncedFile.source,
         target: syncedFile.target,
-        backup: true,
       })
 
       if (result.isValid) {

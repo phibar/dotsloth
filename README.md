@@ -1,13 +1,75 @@
 dotsloth
 =================
 
-A new CLI generated with oclif
-
+**Sync your dots, be a sloth.** A macOS CLI that keeps your development
+environment — git identities, dotfiles, secrets, env files and Claude Code
+config — in sync across machines via iCloud Drive and the macOS Keychain.
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/dotsloth.svg)](https://npmjs.org/package/dotsloth)
 [![Downloads/week](https://img.shields.io/npm/dw/dotsloth.svg)](https://npmjs.org/package/dotsloth)
 
+## What it does
+
+- **Git identities per organization.** Generates `~/.gitconfig` with `includeIf`
+  rules so repos under `~/github/<org>/` automatically use the right name, email
+  and signing key. Every command that changes config re-applies it immediately.
+- **Dotfiles via iCloud.** `~/.gitconfig`, `~/.zprofile` and `~/.ssh/config` are
+  symlinked to versions stored in iCloud Drive.
+- **Secrets in the Keychain.** Sensitive exports are pulled out of shell
+  profiles and stored encrypted, never in a synced plaintext file.
+- **Env files.** `.env` and friends are gitignored by design, so git never saves
+  them. `dotsloth env` backs them up and restores them after a reinstall.
+- **Claude Code.** Share `settings.json`, project memory and conversation
+  history between machines.
+- **Pre-reinstall safety.** `dotsloth doctor` refuses to say "safe to wipe"
+  while anything would be lost.
+- **Periodic sync.** A launchd agent keeps everything current.
+
+## Quick start
+
+```sh
+npm install -g @phibar/dotsloth
+dotsloth init
+dotsloth org add ExRam --email you@exram.de --username you
+dotsloth clone git@github.com:ExRam/some-repo.git
+```
+
+## Reinstalling your Mac
+
+See **[BOOTSTRAP.md](./BOOTSTRAP.md)** for the full ordered procedure. The short
+version — before you wipe:
+
+```sh
+dotsloth doctor          # exits non-zero while anything would be lost
+dotsloth env push
+dotsloth claude memory push
+brctl log --wait --shorten   # a file in iCloud is not a backup until uploaded
+```
+
+And on the new machine: Homebrew → node → iCloud sign-in → dotsloth → SSH key →
+`dotsloth sync` → clone → `dotsloth env pull`.
+
+## Where things live
+
+| What | Where |
+|---|---|
+| Config | `~/Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/config.json` |
+| Dotfiles | `.../development/dotsloth/dotfiles/` |
+| Org gitconfigs | `.../development/dotsloth/organizations/` |
+| Env files | `.../development/dotsloth/envs/<org>/<repo>/` |
+| Claude Code | `.../development/dotsloth/claude/` |
+| Secrets | macOS Keychain, account `dotsloth` |
+| Repos | `~/github/<org>/<repo>` |
+
+## Development
+
+```sh
+npm install
+npm run build
+npm test          # mocha + eslint
+./bin/run.js <command>
+```
 
 <!-- toc -->
 * [Usage](#usage)

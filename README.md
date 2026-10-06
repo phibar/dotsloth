@@ -78,11 +78,11 @@ npm test          # mocha + eslint
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g dotsloth
+$ npm install -g @phibar/dotsloth
 $ dotsloth COMMAND
 running command...
 $ dotsloth (--version)
-dotsloth/0.0.0 darwin-arm64 node-v25.2.0
+@phibar/dotsloth/0.1.0 linux-x64 node-v24.21.0
 $ dotsloth --help [COMMAND]
 USAGE
   $ dotsloth COMMAND
@@ -91,8 +91,6 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`dotsloth hello PERSON`](#dotsloth-hello-person)
-* [`dotsloth hello world`](#dotsloth-hello-world)
 * [`dotsloth help [COMMAND]`](#dotsloth-help-command)
 * [`dotsloth plugins`](#dotsloth-plugins)
 * [`dotsloth plugins add PLUGIN`](#dotsloth-plugins-add-plugin)
@@ -104,48 +102,6 @@ USAGE
 * [`dotsloth plugins uninstall [PLUGIN]`](#dotsloth-plugins-uninstall-plugin)
 * [`dotsloth plugins unlink [PLUGIN]`](#dotsloth-plugins-unlink-plugin)
 * [`dotsloth plugins update`](#dotsloth-plugins-update)
-
-## `dotsloth hello PERSON`
-
-Say hello
-
-```
-USAGE
-  $ dotsloth hello PERSON -f <value>
-
-ARGUMENTS
-  PERSON  Person to say hello to
-
-FLAGS
-  -f, --from=<value>  (required) Who is saying hello
-
-DESCRIPTION
-  Say hello
-
-EXAMPLES
-  $ dotsloth hello friend --from oclif
-  hello friend from oclif! (./src/commands/hello/index.ts)
-```
-
-_See code: [src/commands/hello/index.ts](https://github.com/phibar/dotsloth/blob/v0.0.0/src/commands/hello/index.ts)_
-
-## `dotsloth hello world`
-
-Say hello world
-
-```
-USAGE
-  $ dotsloth hello world
-
-DESCRIPTION
-  Say hello world
-
-EXAMPLES
-  $ dotsloth hello world
-  hello world! (./src/commands/hello/world.ts)
-```
-
-_See code: [src/commands/hello/world.ts](https://github.com/phibar/dotsloth/blob/v0.0.0/src/commands/hello/world.ts)_
 
 ## `dotsloth help [COMMAND]`
 

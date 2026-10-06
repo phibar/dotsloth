@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.2.1
+
+### Patch Changes
+
+- [#55](https://github.com/phibar/dotsloth/pull/55) [`a5efad4`](https://github.com/phibar/dotsloth/commit/a5efad40cf1079219a14f91d8063c20772aae819) Thanks [@phibar](https://github.com/phibar)! - Fix `dotsloth claude history pull` restoring nothing on a fresh machine. It listed only the local project directory, so with an empty `~/.claude` it iterated nothing — the exact case history sync exists for.
+
 ## 0.2.0
 
 ### Minor Changes

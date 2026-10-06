@@ -142,37 +142,45 @@ jobs:
 
       - name: Publish to npm
         if: ${{ steps.npm.outputs.needed == 'true' }}
-        # Authenticated by OIDC via npm trusted publishing - deliberately no
-        # NODE_AUTH_TOKEN. npm also attaches a provenance attestation
-        # automatically on this path, linking the package to this exact commit
-        # and workflow run.
         run: |
           set -euo pipefail
-          # Fail loudly rather than silently falling back to a stale
-          # credential: any configured _authToken means OIDC gets bypassed,
-          # which is exactly how the 0.1.0 publish failed. npm prints an empty
-          # string when the key is unset.
-          token=$(npm config get //registry.npmjs.org/:_authToken 2>/dev/null | tr -d '[:space:]')
-          if [ -n "$token" ] && [ "$token" != "undefined" ] && [ "$token" != "null" ]; then
+          # npm refuses `config get` on _authToken - it is "protected" and
+          # exits non-zero whether set or unset, which under `set -e` silently
+          # killed this step. `config list` shows the key when configured and
+          # is the only reliable probe. Any token here means OIDC is bypassed.
+          if npm config list 2>/dev/null | grep -q '^//registry\.npmjs\.org/:_authToken'; then
             echo "::error::An npm _authToken is configured, so OIDC would be bypassed. Remove registry-url / NODE_AUTH_TOKEN from this job."
             exit 1
           fi
-          echo "No npm token configured - publishing over OIDC as $(npm -v)."
-          npx changeset publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+          # `npm publish`, not `changeset publish`. changesets does not support
+          # trusted publishing: on the same runner, in the same step, with the
+          # OIDC environment present, `npm publish` succeeded and signed a
+          # provenance statement while `changeset publish` failed seconds later
+          # with ENEEDAUTH. Tags are created separately below.
+          echo "Publishing over OIDC with npm $(npm -v)."
+          npm publish --access public
+
+      # Gated on the tag's absence, not on having just published. 0.1.0 reached
+      # npm while its tag and release did not, and a condition tied to
+      # publishing would have left that permanently unfixable.
       - name: Push tags and create the GitHub release
-        if: ${{ steps.npm.outputs.needed == 'true' }}
+        if: ${{ always() && steps.npm.outputs.version != '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.npm.outputs.version }}
         run: |
           set -euo pipefail
+          tag="v${VERSION}"
+
+          # changeset publish used to create tags; since publishing is now
+          # npm's job, ask changesets for them explicitly. Skip if it already
+          # exists so re-runs are harmless.
+          if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            npx changeset git-tag
+          fi
           git push origin --tags
 
-          # changeset publish tags as v<version> for a single-package repo.
-          tag="v${VERSION}"
           if ! gh release view "$tag" >/dev/null 2>&1; then
             # Release notes come from the section changesets just wrote.
             notes=$(awk '/^## /{n++} n==1' CHANGELOG.md | tail -n +2 | sed '/./,$!d')

@@ -3,6 +3,10 @@ name: release
 on:
   push:
     branches: [main]
+  # Manual trigger for recovery: the release commit carries a skip-CI marker,
+  # so after fixing something like an expired npm token there is otherwise no
+  # push to retrigger the publish.
+  workflow_dispatch:
 
 concurrency:
   # Two releases must never interleave: they would race on the version commit
@@ -48,8 +52,10 @@ jobs:
           # @changesets/changelog-github needs this to build PR links.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Always build: a recovery run has no pending changesets but still
+      # publishes, and the package ships dist/ - publishing without it would
+      # put a broken tarball on npm.
       - name: Build
-        if: ${{ steps.pending.outputs.count != '0' }}
         run: npm run build
 
       - name: Commit and push the version bump
@@ -90,18 +96,38 @@ jobs:
           git push origin HEAD:main
           echo "released=true" >> "$GITHUB_OUTPUT"
 
+      - name: Is this version already on npm?
+        id: npm
+        run: |
+          set -uo pipefail
+          name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+          # Keyed off the registry rather than off "did we just version", so a
+          # run that versioned successfully but failed to publish (expired npm
+          # token, registry outage) recovers on the next push to main instead
+          # of stranding a version that exists in git but not on npm.
+          if npm view "$name@$version" version >/dev/null 2>&1; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+            echo "$name@$version is already published."
+          else
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            echo "$name@$version is not on the registry - publishing."
+          fi
+
       - name: Publish to npm
-        if: ${{ steps.commit.outputs.released == 'true' }}
+        if: ${{ steps.npm.outputs.needed == 'true' }}
         run: npx changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Push tags and create the GitHub release
-        if: ${{ steps.commit.outputs.released == 'true' }}
+        if: ${{ steps.npm.outputs.needed == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.commit.outputs.version }}
+          VERSION: ${{ steps.npm.outputs.version }}
         run: |
           set -euo pipefail
           git push origin --tags

@@ -20,6 +20,8 @@
     "zod": "^3"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
     "@eslint/compat": "^1",
     "@oclif/prettier-config": "^0.2.1",
     "@oclif/test": "^4",
@@ -89,12 +91,14 @@
   "repository": "phibar/dotsloth",
   "scripts": {
     "build": "shx rm -rf dist && tsc -b",
+    "changeset": "changeset",
     "lint": "eslint",
     "postpack": "shx rm -f oclif.manifest.json",
     "posttest": "npm run lint",
     "prepack": "oclif manifest && oclif readme",
+    "release": "changeset publish",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif readme && git add README.md"
+    "version": "changeset version && oclif readme && git add README.md CHANGELOG.md"
   },
   "types": "dist/index.d.ts"
 }

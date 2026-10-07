@@ -25,6 +25,8 @@ config — in sync across machines via iCloud Drive and the macOS Keychain.
   them. `dotsloth env` backs them up and restores them after a reinstall.
 - **Claude Code.** Share `settings.json`, project memory and conversation
   history between machines.
+- **Mail.** Back up Mail rules and signatures and recreate them on a new
+  machine, with a checklist for the accounts that need a manual sign-in.
 - **Pre-reinstall safety.** `dotsloth doctor` refuses to say "safe to wipe"
   while anything would be lost.
 - **Periodic sync.** A launchd agent keeps everything current.

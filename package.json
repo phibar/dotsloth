@@ -83,6 +83,9 @@
       },
       "claude": {
         "description": "Share Claude Code settings, memory and history between machines"
+      },
+      "mail": {
+        "description": "Back up and restore Mail accounts, rules and signatures"
       }
     }
   },

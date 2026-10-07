@@ -103,7 +103,20 @@ dotsloth env list        # confirm
 Run this *after* cloning. `env pull` will not scatter files into a tree that is
 not there yet.
 
-### 9. Claude Code
+### 9. Mail
+
+```sh
+dotsloth mail restore
+```
+
+Recreates your signatures and rules, and prints the accounts to re-add. The
+accounts themselves cannot be scripted - every one is Apple ID or OAuth backed,
+a configuration profile can only provision plain IMAP/SMTP with a stored
+password, and macOS 26 removed `profiles install` anyway. Work down the
+checklist; re-run `dotsloth mail restore` afterwards and the ticks confirm what
+is configured.
+
+### 10. Claude Code
 
 ```sh
 dotsloth claude link            # share settings.json and global CLAUDE.md
@@ -114,7 +127,7 @@ dotsloth claude history pull    # conversation history
 Claude Code auth lives in the macOS keychain, not in `~/.claude`, so you will
 simply log in again.
 
-### 10. Turn on periodic sync
+### 11. Turn on periodic sync
 
 ```sh
 dotsloth daemon install

@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.3.0
+
+### Minor Changes
+
+- [#56](https://github.com/phibar/dotsloth/pull/56) [`aade56d`](https://github.com/phibar/dotsloth/commit/aade56d2d5f81b820a49fd33dec81229ad8d7b40) Thanks [@phibar](https://github.com/phibar)! - Add `dotsloth mail export|status|restore`. Backs up Mail accounts, rules and signatures, recreates rules and signatures automatically on a new machine, and prints a checklist for the accounts that can only be re-added by signing in.
+
 ## 0.2.1
 
 ### Patch Changes

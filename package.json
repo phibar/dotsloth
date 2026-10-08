@@ -34,8 +34,9 @@
     "mocha": "^12.0.3",
     "oclif": "^6.0.2",
     "shx": "^0.4.0",
-    "ts-node": "^10",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3",
+    "tsx": "^4.21.0",
+    "typescript-native": "npm:typescript@^7.0.2"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -91,7 +92,7 @@
   },
   "repository": "phibar/dotsloth",
   "scripts": {
-    "build": "shx rm -rf dist && tsc -b",
+    "build": "shx rm -rf dist && node node_modules/typescript-native/bin/tsc -b",
     "changeset": "changeset",
     "lint": "eslint",
     "postpack": "shx rm -f oclif.manifest.json",

@@ -7,6 +7,12 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      # The root typescript stays on 6.x on purpose: typescript-eslint and
+      # ts-api-utils need its JS compiler API, which TS 7 (the Go port) no
+      # longer ships. The build uses TS 7 via the typescript-native alias.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "deps"
       prefix-development: "deps-dev"

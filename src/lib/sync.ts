@@ -1,4 +1,5 @@
 import * as fs from 'node:fs'
+import * as path from 'node:path'
 
 import type {DevSlothConfig, SymlinkStatus} from '../types/index.js'
 
@@ -81,7 +82,9 @@ export async function runSync(options: SyncOptions = {}): Promise<SyncResult> {
   // Main gitconfig, with the includeIf patterns that route each org to its identity
   const userName = config.organizations.length > 0 ? config.organizations[0].gitUsername : 'Your Name'
   if (!dryRun) {
-    fs.writeFileSync(getIcloudDotfilePath('gitconfig'), generateMainGitconfig(config, userName), 'utf8')
+    const gitconfigPath = getIcloudDotfilePath('gitconfig')
+    fs.mkdirSync(path.dirname(gitconfigPath), {recursive: true})
+    fs.writeFileSync(gitconfigPath, generateMainGitconfig(config, userName), 'utf8')
   }
 
   add(true, 'Generated gitconfig with includeIf patterns')

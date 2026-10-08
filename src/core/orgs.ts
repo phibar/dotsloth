@@ -83,14 +83,18 @@ function validateOrg(input: Organization): Organization {
  * folderName of "", "." or "../x" would otherwise point a recursive delete at
  * the GitHub root itself or outside it.
  */
-function safeOrgPath(config: DevSlothConfig, org: Organization): string {
-  const root = path.resolve(config.paths.githubRoot)
-  const dir = path.resolve(root, org.folderName)
-  if (path.dirname(dir) !== root || path.basename(dir) !== org.folderName) {
-    throw new CoreError('UNSAFE_PATH', `Refusing to use '${org.folderName}' as an org folder under ${root}`)
+export function safeOrgFolder(githubRoot: string, folderName: string): string {
+  const root = path.resolve(githubRoot)
+  const dir = path.resolve(root, folderName)
+  if (path.dirname(dir) !== root || path.basename(dir) !== folderName) {
+    throw new CoreError('UNSAFE_PATH', `Refusing to use '${folderName}' as an org folder under ${root}`)
   }
 
   return dir
+}
+
+function safeOrgPath(config: DevSlothConfig, org: Organization): string {
+  return safeOrgFolder(config.paths.githubRoot, org.folderName)
 }
 
 export interface AddOrgResult {

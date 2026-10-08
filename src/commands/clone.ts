@@ -1,14 +1,11 @@
-import * as path from 'node:path'
-import {Args, Command, Flags} from '@oclif/core'
+import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-import {autoSync} from '../cli/autosync.js'
-import {addOrganization, getOrganization, loadConfig} from '../lib/config.js'
-import {run} from '../lib/exec.js'
-import {ensureOrgDirectory, parseGitUrl, writeOrgGitconfig} from '../lib/git.js'
-import type {Organization} from '../types/index.js'
+import {printAutoSync} from '../cli/autosync.js'
+import {BaseCommand} from '../cli/base-command.js'
+import {type ClonePlan, type CloneTarget, clone, planClone} from '../core/clone.js'
 
-export default class Clone extends Command {
+export default class Clone extends BaseCommand {
   static override args = {
     url: Args.string({description: 'Repository URL to clone', required: true}),
   }
@@ -25,119 +22,79 @@ export default class Clone extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Clone)
 
-    const config = loadConfig()
-    if (!config) {
-      this.error('No configuration found. Run "dotsloth init" first.')
-    }
+    const plan = planClone(args.url, {org: flags.org})
+    this.log(chalk.dim(`Repository: ${plan.orgName}/${plan.repo} on ${plan.host}`))
 
-    // Parse the URL
-    const parsed = parseGitUrl(args.url)
-    if (!parsed) {
-      this.error(`Could not parse repository URL: ${args.url}`)
-    }
+    const target = plan.org ? undefined : await this.chooseTarget(plan)
 
-    this.log(chalk.dim(`Repository: ${parsed.org}/${parsed.repo} on ${parsed.host}`))
-
-    // Determine organization
-    let orgName = flags.org || parsed.org
-    let org = getOrganization(orgName)
-
-    // If org not found, prompt to create it
-    if (!org) {
-      this.log(chalk.yellow(`Organization '${orgName}' not configured`))
-
-      const {action} = await Enquirer.prompt<{action: string}>({
-        choices: [
-          {message: `Create '${orgName}' organization`, name: 'create'},
-          {message: 'Select existing organization', name: 'select'},
-          {message: 'Clone without organization config', name: 'skip'},
-        ],
-        message: 'What would you like to do?',
-        name: 'action',
-        type: 'select',
-      })
-
-      if (action === 'create') {
-        // Prompt for org details
-        const {email} = await Enquirer.prompt<{email: string}>({
-          message: 'Git email for this organization:',
-          name: 'email',
-          type: 'input',
-          validate: (input) => (input.includes('@') ? true : 'Invalid email'),
-        })
-
-        const {username} = await Enquirer.prompt<{username: string}>({
-          message: 'Git username for this organization:',
-          name: 'username',
-          type: 'input',
-          validate: (input) => (input.length > 0 ? true : 'Username required'),
-        })
-
-        const newOrg: Organization = {
-          folderName: orgName,
-          gitEmail: email,
-          gitUsername: username,
-          name: orgName,
-        }
-
-        addOrganization(newOrg)
-        writeOrgGitconfig(newOrg)
-        org = newOrg
-
-        this.log(chalk.green('✓') + ` Created organization '${orgName}'`)
-      } else if (action === 'select') {
-        if (config.organizations.length === 0) {
-          this.error('No organizations configured. Run "dotsloth org add" first.')
-        }
-
-        const {selectedOrg} = await Enquirer.prompt<{selectedOrg: string}>({
-          choices: config.organizations.map((o) => ({message: `${o.name} (${o.gitEmail})`, name: o.name})),
-          message: 'Select organization:',
-          name: 'selectedOrg',
-          type: 'select',
-        })
-
-        org = getOrganization(selectedOrg)
-        if (org) {
-          orgName = org.folderName
-        }
-      } else {
-        // Skip org config - use parsed org name for folder
-        orgName = parsed.org
+    const result = await clone(args.url, {interactive: true, org: flags.org, target}, (event) => {
+      if (event.type === 'org-created') {
+        this.log(chalk.green('✓') + ` Created organization '${event.name}'`)
+      } else if (event.type === 'cloning') {
+        this.log('')
+        this.log(chalk.bold('Cloning...'))
+        this.log(chalk.dim(`  From: ${event.url}`))
+        this.log(chalk.dim(`  To:   ${event.repoPath}`))
+        this.log('')
       }
-    }
+    })
 
-    // Ensure org directory exists
-    const orgPath = ensureOrgDirectory(orgName, config.paths.githubRoot)
-    const repoPath = path.join(orgPath, parsed.repo)
-
-    // Sync first: the includeIf identity must exist in ~/.gitconfig *before*
-    // git creates the repo, otherwise the first commit gets the wrong author (#1).
-    await autoSync(this.log.bind(this), {quiet: true})
-
-    this.log('')
-    this.log(chalk.bold('Cloning...'))
-    this.log(chalk.dim(`  From: ${args.url}`))
-    this.log(chalk.dim(`  To:   ${repoPath}`))
-    this.log('')
-
-    // Clone the repository
-    try {
-      // `--` ends option parsing: a URL can never be read as a git option.
-      run('git', ['clone', '--', args.url, repoPath], {interactive: true})
-    } catch {
-      this.error('Git clone failed')
-    }
-
+    printAutoSync(this.log.bind(this), result.sync, {quiet: true})
     this.log('')
     this.log(chalk.bold.green('✓ Repository cloned successfully'))
-
-    if (org) {
-      this.log(chalk.dim(`  Organization: ${org.name}`))
-      this.log(chalk.dim(`  Git identity: ${org.gitUsername} <${org.gitEmail}>`))
+    if (result.org) {
+      this.log(chalk.dim(`  Organization: ${result.org.name}`))
+      this.log(chalk.dim(`  Git identity: ${result.org.gitUsername} <${result.org.gitEmail}>`))
     }
 
-    this.log(chalk.dim(`  Location: ${repoPath}`))
+    this.log(chalk.dim(`  Location: ${result.repoPath}`))
     this.log('')
+  }
+
+  private async chooseTarget(plan: ClonePlan): Promise<CloneTarget> {
+    this.log(chalk.yellow(`Organization '${plan.orgName}' not configured`))
+
+    const {action} = await Enquirer.prompt<{action: string}>({
+      choices: [
+        {message: `Create '${plan.orgName}' organization`, name: 'create'},
+        {message: 'Select existing organization', name: 'select'},
+        {message: 'Clone without organization config', name: 'skip'},
+      ],
+      message: 'What would you like to do?',
+      name: 'action',
+      type: 'select',
+    })
+
+    if (action === 'create') {
+      const {email} = await Enquirer.prompt<{email: string}>({
+        message: 'Git email for this organization:',
+        name: 'email',
+        type: 'input',
+        validate: (input) => (input.includes('@') ? true : 'Invalid email'),
+      })
+      const {username} = await Enquirer.prompt<{username: string}>({
+        message: 'Git username for this organization:',
+        name: 'username',
+        type: 'input',
+        validate: (input) => (input.length > 0 ? true : 'Username required'),
+      })
+      return {gitEmail: email, gitUsername: username, kind: 'new-org'}
+    }
+
+    if (action === 'select') {
+      if (plan.organizations.length === 0) {
+        this.error('No organizations configured. Run "dotsloth org add" first.')
+      }
+
+      const {selectedOrg} = await Enquirer.prompt<{selectedOrg: string}>({
+        choices: plan.organizations.map((o) => ({message: `${o.name} (${o.gitEmail})`, name: o.name})),
+        message: 'Select organization:',
+        name: 'selectedOrg',
+        type: 'select',
+      })
+      return {kind: 'org', name: selectedOrg}
+    }
+
+    return {kind: 'none'}
   }
 }

@@ -97,6 +97,8 @@ export function runAsync(
 }
 
 export interface StreamOptions extends Omit<ExecOptions, 'input' | 'interactive' | 'maxBuffer'> {
+  /** Added to the inherited environment. */
+  env?: Record<string, string>
   /** Called for every complete line on stdout or stderr. */
   onLine: (line: string, stream: 'stderr' | 'stdout') => void
 }
@@ -108,7 +110,12 @@ export interface StreamOptions extends Omit<ExecOptions, 'input' | 'interactive'
  */
 export function runStreaming(command: string, args: readonly string[], options: StreamOptions): Promise<number> {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {cwd: options.cwd, stdio: ['ignore', 'pipe', 'pipe'], timeout: options.timeout})
+    const child = spawn(command, args, {
+      cwd: options.cwd,
+      env: options.env ? {...process.env, ...options.env} : process.env,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: options.timeout,
+    })
 
     for (const stream of ['stdout', 'stderr'] as const) {
       let pending = ''

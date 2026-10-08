@@ -1,10 +1,9 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import {ConfigError, readConfig} from '../lib/config.js'
 import type {EnvFile, EnvSyncEntry} from '../lib/env.js'
 import {compare, copyFromStore, copyToStore, DEFAULT_ENV_PATTERNS, scanAll, scanStore} from '../lib/env.js'
 import {PATHS} from '../lib/paths.js'
-import {CoreError} from './errors.js'
+import {getGithubRoot} from './config.js'
 
 /**
  * Env files hold credentials, so nothing here ever returns their contents:
@@ -47,16 +46,6 @@ export interface EnvTransferOptions {
   force?: boolean | readonly string[]
 }
 
-/** The configured GitHub root; the default one before init. */
-export function envGithubRoot(): string {
-  try {
-    return readConfig()?.paths.githubRoot ?? PATHS.githubRoot
-  } catch (error) {
-    if (error instanceof ConfigError) throw new CoreError('CONFIG_INVALID', 'config.json is invalid', error.issues)
-    throw error
-  }
-}
-
 const keyOf = (file: EnvFile) => `${file.org}/${file.repo}/${file.relativePath}`
 const describeFile = (file: EnvFile) => ({
   key: keyOf(file),
@@ -71,7 +60,7 @@ function isForced(force: EnvTransferOptions['force'], key: string): boolean {
 
 /** Every env file in the repos or the store, with its sync state. */
 export function scanEnv({unsavedOnly = false} = {}): {entries: EnvEntry[]; githubRoot: string} {
-  const githubRoot = envGithubRoot()
+  const githubRoot = getGithubRoot()
   const entries = scanAll(githubRoot, DEFAULT_ENV_PATTERNS)
     .map((file) => compare(file))
     .filter((entry) => !unsavedOnly || entry.state !== 'identical')
@@ -89,7 +78,7 @@ function summarize(githubRoot: string, transfers: EnvTransfer[]): EnvTransferRes
  * be newer work from the other machine, so it is only overwritten when forced.
  */
 export function pushEnv({dryRun = false, force = false}: EnvTransferOptions = {}): EnvTransferResult {
-  const githubRoot = envGithubRoot()
+  const githubRoot = getGithubRoot()
   const transfers: EnvTransfer[] = []
 
   for (const entry of scanAll(githubRoot, DEFAULT_ENV_PATTERNS).map((file) => compare(file))) {
@@ -113,7 +102,7 @@ export function pushEnv({dryRun = false, force = false}: EnvTransferOptions = {}
  * yet are skipped rather than created as a tree of stray env files.
  */
 export function pullEnv({dryRun = false, force = false}: EnvTransferOptions = {}): EnvTransferResult {
-  const githubRoot = envGithubRoot()
+  const githubRoot = getGithubRoot()
   const transfers: EnvTransfer[] = []
 
   for (const file of scanStore(githubRoot)) {
@@ -139,5 +128,5 @@ export function pullEnv({dryRun = false, force = false}: EnvTransferOptions = {}
 
 /** True when the store holds no env files at all. */
 export function envStoreIsEmpty(): boolean {
-  return scanStore(envGithubRoot()).length === 0
+  return scanStore(getGithubRoot()).length === 0
 }

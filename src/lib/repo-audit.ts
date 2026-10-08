@@ -2,7 +2,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 import {isEnvFile} from './env.js'
-import {run, tryRun} from './exec.js'
+import {runAsync} from './exec.js'
 
 export type BranchRisk = 'local-only' | 'merged' | 'unknown'
 
@@ -27,8 +27,13 @@ export interface RepoAudit {
   stashes: number
 }
 
-function git(repoPath: string, args: string[]): string {
-  return tryRun('git', ['-C', repoPath, ...args])?.trim() ?? ''
+/** Output of a git command, or '' when it fails. Async, so a long audit never blocks a server. */
+async function git(repoPath: string, args: string[]): Promise<string> {
+  try {
+    return (await runAsync('git', ['-C', repoPath, ...args])).trim()
+  } catch {
+    return ''
+  }
 }
 
 export function isRepo(dir: string): boolean {
@@ -81,12 +86,14 @@ export function findRepos(githubRoot: string): string[] {
  * destroyed". During the reinstall audit this separated 20 safe branches from
  * 3 carrying 55 commits that existed nowhere else.
  */
-function classifyBranch(repoPath: string, branch: string): {reason: string; risk: BranchRisk} {
+async function classifyBranch(repoPath: string, branch: string): Promise<{reason: string; risk: BranchRisk}> {
   let raw = ''
   try {
-    raw = run('gh', ['pr', 'list', '--head', branch, '--state', 'all', '--json', 'number,state'], {
-      cwd: repoPath,
-    }).trim()
+    raw = (
+      await runAsync('gh', ['pr', 'list', '--head', branch, '--state', 'all', '--json', 'number,state'], {
+        cwd: repoPath,
+      })
+    ).trim()
   } catch {
     return {reason: 'could not reach GitHub', risk: 'unknown'}
   }
@@ -110,11 +117,11 @@ export interface AuditOptions {
   offline?: boolean
 }
 
-export function auditRepo(repoPath: string, options: AuditOptions = {}): RepoAudit {
+export async function auditRepo(repoPath: string, options: AuditOptions = {}): Promise<RepoAudit> {
   // An untracked file that the env store already backs up is not at risk, and
   // counting it here as well as under "env files" meant doctor could never
   // reach zero: backing it up cleared one line and left the other standing.
-  const dirty = git(repoPath, ['status', '--porcelain'])
+  const dirty = (await git(repoPath, ['status', '--porcelain']))
     .split('\n')
     .filter(Boolean)
     .filter((line) => {
@@ -123,9 +130,9 @@ export function auditRepo(repoPath: string, options: AuditOptions = {}): RepoAud
       const name = path.basename(line.slice(3).trim())
       return !isEnvFile(name)
     }).length
-  const stashes = git(repoPath, ['stash', 'list']).split('\n').filter(Boolean).length
+  const stashes = (await git(repoPath, ['stash', 'list'])).split('\n').filter(Boolean).length
 
-  const refs = git(repoPath, [
+  const refs = await git(repoPath, [
     'for-each-ref',
     '--format=%(refname:short)\t%(upstream:short)\t%(upstream:track)',
     'refs/heads',
@@ -134,7 +141,8 @@ export function auditRepo(repoPath: string, options: AuditOptions = {}): RepoAud
 
   for (const line of refs.split('\n').filter(Boolean)) {
     const [name, , track] = line.split('\t')
-    const unpushed = Number(git(repoPath, ['rev-list', '--count', name, '--not', '--remotes']) || '0')
+    // biome-ignore lint/performance/noAwaitInLoops: one branch at a time keeps gh lookups from bursting
+    const unpushed = Number((await git(repoPath, ['rev-list', '--count', name, '--not', '--remotes'])) || '0')
     const upstreamGone = (track ?? '').includes('gone')
 
     // A branch with no upstream but nothing unpushed is fine: its commits are
@@ -143,7 +151,7 @@ export function auditRepo(repoPath: string, options: AuditOptions = {}): RepoAud
 
     const {reason, risk} =
       unpushed > 0 && !options.offline
-        ? classifyBranch(repoPath, name)
+        ? await classifyBranch(repoPath, name)
         : {reason: upstreamGone ? 'upstream deleted on remote' : 'not checked', risk: 'unknown' as BranchRisk}
 
     branches.push({name, reason, risk, unpushed, upstreamGone})

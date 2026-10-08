@@ -112,9 +112,7 @@ export function addOrganization(org: Organization): DevSlothConfig {
   }
 
   // Check if org already exists
-  const existingIndex = config.organizations.findIndex(
-    (o) => o.name.toLowerCase() === org.name.toLowerCase(),
-  )
+  const existingIndex = config.organizations.findIndex((o) => o.name.toLowerCase() === org.name.toLowerCase())
 
   if (existingIndex === -1) {
     config.organizations.push(org)
@@ -135,9 +133,7 @@ export function removeOrganization(orgName: string): DevSlothConfig | null {
     return null
   }
 
-  config.organizations = config.organizations.filter(
-    (o) => o.name.toLowerCase() !== orgName.toLowerCase(),
-  )
+  config.organizations = config.organizations.filter((o) => o.name.toLowerCase() !== orgName.toLowerCase())
 
   saveConfig(config)
   return config

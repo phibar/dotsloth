@@ -1,26 +1,24 @@
+import {execSync} from 'node:child_process'
+import * as path from 'node:path'
 import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-import {execSync} from 'node:child_process'
-import * as path from 'node:path'
-
-import type {Organization} from '../types/index.js'
-
 import {autoSync} from '../lib/autosync.js'
 import {addOrganization, getOrganization, loadConfig} from '../lib/config.js'
 import {ensureOrgDirectory, parseGitUrl, writeOrgGitconfig} from '../lib/git.js'
+import type {Organization} from '../types/index.js'
 
 export default class Clone extends Command {
   static override args = {
     url: Args.string({description: 'Repository URL to clone', required: true}),
   }
-static override description = 'Clone a repository to the correct organization folder'
-static override examples = [
+  static override description = 'Clone a repository to the correct organization folder'
+  static override examples = [
     '<%= config.bin %> <%= command.id %> git@github.com:phibar/some-repo.git',
     '<%= config.bin %> <%= command.id %> https://github.com/ipfs/kubo',
     '<%= config.bin %> <%= command.id %> git@github.com:fork/repo.git --org phibar',
   ]
-static override flags = {
+  static override flags = {
     org: Flags.string({char: 'o', description: 'Override organization (use a different org than detected)'}),
   }
 

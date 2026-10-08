@@ -1,11 +1,9 @@
-import {expect} from 'chai'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-
-import type {ClaudeProject} from '../../src/lib/claude-projects.js'
-
+import {expect} from 'chai'
 import {sessionFiles} from '../../src/lib/claude-history.js'
+import type {ClaudeProject} from '../../src/lib/claude-projects.js'
 
 const write = (dir: string, name: string, body = '{"type":"x"}\n') => {
   fs.mkdirSync(dir, {recursive: true})

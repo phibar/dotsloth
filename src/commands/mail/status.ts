@@ -5,7 +5,7 @@ import {MAIL_STORE, mailInstalled, readAccounts, readExport, readRules, readSign
 
 export default class MailStatus extends Command {
   static override description = 'Compare Mail on this machine with what is in the dotsloth store'
-static override examples = ['<%= config.bin %> <%= command.id %>']
+  static override examples = ['<%= config.bin %> <%= command.id %>']
 
   public async run(): Promise<void> {
     this.log(chalk.bold('\n🦥 mail status\n'))
@@ -21,8 +21,12 @@ static override examples = ['<%= config.bin %> <%= command.id %>']
 
     if (!mailInstalled()) {
       this.log('')
-      this.log(chalk.dim(`Mail.app not present. Store holds ${stored.accounts.length} account(s), ` +
-        `${stored.rules.length} rule(s), ${stored.signatures.length} signature(s).`))
+      this.log(
+        chalk.dim(
+          `Mail.app not present. Store holds ${stored.accounts.length} account(s), ` +
+            `${stored.rules.length} rule(s), ${stored.signatures.length} signature(s).`,
+        ),
+      )
       this.log('')
       return
     }
@@ -35,7 +39,9 @@ static override examples = ['<%= config.bin %> <%= command.id %>']
 
     const row = (label: string, liveCount: number, storeCount: number) => {
       const mark = liveCount === storeCount ? chalk.green('✓') : chalk.yellow('!')
-      this.log(`  ${mark} ${label.padEnd(12)} local ${String(liveCount).padStart(3)}   store ${String(storeCount).padStart(3)}`)
+      this.log(
+        `  ${mark} ${label.padEnd(12)} local ${String(liveCount).padStart(3)}   store ${String(storeCount).padStart(3)}`,
+      )
     }
 
     this.log('')

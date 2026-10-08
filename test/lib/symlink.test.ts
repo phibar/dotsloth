@@ -1,7 +1,7 @@
-import {expect} from 'chai'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
+import {expect} from 'chai'
 
 import {checkSymlink, createSymlink, removeSymlink} from '../../src/lib/symlink.js'
 

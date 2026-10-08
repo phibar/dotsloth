@@ -12,11 +12,7 @@ export const PLIST_PATH = path.join(os.homedir(), 'Library/LaunchAgents', `${DAE
 export const LOG_DIR = path.join(os.homedir(), 'Library/Logs/dotsloth')
 
 function escapeXml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
 }
 
 export interface DaemonOptions {

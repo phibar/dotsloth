@@ -1,6 +1,6 @@
+import * as fs from 'node:fs'
 import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
-import * as fs from 'node:fs'
 
 import {
   ACTIVE_SESSION_MINUTES,
@@ -10,8 +10,8 @@ import {
   HISTORY_STORE,
   mergeHistory,
   readIfExists,
-  sessionFiles,
   SHARED_HISTORY,
+  sessionFiles,
   writeAtomic,
 } from '../../lib/claude-history.js'
 import {discoverProjects} from '../../lib/claude-projects.js'
@@ -26,13 +26,13 @@ export default class ClaudeHistory extends Command {
       options: ['status', 'push', 'pull'],
     }),
   }
-static override description = 'Share Claude Code conversation history between machines'
-static override examples = [
+  static override description = 'Share Claude Code conversation history between machines'
+  static override examples = [
     '<%= config.bin %> <%= command.id %>',
     '<%= config.bin %> <%= command.id %> push',
     '<%= config.bin %> <%= command.id %> pull --retention 30',
   ]
-static override flags = {
+  static override flags = {
     'dry-run': Flags.boolean({description: 'Show what would change without writing'}),
     retention: Flags.integer({
       default: DEFAULT_RETENTION_DAYS,

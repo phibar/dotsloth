@@ -131,7 +131,11 @@ export function auditRepo(repoPath: string, options: AuditOptions = {}): RepoAud
     }).length
   const stashes = git(repoPath, ['stash', 'list']).split('\n').filter(Boolean).length
 
-  const refs = git(repoPath, ['for-each-ref', '--format=%(refname:short)\t%(upstream:short)\t%(upstream:track)', 'refs/heads'])
+  const refs = git(repoPath, [
+    'for-each-ref',
+    '--format=%(refname:short)\t%(upstream:short)\t%(upstream:track)',
+    'refs/heads',
+  ])
   const branches: BranchFinding[] = []
 
   for (const line of refs.split('\n').filter(Boolean)) {
@@ -156,9 +160,5 @@ export function auditRepo(repoPath: string, options: AuditOptions = {}): RepoAud
 
 /** A repo is unsafe to wipe if anything here would not survive. */
 export function isAtRisk(audit: RepoAudit): boolean {
-  return (
-    audit.dirty > 0 ||
-    audit.stashes > 0 ||
-    audit.branches.some((b) => b.unpushed > 0 && b.risk !== 'merged')
-  )
+  return audit.dirty > 0 || audit.stashes > 0 || audit.branches.some((b) => b.unpushed > 0 && b.risk !== 'merged')
 }

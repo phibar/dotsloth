@@ -81,7 +81,7 @@ export function osascript(script: string, {raw = false} = {}): string {
     })
     return raw ? out.replace(/\n$/, '') : out.trim()
   } catch (error: unknown) {
-    const {stderr} = (error as {stderr?: Buffer | string})
+    const {stderr} = error as {stderr?: Buffer | string}
     const message = (stderr ? String(stderr) : (error as Error).message).trim()
     throw new Error(message || 'osascript failed')
   }
@@ -249,7 +249,11 @@ end tell`
 
 export function writeExport(data: MailExport): void {
   fs.mkdirSync(SIGNATURES_DIR, {recursive: true})
-  fs.writeFileSync(ACCOUNTS_FILE, `${JSON.stringify({accounts: data.accounts, exportedAt: data.exportedAt}, null, 2)}\n`, 'utf8')
+  fs.writeFileSync(
+    ACCOUNTS_FILE,
+    `${JSON.stringify({accounts: data.accounts, exportedAt: data.exportedAt}, null, 2)}\n`,
+    'utf8',
+  )
   fs.writeFileSync(RULES_FILE, `${JSON.stringify(data.rules, null, 2)}\n`, 'utf8')
 
   // One file per signature: the content is multi-line rich text and round-trips
@@ -291,9 +295,7 @@ export function howToAdd(account: MailAccount): string {
 
     case 'imap':
     case 'pop': {
-      return account.server
-        ? `Mail → Add Account (${account.server}:${account.port ?? '?'})`
-        : 'Mail → Add Account'
+      return account.server ? `Mail → Add Account (${account.server}:${account.port ?? '?'})` : 'Mail → Add Account'
     }
 
     default: {

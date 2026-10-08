@@ -1,7 +1,7 @@
+import * as fs from 'node:fs'
 import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-import * as fs from 'node:fs'
 
 import {autoSync} from '../../lib/autosync.js'
 import {loadConfig, removeOrganization} from '../../lib/config.js'
@@ -12,9 +12,9 @@ export default class OrgRemove extends Command {
   static override args = {
     name: Args.string({description: 'Organization name to remove', required: true}),
   }
-static override description = 'Remove an organization configuration'
-static override examples = ['<%= config.bin %> <%= command.id %> phibar']
-static override flags = {
+  static override description = 'Remove an organization configuration'
+  static override examples = ['<%= config.bin %> <%= command.id %> phibar']
+  static override flags = {
     'delete-repos': Flags.boolean({description: 'Also delete the repository folder'}),
     force: Flags.boolean({char: 'f', description: 'Skip confirmation'}),
   }

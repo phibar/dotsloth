@@ -8,9 +8,9 @@ export default class SecretRemove extends Command {
   static override args = {
     name: Args.string({description: 'Secret name to remove', required: true}),
   }
-static override description = 'Remove a secret from Keychain'
-static override examples = ['<%= config.bin %> <%= command.id %> AWS_ACCESS_KEY_ID']
-static override flags = {
+  static override description = 'Remove a secret from Keychain'
+  static override examples = ['<%= config.bin %> <%= command.id %> AWS_ACCESS_KEY_ID']
+  static override flags = {
     force: Flags.boolean({char: 'f', description: 'Skip confirmation'}),
   }
 

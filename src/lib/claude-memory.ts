@@ -1,9 +1,7 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-
-import type {ClaudeProject} from './claude-projects.js'
-
 import {CLAUDE_STORE} from './claude.js'
+import type {ClaudeProject} from './claude-projects.js'
 
 export const MEMORY_STORE = path.join(CLAUDE_STORE, 'memory')
 

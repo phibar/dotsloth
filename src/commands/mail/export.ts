@@ -1,19 +1,12 @@
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 
-import {
-  MAIL_STORE,
-  mailInstalled,
-  readAccounts,
-  readRules,
-  readSignatures,
-  writeExport,
-} from '../../lib/mail.js'
+import {MAIL_STORE, mailInstalled, readAccounts, readRules, readSignatures, writeExport} from '../../lib/mail.js'
 
 export default class MailExport extends Command {
   static override description = 'Export Mail accounts, rules and signatures to the dotsloth store'
-static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
+  static override flags = {
     'dry-run': Flags.boolean({description: 'Show what would be exported without writing'}),
   }
 

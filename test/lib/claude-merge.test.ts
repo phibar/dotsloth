@@ -43,7 +43,9 @@ describe('mergeHistory', () => {
   })
 
   it('preserves unparseable lines rather than dropping them', () => {
-    const merged = mergeHistory('not json at all', entry(1, 's1', 'ok')).trim().split('\n')
+    const merged = mergeHistory('not json at all', entry(1, 's1', 'ok'))
+      .trim()
+      .split('\n')
     expect(merged).to.have.lengthOf(2)
     expect(merged[0]).to.equal('not json at all')
   })

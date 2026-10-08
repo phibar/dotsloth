@@ -15,8 +15,8 @@ export function printSyncResult(log: (message?: string) => void, result: SyncRes
 
 export default class Sync extends Command {
   static override description = 'Sync configurations from iCloud Drive'
-static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
+  static override flags = {
     'dry-run': Flags.boolean({description: 'Show what would be synced without making changes'}),
     force: Flags.boolean({char: 'f', description: 'Force overwrite local files'}),
   }

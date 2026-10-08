@@ -1,7 +1,7 @@
+import * as fs from 'node:fs'
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-import * as fs from 'node:fs'
 
 import {
   configExists,
@@ -19,8 +19,8 @@ import {createSymlink} from '../lib/symlink.js'
 
 export default class Init extends Command {
   static override description = 'Initialize dotsloth on this machine'
-static override examples = ['<%= config.bin %> <%= command.id %>']
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>']
+  static override flags = {
     force: Flags.boolean({char: 'f', description: 'Overwrite existing configuration'}),
     'skip-secrets': Flags.boolean({description: 'Skip secrets extraction from zprofile'}),
     'skip-ssh': Flags.boolean({description: 'Skip SSH keychain setup'}),

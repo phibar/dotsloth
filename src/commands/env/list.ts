@@ -14,8 +14,8 @@ const STATE_LABEL = {
 
 export default class EnvList extends Command {
   static override description = 'List env files found in your repos and whether they are backed up'
-static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --unsaved']
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --unsaved']
+  static override flags = {
     unsaved: Flags.boolean({description: 'Only show files that are not yet backed up'}),
   }
 

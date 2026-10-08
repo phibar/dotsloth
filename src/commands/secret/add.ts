@@ -8,12 +8,12 @@ export default class SecretAdd extends Command {
   static override args = {
     name: Args.string({description: 'Secret name (e.g., AWS_ACCESS_KEY_ID)', required: true}),
   }
-static override description = 'Add or update a secret in macOS Keychain'
-static override examples = [
+  static override description = 'Add or update a secret in macOS Keychain'
+  static override examples = [
     '<%= config.bin %> <%= command.id %> AWS_ACCESS_KEY_ID',
     '<%= config.bin %> <%= command.id %> OPENAI_API_KEY --value sk-...',
   ]
-static override flags = {
+  static override flags = {
     value: Flags.string({char: 'v', description: 'Secret value (not recommended - use prompt instead)'}),
   }
 

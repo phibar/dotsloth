@@ -1,9 +1,7 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-
-import type {ClaudeProject} from './claude-projects.js'
-
 import {CLAUDE_DIR, CLAUDE_STORE} from './claude.js'
+import type {ClaudeProject} from './claude-projects.js'
 
 export const HISTORY_FILE = path.join(CLAUDE_DIR, 'history.jsonl')
 export const HISTORY_STORE = path.join(CLAUDE_STORE, 'history')

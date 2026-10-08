@@ -1,16 +1,8 @@
+import * as fs from 'node:fs'
 import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
-import * as fs from 'node:fs'
 
-import {
-  copyFile,
-  isIndex,
-  MEMORY_STORE,
-  memorySetFor,
-  mergeIndex,
-  stateOf,
-  writeFile,
-} from '../../lib/claude-memory.js'
+import {copyFile, isIndex, MEMORY_STORE, memorySetFor, mergeIndex, stateOf, writeFile} from '../../lib/claude-memory.js'
 import {discoverProjects} from '../../lib/claude-projects.js'
 import {loadConfig} from '../../lib/config.js'
 import {PATHS} from '../../lib/paths.js'
@@ -23,13 +15,13 @@ export default class ClaudeMemory extends Command {
       options: ['status', 'push', 'pull'],
     }),
   }
-static override description = 'Share Claude Code project memory between machines'
-static override examples = [
+  static override description = 'Share Claude Code project memory between machines'
+  static override examples = [
     '<%= config.bin %> <%= command.id %>',
     '<%= config.bin %> <%= command.id %> push',
     '<%= config.bin %> <%= command.id %> pull',
   ]
-static override flags = {
+  static override flags = {
     'dry-run': Flags.boolean({description: 'Show what would change without writing'}),
   }
 

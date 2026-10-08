@@ -6,6 +6,7 @@ import type {DevSlothConfig} from '../types/index.js'
  * web API maps the code to an HTTP status, so codes must not be renamed.
  */
 export type CoreErrorCode =
+  | 'COMMAND_FAILED'
   | 'CONFIG_INVALID'
   | 'CONFIG_MISSING'
   | 'CONFLICT'

@@ -42,48 +42,48 @@ describe('auditRepo dirty counting', () => {
     fs.rmSync(remote, {force: true, recursive: true})
   })
 
-  it('reports a clean repo as not at risk', () => {
-    const audit = auditRepo(dir, {offline: true})
+  it('reports a clean repo as not at risk', async () => {
+    const audit = await auditRepo(dir, {offline: true})
     expect(audit.dirty).to.equal(0)
     expect(isAtRisk(audit)).to.equal(false)
   })
 
-  it('counts a modified tracked file', () => {
+  it('counts a modified tracked file', async () => {
     fs.writeFileSync(path.join(dir, 'README.md'), '# changed\n', 'utf8')
-    expect(auditRepo(dir, {offline: true}).dirty).to.equal(1)
+    expect((await auditRepo(dir, {offline: true})).dirty).to.equal(1)
   })
 
-  it('counts an ordinary untracked file', () => {
+  it('counts an ordinary untracked file', async () => {
     fs.writeFileSync(path.join(dir, 'notes.txt'), 'scratch\n', 'utf8')
-    expect(auditRepo(dir, {offline: true}).dirty).to.equal(1)
+    expect((await auditRepo(dir, {offline: true})).dirty).to.equal(1)
   })
 
-  it('does not count an untracked file the env store backs up', () => {
+  it('does not count an untracked file the env store backs up', async () => {
     // Both of these are reported separately under "env files"; counting them
     // here too meant doctor could never reach zero.
     fs.writeFileSync(path.join(dir, '.env'), 'K=V\n', 'utf8')
     fs.writeFileSync(path.join(dir, 'docker-compose.override.yml'), 'services: {}\n', 'utf8')
 
-    const audit = auditRepo(dir, {offline: true})
+    const audit = await auditRepo(dir, {offline: true})
     expect(audit.dirty).to.equal(0)
     expect(isAtRisk(audit)).to.equal(false)
   })
 
-  it('still counts a .env that has been committed and then modified', () => {
+  it('still counts a .env that has been committed and then modified', async () => {
     // Tracked means it is real repository content, not a machine-local file.
     fs.writeFileSync(path.join(dir, '.env'), 'K=V\n', 'utf8')
     git('add', '-f', '.env')
     git('commit', '-q', '-m', 'add env')
     fs.writeFileSync(path.join(dir, '.env'), 'K=CHANGED\n', 'utf8')
 
-    expect(auditRepo(dir, {offline: true}).dirty).to.equal(1)
+    expect((await auditRepo(dir, {offline: true})).dirty).to.equal(1)
   })
 
-  it('counts stashes, which git status never shows', () => {
+  it('counts stashes, which git status never shows', async () => {
     fs.writeFileSync(path.join(dir, 'README.md'), '# wip\n', 'utf8')
     git('stash', '-q')
 
-    const audit = auditRepo(dir, {offline: true})
+    const audit = await auditRepo(dir, {offline: true})
     expect(audit.stashes).to.equal(1)
     expect(isAtRisk(audit)).to.equal(true)
   })

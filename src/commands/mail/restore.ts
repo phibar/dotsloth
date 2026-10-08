@@ -1,19 +1,9 @@
-import {Command, Flags} from '@oclif/core'
+import {Flags} from '@oclif/core'
 import chalk from 'chalk'
+import {BaseCommand} from '../../cli/base-command.js'
+import {applyMailRestore, type MailRestorePlan, planMailRestore} from '../../core/mail.js'
 
-import {
-  howToAdd,
-  mailInstalled,
-  osascript,
-  readAccounts,
-  readExport,
-  readRules,
-  readSignatures,
-  ruleScript,
-  signatureScript,
-} from '../../lib/mail.js'
-
-export default class MailRestore extends Command {
+export default class MailRestore extends BaseCommand {
   static override description = 'Recreate Mail signatures and rules, and list the accounts to re-add'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
   static override flags = {
@@ -24,93 +14,66 @@ export default class MailRestore extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(MailRestore)
 
-    const stored = readExport()
-    if (!stored) {
-      this.error('Nothing in the mail store. Run "dotsloth mail export" on the old machine first.')
-    }
+    const plan = planMailRestore()
 
     this.log(chalk.bold('\n🦥 mail restore\n'))
-    this.log(chalk.dim(`Exported ${stored.exportedAt}`))
+    this.log(chalk.dim(`Exported ${plan.exportedAt}`))
     this.log('')
-
-    // --- Accounts: a checklist, never automated -------------------------
-    // Every account type here is Apple ID or OAuth backed. A configuration
-    // profile can only provision plain IMAP/SMTP with a stored password, and
-    // macOS 26 removed `profiles install` anyway, so re-adding is manual.
-    // Reading accounts changes nothing, so this runs in dry-run too - otherwise
-    // every account would be reported missing and the checklist would be wrong.
-    const existing = mailInstalled() ? new Set(readAccounts().map((a) => a.name)) : new Set<string>()
-
-    this.log(chalk.bold(`Accounts to re-add (${stored.accounts.length})`))
-    for (const [i, a] of stored.accounts.entries()) {
-      const done = existing.has(a.name)
-      const mark = done ? chalk.green('✓') : chalk.yellow('○')
-      this.log(`  ${mark} ${i + 1}. ${chalk.bold(a.name)} ${chalk.dim(`(${a.type})`)}`)
-      this.log(chalk.dim(`       sign in as  ${a.user}`))
-      if (a.emails.length > 1) {
-        this.log(chalk.dim(`       aliases     ${a.emails.slice(1).join(', ')}`))
-      }
-
-      if (!done) this.log(chalk.dim(`       → ${howToAdd(a)}`))
-    }
+    this.printAccounts(plan)
 
     if (flags['accounts-only']) {
       this.log('')
       return
     }
 
-    // --- Signatures and rules: these can be recreated --------------------
-    const liveSignatures = mailInstalled() ? new Set(readSignatures().map((s) => s.name)) : new Set<string>()
-    const liveRules = mailInstalled() ? readRules() : []
-    const liveRuleNames = new Set(liveRules.map((r) => r.name))
+    const dryRun = flags['dry-run']
+    const created = new Set<string>()
+    if (!dryRun) {
+      applyMailRestore((event) => created.add(`${event.kind}:${event.name}`))
+    }
 
     this.log('')
     this.log(chalk.bold('Signatures'))
-    for (const sig of stored.signatures) {
-      if (liveSignatures.has(sig.name)) {
-        this.log(chalk.dim(`  = ${sig.name} (already present)`))
-        continue
-      }
-
-      if (flags['dry-run']) {
-        this.log(chalk.dim(`  + would create ${sig.name}`))
-        continue
-      }
-
-      osascript(signatureScript(sig))
-      this.log(`  ${chalk.green('+')} ${sig.name}`)
+    for (const sig of plan.signatures) {
+      if (sig.action === 'present') this.log(chalk.dim(`  = ${sig.name} (already present)`))
+      else if (dryRun) this.log(chalk.dim(`  + would create ${sig.name}`))
+      else if (created.has(`signature:${sig.name}`)) this.log(`  ${chalk.green('+')} ${sig.name}`)
     }
 
     this.log('')
     this.log(chalk.bold('Rules'))
-    for (const rule of stored.rules) {
-      if (liveRuleNames.has(rule.name)) {
+    for (const rule of plan.rules) {
+      const conditions = `(${rule.conditions} condition(s))`
+      if (rule.action === 'present') {
         this.log(chalk.dim(`  = ${rule.name} (already present)`))
-        continue
-      }
-
-      // A move action points at a mailbox by name. Recreating the rule before
-      // that mailbox exists would silently drop the action, so say so rather
-      // than produce a rule that looks right and does nothing.
-      if (rule.moveTo) {
+      } else if (rule.action === 'blocked') {
         this.log(
           chalk.yellow(`  ! ${rule.name}`) +
             chalk.dim(` — moves mail to "${rule.moveTo}"; create that mailbox first, then re-run`),
         )
-        continue
+      } else if (dryRun) {
+        this.log(chalk.dim(`  + would create ${rule.name} ${conditions}`))
+      } else if (created.has(`rule:${rule.name}`)) {
+        this.log(`  ${chalk.green('+')} ${rule.name} ${chalk.dim(conditions)}`)
       }
-
-      if (flags['dry-run']) {
-        this.log(chalk.dim(`  + would create ${rule.name} (${rule.conditions.length} condition(s))`))
-        continue
-      }
-
-      osascript(ruleScript(rule))
-      this.log(`  ${chalk.green('+')} ${rule.name} ${chalk.dim(`(${rule.conditions.length} condition(s))`)}`)
     }
 
     this.log('')
-    if (flags['dry-run']) this.log(chalk.yellow('Dry run — Mail was not changed.'))
+    if (dryRun) this.log(chalk.yellow('Dry run — Mail was not changed.'))
     this.log('')
+  }
+
+  private printAccounts(plan: MailRestorePlan): void {
+    this.log(chalk.bold(`Accounts to re-add (${plan.accounts.length})`))
+    for (const [i, {account, howToAdd, present}] of plan.accounts.entries()) {
+      const mark = present ? chalk.green('✓') : chalk.yellow('○')
+      this.log(`  ${mark} ${i + 1}. ${chalk.bold(account.name)} ${chalk.dim(`(${account.type})`)}`)
+      this.log(chalk.dim(`       sign in as  ${account.user}`))
+      if (account.emails.length > 1) {
+        this.log(chalk.dim(`       aliases     ${account.emails.slice(1).join(', ')}`))
+      }
+
+      if (!present) this.log(chalk.dim(`       → ${howToAdd}`))
+    }
   }
 }

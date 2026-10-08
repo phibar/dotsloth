@@ -1,40 +1,35 @@
-import {Command} from '@oclif/core'
 import chalk from 'chalk'
+import {BaseCommand} from '../../cli/base-command.js'
+import {getMailStatus} from '../../core/mail.js'
 
-import {MAIL_STORE, mailInstalled, readAccounts, readExport, readRules, readSignatures} from '../../lib/mail.js'
-
-export default class MailStatus extends Command {
+export default class MailStatus extends BaseCommand {
   static override description = 'Compare Mail on this machine with what is in the dotsloth store'
   static override examples = ['<%= config.bin %> <%= command.id %>']
 
   public async run(): Promise<void> {
     this.log(chalk.bold('\n🦥 mail status\n'))
-    this.log(chalk.dim(`Store: ${MAIL_STORE}`))
 
-    const stored = readExport()
-    if (!stored) {
+    const status = getMailStatus()
+    this.log(chalk.dim(`Store: ${status.store}`))
+
+    if (!status.exported) {
       this.log('')
       this.log(chalk.yellow('Nothing exported yet') + chalk.dim(' — run "dotsloth mail export"'))
       this.log('')
       return
     }
 
-    if (!mailInstalled()) {
+    const stored = status.exported.counts
+    if (!status.local) {
       this.log('')
       this.log(
         chalk.dim(
-          `Mail.app not present. Store holds ${stored.accounts.length} account(s), ` +
-            `${stored.rules.length} rule(s), ${stored.signatures.length} signature(s).`,
+          `Mail.app not present. Store holds ${stored.accounts} account(s), ` +
+            `${stored.rules} rule(s), ${stored.signatures} signature(s).`,
         ),
       )
       this.log('')
       return
-    }
-
-    const live = {
-      accounts: readAccounts(),
-      rules: readRules(),
-      signatures: readSignatures(),
     }
 
     const row = (label: string, liveCount: number, storeCount: number) => {
@@ -45,16 +40,15 @@ export default class MailStatus extends Command {
     }
 
     this.log('')
-    this.log(chalk.dim(`Exported ${stored.exportedAt}`))
-    row('accounts', live.accounts.length, stored.accounts.length)
-    row('rules', live.rules.length, stored.rules.length)
-    row('signatures', live.signatures.length, stored.signatures.length)
+    this.log(chalk.dim(`Exported ${status.exported.exportedAt}`))
+    row('accounts', status.local.accounts, stored.accounts)
+    row('rules', status.local.rules, stored.rules)
+    row('signatures', status.local.signatures, stored.signatures)
 
-    const missing = stored.accounts.filter((a) => !live.accounts.some((l) => l.name === a.name))
-    if (missing.length > 0) {
+    if (status.missingAccounts.length > 0) {
       this.log('')
-      this.log(chalk.yellow(`${missing.length} account(s) in the store are not configured here:`))
-      for (const a of missing) this.log(chalk.dim(`    ${a.name} (${a.user})`))
+      this.log(chalk.yellow(`${status.missingAccounts.length} account(s) in the store are not configured here:`))
+      for (const a of status.missingAccounts) this.log(chalk.dim(`    ${a.name} (${a.user})`))
       this.log(chalk.dim('    → dotsloth mail restore'))
     }
 

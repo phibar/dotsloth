@@ -1,11 +1,11 @@
-import {Command, Flags} from '@oclif/core'
+import {Flags} from '@oclif/core'
 import chalk from 'chalk'
+import {BaseCommand} from '../../cli/base-command.js'
 import {printLinkResult} from '../../cli/format.js'
-import {claudeInstalled, configFiles, SHARED_CONFIG_FILES, seedStore} from '../../lib/claude.js'
-import {loadConfig, saveConfig} from '../../lib/config.js'
-import {createSymlink} from '../../lib/symlink.js'
+import {linkClaude} from '../../core/claude.js'
+import {getConfig} from '../../core/config.js'
 
-export default class ClaudeLink extends Command {
+export default class ClaudeLink extends BaseCommand {
   static override description = 'Share Claude Code settings between machines via the dotsloth store'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
   static override flags = {
@@ -15,52 +15,17 @@ export default class ClaudeLink extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(ClaudeLink)
 
-    if (!claudeInstalled()) {
-      this.error('~/.claude not found — is Claude Code installed?')
-    }
-
-    const config = loadConfig()
-    if (!config) {
-      this.error('No configuration found. Run "dotsloth init" first.')
-    }
-
+    getConfig() // fail before printing anything when there is no config
     this.log(chalk.bold('\n🦥 claude settings\n'))
 
-    const files = configFiles(SHARED_CONFIG_FILES)
-
-    // Seed the store from this machine if it is the first to adopt syncing.
-    if (!flags['dry-run']) {
-      for (const seeded of seedStore(files)) {
-        this.log(chalk.dim(`  seeded store from local ${seeded.name}`))
-      }
-    }
-
-    for (const file of configFiles(SHARED_CONFIG_FILES)) {
-      if (!file.existsInStore && !file.existsLocally) {
-        this.log(chalk.dim(`  skip ${file.name} — not present on this machine or in the store`))
-        continue
-      }
-
-      if (flags['dry-run']) {
-        this.log(chalk.dim(`  would link ${file.localPath} → ${file.storePath}`))
-        continue
-      }
-
-      // biome-ignore lint/performance/noAwaitInLoops: sequential on purpose, each link reports its own line
-      const result = await createSymlink({backup: true, source: file.storePath, target: file.localPath})
-      printLinkResult(this.log.bind(this), file.name, result)
-      if (result.isValid) {
-        // Record it so "dotsloth sync" re-establishes the link on a new machine.
-        const already = config.syncedFiles.some((f) => f.target === file.localPath)
-        if (!already) {
-          config.syncedFiles.push({source: file.storePath, target: file.localPath})
-        }
-      }
-    }
-
-    if (!flags['dry-run']) {
-      saveConfig(config)
-    }
+    await linkClaude({dryRun: flags['dry-run']}, (event) => {
+      if (event.type === 'seeded') this.log(chalk.dim(`  seeded store from local ${event.name}`))
+      else if (event.type === 'skipped') {
+        this.log(chalk.dim(`  skip ${event.name} — not present on this machine or in the store`))
+      } else if (event.type === 'would-link')
+        this.log(chalk.dim(`  would link ${event.localPath} → ${event.storePath}`))
+      else printLinkResult(this.log.bind(this), event.name, event.result)
+    })
 
     this.log('')
     this.log(chalk.dim('History and memory are handled separately — they must not be symlinked.'))

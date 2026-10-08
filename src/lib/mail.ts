@@ -1,7 +1,6 @@
-import {execFileSync} from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-
+import {run} from './exec.js'
 import {PATHS} from './paths.js'
 
 export const MAIL_STORE = PATHS.icloudMail
@@ -73,17 +72,10 @@ export function asLiteral(value: string): string {
  */
 export function osascript(script: string, {raw = false} = {}): string {
   try {
-    const out = execFileSync('osascript', ['-'], {
-      encoding: 'utf8',
-      input: script,
-      maxBuffer: 32 * 1024 * 1024,
-      stdio: ['pipe', 'pipe', 'pipe'],
-    })
+    const out = run('osascript', ['-'], {input: script})
     return raw ? out.replace(/\n$/, '') : out.trim()
   } catch (error: unknown) {
-    const {stderr} = error as {stderr?: Buffer | string}
-    const message = (stderr ? String(stderr) : (error as Error).message).trim()
-    throw new Error(message || 'osascript failed')
+    throw new Error((error as Error).message.trim() || 'osascript failed')
   }
 }
 

@@ -1,8 +1,8 @@
-import {execFileSync} from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 import {isEnvFile} from './env.js'
+import {run, tryRun} from './exec.js'
 
 export type BranchRisk = 'local-only' | 'merged' | 'unknown'
 
@@ -28,11 +28,7 @@ export interface RepoAudit {
 }
 
 function git(repoPath: string, args: string[]): string {
-  try {
-    return execFileSync('git', ['-C', repoPath, ...args], {encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe']}).trim()
-  } catch {
-    return ''
-  }
+  return tryRun('git', ['-C', repoPath, ...args])?.trim() ?? ''
 }
 
 export function isRepo(dir: string): boolean {
@@ -88,10 +84,8 @@ export function findRepos(githubRoot: string): string[] {
 function classifyBranch(repoPath: string, branch: string): {reason: string; risk: BranchRisk} {
   let raw = ''
   try {
-    raw = execFileSync('gh', ['pr', 'list', '--head', branch, '--state', 'all', '--json', 'number,state'], {
+    raw = run('gh', ['pr', 'list', '--head', branch, '--state', 'all', '--json', 'number,state'], {
       cwd: repoPath,
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'pipe'],
     }).trim()
   } catch {
     return {reason: 'could not reach GitHub', risk: 'unknown'}

@@ -143,8 +143,11 @@ export function readPublicKey(keyPath: string): null | string {
  * Parse a git remote URL to extract org and repo
  */
 export function parseGitUrl(url: string): null | {host: string; org: string; repo: string} {
+  // Anchored and whitespace-free: the URL is handed to `git clone`, so
+  // anything before or around the address (an `--upload-pack=...` option,
+  // say) must make it invalid rather than be ignored.
   // SSH format: git@github.com:phibar/repo.git
-  const sshMatch = url.match(/git@([^:]+):([^/]+)\/(.+?)(?:\.git)?$/)
+  const sshMatch = url.match(/^git@([^\s:/]+):([^\s/]+)\/([^\s]+?)(?:\.git)?$/)
   if (sshMatch) {
     return {
       host: sshMatch[1],
@@ -154,7 +157,7 @@ export function parseGitUrl(url: string): null | {host: string; org: string; rep
   }
 
   // HTTPS format: https://github.com/phibar/repo.git
-  const httpsMatch = url.match(/https?:\/\/([^/]+)\/([^/]+)\/(.+?)(?:\.git)?$/)
+  const httpsMatch = url.match(/^https?:\/\/([^\s/]+)\/([^\s/]+)\/([^\s]+?)(?:\.git)?$/)
   if (httpsMatch) {
     return {
       host: httpsMatch[1],

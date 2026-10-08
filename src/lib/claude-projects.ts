@@ -1,8 +1,8 @@
-import {execFileSync} from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 import {CLAUDE_DIR} from './claude.js'
+import {tryRun} from './exec.js'
 import {parseGitUrl} from './git.js'
 import {findRepos} from './repo-audit.js'
 
@@ -42,16 +42,10 @@ export interface ClaudeProject {
 }
 
 function remoteKey(repoPath: string): null | string {
-  try {
-    const url = execFileSync('git', ['-C', repoPath, 'remote', 'get-url', 'origin'], {
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    }).trim()
-    const parsed = parseGitUrl(url)
-    return parsed ? `${parsed.org}/${parsed.repo}` : null
-  } catch {
-    return null
-  }
+  const url = tryRun('git', ['-C', repoPath, 'remote', 'get-url', 'origin'])
+  if (url === null) return null
+  const parsed = parseGitUrl(url.trim())
+  return parsed ? `${parsed.org}/${parsed.repo}` : null
 }
 
 /**

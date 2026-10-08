@@ -1,10 +1,10 @@
-import {execSync} from 'node:child_process'
 import * as path from 'node:path'
 import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
 import {autoSync} from '../lib/autosync.js'
 import {addOrganization, getOrganization, loadConfig} from '../lib/config.js'
+import {run} from '../lib/exec.js'
 import {ensureOrgDirectory, parseGitUrl, writeOrgGitconfig} from '../lib/git.js'
 import type {Organization} from '../types/index.js'
 
@@ -123,9 +123,8 @@ export default class Clone extends Command {
 
     // Clone the repository
     try {
-      execSync(`git clone "${args.url}" "${repoPath}"`, {
-        stdio: 'inherit',
-      })
+      // `--` ends option parsing: a URL can never be read as a git option.
+      run('git', ['clone', '--', args.url, repoPath], {interactive: true})
     } catch {
       this.error('Git clone failed')
     }

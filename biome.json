@@ -363,6 +363,33 @@
       "javascript": {
         "globals": ["describe", "it", "before", "after", "beforeEach", "afterEach"]
       }
+    },
+    {
+      "includes": ["src/lib/**", "src/core/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": {
+              "level": "error",
+              "options": {
+                "allow": []
+              }
+            }
+          },
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "chalk": "src/lib and src/core return data; terminal output and prompts belong in src/cli and src/commands",
+                  "enquirer": "src/lib and src/core return data; terminal output and prompts belong in src/cli and src/commands",
+                  "@oclif/core": "src/lib and src/core return data; terminal output and prompts belong in src/cli and src/commands"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   ],
   "assist": {

@@ -1,6 +1,6 @@
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
-
+import {printLinkResult} from '../../cli/format.js'
 import {claudeInstalled, configFiles, SHARED_CONFIG_FILES, seedStore} from '../../lib/claude.js'
 import {loadConfig, saveConfig} from '../../lib/config.js'
 import {createSymlink} from '../../lib/symlink.js'
@@ -48,16 +48,13 @@ export default class ClaudeLink extends Command {
 
       // biome-ignore lint/performance/noAwaitInLoops: sequential on purpose, each link reports its own line
       const result = await createSymlink({backup: true, source: file.storePath, target: file.localPath})
+      printLinkResult(this.log.bind(this), file.name, result)
       if (result.isValid) {
-        this.log(chalk.green('✓') + ` ${file.name}`)
-
         // Record it so "dotsloth sync" re-establishes the link on a new machine.
         const already = config.syncedFiles.some((f) => f.target === file.localPath)
         if (!already) {
           config.syncedFiles.push({source: file.storePath, target: file.localPath})
         }
-      } else {
-        this.log(chalk.red('✗') + ` ${file.name}: ${result.error}`)
       }
     }
 

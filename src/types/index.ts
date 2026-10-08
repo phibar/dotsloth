@@ -36,6 +36,8 @@ export interface SecretEntry {
 }
 
 export interface SymlinkStatus {
+  /** Where an existing file at the target was moved before linking. */
+  backupPath?: string
   error?: string
   exists: boolean
   isValid: boolean

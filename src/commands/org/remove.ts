@@ -3,7 +3,7 @@ import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
 
-import {autoSync} from '../../lib/autosync.js'
+import {autoSync} from '../../cli/autosync.js'
 import {loadConfig, removeOrganization} from '../../lib/config.js'
 import {deleteOrgGitconfig} from '../../lib/git.js'
 import {getOrgRepoPath} from '../../lib/paths.js'

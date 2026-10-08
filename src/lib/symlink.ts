@@ -14,6 +14,7 @@ export interface SymlinkConfig {
  */
 export async function createSymlink(config: SymlinkConfig): Promise<SymlinkStatus> {
   const {backup = true, source, target} = config
+  let backupPath: string | undefined
 
   try {
     // Check if source exists in iCloud
@@ -47,9 +48,8 @@ export async function createSymlink(config: SymlinkConfig): Promise<SymlinkStatu
         fs.unlinkSync(target)
       } else if (backup) {
         // Backup existing file
-        const backupPath = `${target}.backup.${Date.now()}`
+        backupPath = `${target}.backup.${Date.now()}`
         fs.renameSync(target, backupPath)
-        console.log(`Backed up existing file to: ${backupPath}`)
       } else {
         fs.unlinkSync(target)
       }
@@ -67,6 +67,7 @@ export async function createSymlink(config: SymlinkConfig): Promise<SymlinkStatu
     fs.symlinkSync(source, target)
 
     return {
+      backupPath,
       exists: true,
       isValid: true,
       source,

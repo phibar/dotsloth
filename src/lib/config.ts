@@ -66,50 +66,90 @@ export function configExists(): boolean {
   return fs.existsSync(PATHS.icloudConfig)
 }
 
+/** config.json exists but cannot be used: not JSON, or not the expected shape. */
+export class ConfigError extends Error {
+  constructor(
+    summary: string,
+    /** One line per problem, `path: message`. */
+    readonly issues: string[] = [],
+  ) {
+    super([summary, ...issues.map((issue) => `  - ${issue}`)].join('\n'))
+    this.name = 'ConfigError'
+  }
+}
+
+function validate(data: unknown): DevSlothConfig {
+  const result = DevSlothConfigSchema.safeParse(data)
+  if (!result.success) {
+    throw new ConfigError(
+      'config.json does not match the expected format',
+      result.error.issues.map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`),
+    )
+  }
+
+  return result.data
+}
+
 /**
- * Load config from iCloud and sync org gitconfigs
+ * Read and validate config.json without side effects.
+ *
+ * Returns null when there is no config yet. Throws {@link ConfigError} when
+ * it exists but is broken - deliberately not null, which callers read as
+ * "run init" and which would invite overwriting a config that only has a typo.
  */
-export function loadConfig(autoSync = true): DevSlothConfig | null {
+export function readConfig(): DevSlothConfig | null {
   if (!configExists()) {
     return null
   }
 
+  let data: unknown
   try {
-    const content = fs.readFileSync(PATHS.icloudConfig, 'utf8')
-    const data = JSON.parse(content)
-    const config = DevSlothConfigSchema.parse(data)
-
-    // Auto-sync org gitconfigs from config.json (single source of truth)
-    if (autoSync && config.organizations.length > 0) {
-      syncAllOrgGitconfigs(config)
-    }
-
-    return config
+    data = JSON.parse(fs.readFileSync(PATHS.icloudConfig, 'utf8'))
   } catch (error) {
-    console.error('Failed to load config:', error)
-    return null
+    throw new ConfigError(`config.json is not valid JSON: ${(error as Error).message}`)
   }
+
+  return validate(data)
 }
 
 /**
- * Save config to iCloud
+ * Read config and, by default, regenerate the org gitconfigs from it.
+ *
+ * The CLI's convenience entry point. Anything that only needs to look at the
+ * config - every status view - uses {@link readConfig}, which writes nothing.
+ */
+export function loadConfig(autoSync = true): DevSlothConfig | null {
+  const config = readConfig()
+
+  // Auto-sync org gitconfigs from config.json (single source of truth)
+  if (config && autoSync && config.organizations.length > 0) {
+    syncAllOrgGitconfigs(config)
+  }
+
+  return config
+}
+
+/**
+ * Validate and save config to iCloud.
+ *
+ * Written to a temp file and renamed into place, so a crash or a concurrent
+ * reader (iCloud itself, another dotsloth process) never sees half a file.
  */
 export function saveConfig(config: DevSlothConfig): void {
-  // Ensure directories exist
+  const valid = validate(config)
+
   fs.mkdirSync(path.dirname(PATHS.icloudConfig), {recursive: true})
 
-  const content = JSON.stringify(config, null, 2)
-  fs.writeFileSync(PATHS.icloudConfig, content, 'utf8')
+  const tmpPath = `${PATHS.icloudConfig}.${process.pid}.tmp`
+  fs.writeFileSync(tmpPath, JSON.stringify(valid, null, 2), 'utf8')
+  fs.renameSync(tmpPath, PATHS.icloudConfig)
 }
 
 /**
  * Add organization to config
  */
 export function addOrganization(org: Organization): DevSlothConfig {
-  let config = loadConfig()
-  if (!config) {
-    config = getDefaultConfig()
-  }
+  const config = readConfig() ?? getDefaultConfig()
 
   // Check if org already exists
   const existingIndex = config.organizations.findIndex((o) => o.name.toLowerCase() === org.name.toLowerCase())
@@ -128,7 +168,7 @@ export function addOrganization(org: Organization): DevSlothConfig {
  * Remove organization from config
  */
 export function removeOrganization(orgName: string): DevSlothConfig | null {
-  const config = loadConfig()
+  const config = readConfig()
   if (!config) {
     return null
   }
@@ -143,7 +183,7 @@ export function removeOrganization(orgName: string): DevSlothConfig | null {
  * Get organization by name
  */
 export function getOrganization(orgName: string): null | Organization {
-  const config = loadConfig()
+  const config = readConfig()
   if (!config) {
     return null
   }
@@ -155,7 +195,7 @@ export function getOrganization(orgName: string): null | Organization {
  * Find organization by folder path
  */
 export function findOrgByPath(repoPath: string): null | Organization {
-  const config = loadConfig()
+  const config = readConfig()
   if (!config) {
     return null
   }

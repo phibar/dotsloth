@@ -1,3 +1,6 @@
+import * as fs from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
 import {expect} from 'chai'
 import {Hono} from 'hono'
 
@@ -152,6 +155,33 @@ describe('web server', () => {
         method: 'POST',
       })
       expect(response.status).to.equal(400)
+    })
+  })
+
+  describe('web app', () => {
+    it('serves the built app, and its index for every client route', async () => {
+      const webRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dotsloth-web-'))
+      fs.mkdirSync(path.join(webRoot, 'assets'))
+      fs.writeFileSync(path.join(webRoot, 'index.html'), '<!doctype html><div id="root"></div>')
+      fs.writeFileSync(path.join(webRoot, 'assets', 'app.js'), 'console.log(1)')
+      app = createApp({port: () => PORT, token: TOKEN, webRoot})
+
+      const index = await request('/')
+      expect(index.status).to.equal(200)
+      expect(await index.text()).to.include('id="root"')
+
+      const asset = await request('/assets/app.js')
+      expect(asset.headers.get('content-type')).to.match(/javascript/)
+
+      expect(await (await request('/some/client/route')).text()).to.include('id="root"')
+      expect((await request('/assets/app.js', {headers: {cookie: ''}})).status).to.equal(401)
+      fs.rmSync(webRoot, {force: true, recursive: true})
+    })
+
+    it('says so when the app has not been built', async () => {
+      const response = await request('/')
+      expect(response.status).to.equal(503)
+      expect(await response.text()).to.include('npm run build')
     })
   })
 

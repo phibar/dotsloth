@@ -1,3 +1,7 @@
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+
+import {serveStatic} from '@hono/node-server/serve-static'
 import {Hono} from 'hono'
 import {setCookie} from 'hono/cookie'
 
@@ -13,9 +17,14 @@ export interface AppOptions {
   port: () => number
   /** The secret the opened URL carries. */
   token: string
+  /** The built web app (dist/web); null when it has not been built. */
+  webRoot?: null | string
 }
 
-export function createApp({port, token}: AppOptions) {
+const NOT_BUILT =
+  '<!doctype html><title>dotsloth</title><p>The web app has not been built. Run <code>npm run build</code>.</p>'
+
+export function createApp({port, token, webRoot = null}: AppOptions) {
   const runner = new JobRunner()
   const app = new Hono()
 
@@ -41,9 +50,14 @@ export function createApp({port, token}: AppOptions) {
   app.route('/api/jobs', jobRoutes(runner))
   app.all('/api/*', (c) => c.json({code: 'NOT_FOUND', details: [], message: 'No such endpoint'}, 404))
 
-  app.get('/', (c) =>
-    c.html('<!doctype html><title>dotsloth</title><p>dotsloth ui is running. The web app arrives with #68.</p>'),
-  )
+  if (webRoot) {
+    const index = fs.readFileSync(path.join(webRoot, 'index.html'), 'utf8')
+    app.use('*', serveStatic({root: webRoot}))
+    // Anything else is a page of the single-page app.
+    app.get('*', (c) => c.html(index))
+  } else {
+    app.get('*', (c) => c.html(NOT_BUILT, 503))
+  }
 
   app.onError((error, c) => {
     const {body, status} = toApiError(error)

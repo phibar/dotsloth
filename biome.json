@@ -390,6 +390,16 @@
           }
         }
       }
+    },
+    {
+      "includes": ["web/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnresolvedImports": "off"
+          }
+        }
+      }
     }
   ],
   "assist": {

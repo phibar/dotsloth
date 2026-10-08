@@ -35,6 +35,7 @@ jobs:
         env:
           BASE_REF: ${{ github.base_ref }}
           LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
           set -uo pipefail
           git fetch --quiet origin "$BASE_REF"
@@ -51,6 +52,19 @@ jobs:
             echo "skipped=true" >> "$GITHUB_OUTPUT"
           else
             echo "skipped=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Dependabot cannot write a changeset, and a bot commit adding one
+          # stops `@dependabot rebase` from working and holds the checks for
+          # approval. Its updates that leave production dependencies alone
+          # (devDependencies, GitHub Actions) publish nothing, so they pass
+          # without a file. Production bumps still get the patch changeset
+          # that the dependabot-changeset workflow commits.
+          if [ "$PR_AUTHOR" = "dependabot[bot]" ] && [ "$added" = "0" ] \
+             && ! bash .github/scripts/prod-deps-changed.sh "origin/${BASE_REF}" >/dev/null; then
+            echo "dependabot=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dependabot=false" >> "$GITHUB_OUTPUT"
           fi
 
           echo "changeset files added: $added"
@@ -106,6 +120,7 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           ADDED: ${{ steps.status.outputs.added }}
           SKIPPED: ${{ steps.status.outputs.skipped }}
+          DEPENDABOT: ${{ steps.status.outputs.dependabot }}
           CURRENT: ${{ steps.preview.outputs.current }}
           NEXT: ${{ steps.preview.outputs.next }}
           KIND: ${{ steps.preview.outputs.kind }}
@@ -117,6 +132,9 @@ jobs:
           if [ "$SKIPPED" = "true" ]; then
             body="$marker
           **Changeset check skipped** via the \`skip-changeset\` label. Merging publishes nothing."
+          elif [ "$DEPENDABOT" = "true" ]; then
+            body="$marker
+          **Dependabot update without production dependency changes.** No changeset needed - merging publishes nothing."
           elif [ "$ADDED" = "0" ]; then
             body="$marker
           ### No changeset - this PR cannot be merged
@@ -169,7 +187,7 @@ jobs:
           fi
 
       - name: Require a changeset
-        if: ${{ steps.status.outputs.skipped != 'true' && steps.status.outputs.added == '0' }}
+        if: ${{ steps.status.outputs.skipped != 'true' && steps.status.outputs.dependabot != 'true' && steps.status.outputs.added == '0' }}
         run: |
           echo "::error::This PR adds no changeset. Run 'npm run changeset' (or '--empty' for no user-facing change)."
           exit 1

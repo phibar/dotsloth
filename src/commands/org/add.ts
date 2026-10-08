@@ -1,25 +1,23 @@
+import * as fs from 'node:fs'
 import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-import * as fs from 'node:fs'
-
-import type {Organization} from '../../types/index.js'
-
 import {autoSync} from '../../lib/autosync.js'
 import {addOrganization, ensureIcloudStructure, loadConfig} from '../../lib/config.js'
 import {writeOrgGitconfig} from '../../lib/git.js'
 import {getOrgRepoPath} from '../../lib/paths.js'
+import type {Organization} from '../../types/index.js'
 
 export default class OrgAdd extends Command {
   static override args = {
     name: Args.string({description: 'Organization name (e.g., phibar)'}),
   }
-static override description = 'Add a new organization configuration'
-static override examples = [
+  static override description = 'Add a new organization configuration'
+  static override examples = [
     '<%= config.bin %> <%= command.id %>',
     '<%= config.bin %> <%= command.id %> phibar --email you@phibar.work --username phibar',
   ]
-static override flags = {
+  static override flags = {
     email: Flags.string({char: 'e', description: 'Git email for this organization'}),
     username: Flags.string({char: 'u', description: 'Git username for this organization'}),
   }

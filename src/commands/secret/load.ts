@@ -5,10 +5,7 @@ import {generateExportStatements} from '../../lib/secrets.js'
 
 export default class SecretLoad extends Command {
   static override description = 'Output export statements for all secrets (for use in shell profile)'
-static override examples = [
-    '<%= config.bin %> <%= command.id %>',
-    'eval "$(<%= config.bin %> <%= command.id %>)"',
-  ]
+  static override examples = ['<%= config.bin %> <%= command.id %>', 'eval "$(<%= config.bin %> <%= command.id %>)"']
 
   public async run(): Promise<void> {
     const secrets = getAllSecrets()

@@ -17,11 +17,35 @@ export function generateMainGitconfig(config: DevSlothConfig, userName: string):
     lines.push(`    signingkey = ${config.sshSigning.defaultKeyPath}.pub`)
   }
 
-  lines.push('', '[core]', '    autocrlf = input', '', '[init]', '    defaultBranch = main', '', '[pull]', '    rebase = true', '')
+  lines.push(
+    '',
+    '[core]',
+    '    autocrlf = input',
+    '',
+    '[init]',
+    '    defaultBranch = main',
+    '',
+    '[pull]',
+    '    rebase = true',
+    '',
+  )
 
   // SSH signing configuration
   if (config.sshSigning.enabled) {
-    lines.push('[gpg]', '    format = ssh', '', '[gpg "ssh"]', `    allowedSignersFile = ${PATHS.icloudAllowedSigners}`, '', '[commit]', '    gpgsign = true', '', '[tag]', '    gpgsign = true', '')
+    lines.push(
+      '[gpg]',
+      '    format = ssh',
+      '',
+      '[gpg "ssh"]',
+      `    allowedSignersFile = ${PATHS.icloudAllowedSigners}`,
+      '',
+      '[commit]',
+      '    gpgsign = true',
+      '',
+      '[tag]',
+      '    gpgsign = true',
+      '',
+    )
   }
 
   // Credential helper

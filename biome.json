@@ -1,0 +1,376 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120,
+    "lineEnding": "auto"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "none",
+      "complexity": {
+        "noAdjacentSpacesInRegex": "error",
+        "noBannedTypes": "error",
+        "noExtraBooleanCast": "error",
+        "noForEach": "error",
+        "noStaticOnlyClass": "error",
+        "noUselessCatch": "error",
+        "noUselessConstructor": "error",
+        "noUselessEscapeInRegex": "error",
+        "noUselessSwitchCase": "error",
+        "noUselessThisAlias": "error",
+        "noUselessTypeConstraint": "error",
+        "noUselessUndefined": "error",
+        "useDateNow": "error",
+        "useFlatMap": "error",
+        "useIndexOf": "error"
+      },
+      "correctness": {
+        "noConstAssign": "error",
+        "noConstantCondition": "error",
+        "noEmptyCharacterClassInRegex": "error",
+        "noEmptyPattern": "error",
+        "noGlobalDirnameFilename": "error",
+        "noGlobalObjectCalls": "error",
+        "noInvalidBuiltinInstantiation": "error",
+        "noInvalidConstructorSuper": "error",
+        "noNonoctalDecimalEscape": "error",
+        "noPrecisionLoss": "error",
+        "noSelfAssign": "error",
+        "noSetterReturn": "error",
+        "noSwitchDeclarations": "error",
+        "noUndeclaredVariables": "error",
+        "noUnreachable": "error",
+        "noUnreachableSuper": "error",
+        "noUnresolvedImports": "error",
+        "noUnsafeFinally": "error",
+        "noUnsafeOptionalChaining": "error",
+        "noUnusedLabels": "error",
+        "noUnusedPrivateClassMembers": "error",
+        "noUnusedVariables": "error",
+        "useIsNan": "error",
+        "useSingleJsDocAsterisk": "warn",
+        "useValidForDirection": "error",
+        "useValidTypeof": "error",
+        "useYield": "error"
+      },
+      "style": {
+        "noCommonJs": "error",
+        "noNamespace": "error",
+        "noNegationElse": "off",
+        "noNestedTernary": "error",
+        "noSubstr": "error",
+        "useArrayLiterals": "error",
+        "useAsConstAssertion": "error",
+        "useAtIndex": "error",
+        "useBlockStatements": "off",
+        "useCollapsedIf": "error",
+        "useDefaultSwitchClause": "off",
+        "useExplicitLengthCheck": "error",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["kebab-case"]
+          }
+        },
+        "useForOf": "error",
+        "useGlobalThis": "error",
+        "useNodejsImportProtocol": "error",
+        "useNumberNamespace": "error",
+        "useNumericSeparators": {
+          "level": "error",
+          "options": {}
+        },
+        "useThrowNewError": "error",
+        "useTrimStartEnd": "error"
+      },
+      "suspicious": {
+        "noAssignInExpressions": "error",
+        "noAsyncPromiseExecutor": "error",
+        "noCatchAssign": "error",
+        "noClassAssign": "error",
+        "noCompareNegZero": "error",
+        "noConstantBinaryExpressions": "error",
+        "noControlCharactersInRegex": "error",
+        "noDebugger": "error",
+        "noDocumentCookie": "error",
+        "noDuplicateCase": "error",
+        "noDuplicateClassMembers": "error",
+        "noDuplicateElseIf": "error",
+        "noDuplicateEnumValues": "error",
+        "noDuplicateObjectKeys": "error",
+        "noDuplicateParameters": "error",
+        "noEmptyBlockStatements": "error",
+        "noEmptySource": "error",
+        "noExplicitAny": "error",
+        "noExtraNonNullAssertion": "error",
+        "noFallthroughSwitchClause": "error",
+        "noFunctionAssign": "error",
+        "noGlobalAssign": "error",
+        "noImportAssign": "error",
+        "noIrregularWhitespace": "error",
+        "noMisleadingCharacterClass": "error",
+        "noMisleadingInstantiator": "error",
+        "noNonNullAssertedOptionalChain": "error",
+        "noPrototypeBuiltins": "error",
+        "noRedeclare": "error",
+        "noShadowRestrictedNames": "error",
+        "noSparseArray": "error",
+        "noThenProperty": "error",
+        "noTsIgnore": "error",
+        "noUnsafeDeclarationMerging": "error",
+        "noUnsafeNegation": "error",
+        "noUnusedExpressions": "off",
+        "noUselessRegexBackrefs": "error",
+        "noWith": "error",
+        "useErrorMessage": "error",
+        "useGetterReturn": "error",
+        "useIsArray": "error",
+        "useNamespaceKeyword": "error",
+        "useNumberToFixedDigitsArgument": "error"
+      }
+    },
+    "includes": [
+      "**",
+      "!**/*-debug.log",
+      "!**/*-error.log",
+      "!**/.DS_Store",
+      "!.idea",
+      "!dist",
+      "!tmp",
+      "!node_modules",
+      "!**/oclif.manifest.json",
+      "!**/yarn.lock",
+      "!**/pnpm-lock.yaml",
+      "!**/tsconfig.tsbuildinfo"
+    ]
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "asNeeded",
+      "bracketSpacing": false,
+      "trailingCommas": "all"
+    },
+    "globals": ["describe", "NodeJS", "it"]
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noArguments": "error"
+          },
+          "correctness": {
+            "noConstAssign": "off",
+            "noGlobalObjectCalls": "off",
+            "noInvalidBuiltinInstantiation": "off",
+            "noInvalidConstructorSuper": "off",
+            "noSetterReturn": "off",
+            "noUndeclaredVariables": "off",
+            "noUnreachable": "off",
+            "noUnreachableSuper": "off"
+          },
+          "style": {
+            "useConst": "error",
+            "useSpreadOverApply": "error"
+          },
+          "suspicious": {
+            "noClassAssign": "off",
+            "noDuplicateClassMembers": "off",
+            "noDuplicateObjectKeys": "off",
+            "noDuplicateParameters": "off",
+            "noFunctionAssign": "off",
+            "noImportAssign": "off",
+            "noRedeclare": "off",
+            "noUnsafeNegation": "off",
+            "noVar": "error",
+            "noWith": "off",
+            "useGetterReturn": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"],
+      "javascript": {
+        "globals": []
+      },
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noAdjacentSpacesInRegex": "error",
+            "noArguments": "error",
+            "noCommaOperator": "error",
+            "noExcessiveCognitiveComplexity": {
+              "level": "warn",
+              "options": {
+                "maxAllowedComplexity": 20
+              }
+            },
+            "noExtraBooleanCast": "error",
+            "noImplicitCoercions": "error",
+            "noUselessCatch": "error",
+            "noUselessConstructor": "error",
+            "noUselessEscapeInRegex": "error",
+            "noUselessLabel": "error",
+            "noUselessLoneBlockStatements": "error",
+            "noUselessRename": "error",
+            "noUselessReturn": "error",
+            "noUselessStringConcat": "error",
+            "noUselessTernary": "error",
+            "noUselessUndefinedInitialization": "error",
+            "noVoid": "error",
+            "useArrowFunction": "error",
+            "useLiteralKeys": "error",
+            "useMaxParams": "warn",
+            "useNumericLiterals": "error",
+            "useRegexLiterals": "error"
+          },
+          "correctness": {
+            "noConstAssign": "error",
+            "noConstantCondition": "error",
+            "noConstructorReturn": "error",
+            "noEmptyCharacterClassInRegex": "error",
+            "noEmptyPattern": "error",
+            "noGlobalObjectCalls": "error",
+            "noInnerDeclarations": "error",
+            "noInvalidBuiltinInstantiation": "error",
+            "noInvalidConstructorSuper": "error",
+            "noNonoctalDecimalEscape": "error",
+            "noPrecisionLoss": "error",
+            "noSelfAssign": "error",
+            "noSetterReturn": "error",
+            "noSwitchDeclarations": "error",
+            "noUndeclaredVariables": "error",
+            "noUnreachable": "error",
+            "noUnreachableSuper": "error",
+            "noUnsafeFinally": "error",
+            "noUnsafeOptionalChaining": "error",
+            "noUnusedInstantiation": "error",
+            "noUnusedLabels": "error",
+            "noUnusedPrivateClassMembers": "error",
+            "noUnusedVariables": "error",
+            "useIsNan": "error",
+            "useParseIntRadix": "error",
+            "useValidForDirection": "error",
+            "useValidTypeof": "error",
+            "useYield": "error"
+          },
+          "performance": {
+            "noAwaitInLoops": "error"
+          },
+          "security": {
+            "noGlobalEval": "error",
+            "noScriptUrl": "error"
+          },
+          "style": {
+            "noExcessiveLinesPerFile": "warn",
+            "noMultiAssign": "error",
+            "noMultilineString": "error",
+            "noNegationElse": "error",
+            "noRestrictedImports": "error",
+            "noUselessElse": "error",
+            "noYodaExpression": "error",
+            "useArrayLiterals": "error",
+            "useCollapsedElseIf": "error",
+            "useConsistentArrowReturn": "error",
+            "useConsistentBuiltinInstantiation": "error",
+            "useConsistentObjectDefinitions": "error",
+            "useConst": "error",
+            "useDefaultSwitchClause": "error",
+            "useExponentiationOperator": "error",
+            "useGroupedAccessorPairs": "error",
+            "useObjectSpread": "error",
+            "useShorthandAssign": "error",
+            "useSingleVarDeclarator": "error",
+            "useSpreadOverApply": "error",
+            "useSymbolDescription": "error",
+            "useThrowOnlyError": "error"
+          },
+          "suspicious": {
+            "noAlert": "error",
+            "noAssignInExpressions": "error",
+            "noAsyncPromiseExecutor": "error",
+            "noBitwiseOperators": "error",
+            "noCatchAssign": "error",
+            "noClassAssign": "error",
+            "noCompareNegZero": "error",
+            "noConfusingLabels": "error",
+            "noConstantBinaryExpressions": "error",
+            "noControlCharactersInRegex": "error",
+            "noDebugger": "error",
+            "noDoubleEquals": "error",
+            "noDuplicateCase": "error",
+            "noDuplicateClassMembers": "error",
+            "noDuplicateElseIf": "error",
+            "noDuplicateObjectKeys": "error",
+            "noDuplicateParameters": "error",
+            "noEmptyBlockStatements": "error",
+            "noEqualsToNull": "error",
+            "noFallthroughSwitchClause": "error",
+            "noFunctionAssign": "error",
+            "noGlobalAssign": "error",
+            "noImportAssign": "error",
+            "noIrregularWhitespace": "error",
+            "noLabelVar": "error",
+            "noMisleadingCharacterClass": "error",
+            "noOctalEscape": "error",
+            "noProto": "error",
+            "noPrototypeBuiltins": "error",
+            "noRedeclare": "error",
+            "noReturnAssign": "error",
+            "noSelfCompare": "error",
+            "noShadowRestrictedNames": "error",
+            "noSparseArray": "error",
+            "noTemplateCurlyInString": "error",
+            "noUnassignedVariables": "error",
+            "noUnsafeNegation": "error",
+            "noUnusedExpressions": "error",
+            "noUselessRegexBackrefs": "error",
+            "noVar": "error",
+            "noWith": "error",
+            "useDefaultSwitchClauseLast": "error",
+            "useGetterReturn": "error",
+            "useGuardForIn": "error",
+            "useIterableCallbackReturn": {
+              "level": "error",
+              "options": {
+                "allowImplicit": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["test/**/*.ts"],
+      "linter": {
+        "rules": {}
+      },
+      "javascript": {
+        "globals": ["describe", "it", "before", "after", "beforeEach", "afterEach"]
+      }
+    }
+  ],
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
-import {Command, Flags} from '@oclif/core'
-import chalk from 'chalk'
 import * as path from 'node:path'
 import {fileURLToPath} from 'node:url'
+import {Command, Flags} from '@oclif/core'
+import chalk from 'chalk'
 
 import {
   DEFAULT_INTERVAL_SECONDS,
@@ -21,11 +21,11 @@ function resolveBin(): string {
 
 export default class DaemonInstall extends Command {
   static override description = 'Install the periodic sync agent (runs dotsloth sync on a schedule)'
-static override examples = [
+  static override examples = [
     '<%= config.bin %> <%= command.id %>',
     '<%= config.bin %> <%= command.id %> --interval 3600',
   ]
-static override flags = {
+  static override flags = {
     interval: Flags.integer({
       default: DEFAULT_INTERVAL_SECONDS,
       description: 'Seconds between syncs (default: once a day)',

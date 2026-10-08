@@ -1,23 +1,21 @@
 import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-
-import type {Organization} from '../../types/index.js'
-
 import {autoSync} from '../../lib/autosync.js'
 import {addOrganization, loadConfig} from '../../lib/config.js'
+import type {Organization} from '../../types/index.js'
 
 export default class OrgUpdate extends Command {
   static override args = {
     name: Args.string({description: 'Organization name to update'}),
   }
-static override description = 'Update an organization configuration'
-static override examples = [
+  static override description = 'Update an organization configuration'
+  static override examples = [
     '<%= config.bin %> <%= command.id %>',
     '<%= config.bin %> <%= command.id %> phibar',
     '<%= config.bin %> <%= command.id %> phibar --email new@email.com',
   ]
-static override flags = {
+  static override flags = {
     email: Flags.string({char: 'e', description: 'New git email'}),
     username: Flags.string({char: 'u', description: 'New git username'}),
   }

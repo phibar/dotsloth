@@ -9,11 +9,8 @@ import {auditRepo, findRepos, isAtRisk} from '../lib/repo-audit.js'
 
 export default class Doctor extends Command {
   static override description = 'Check whether anything would be lost if this machine were wiped'
-static override examples = [
-    '<%= config.bin %> <%= command.id %>',
-    '<%= config.bin %> <%= command.id %> --offline',
-  ]
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --offline']
+  static override flags = {
     offline: Flags.boolean({description: 'Skip GitHub PR lookups (faster, less precise)'}),
   }
 
@@ -60,9 +57,7 @@ static override flags = {
 
         const marker = branch.risk === 'local-only' ? chalk.red('  ✗') : chalk.yellow('  !')
         const gone = branch.upstreamGone ? chalk.dim(' [upstream deleted]') : ''
-        this.log(
-          `${marker} ${branch.name}: ${branch.unpushed} unpushed${gone}` + chalk.dim(`  (${branch.reason})`),
-        )
+        this.log(`${marker} ${branch.name}: ${branch.unpushed} unpushed${gone}` + chalk.dim(`  (${branch.reason})`))
         this.log(chalk.dim(`      → git push -u origin ${branch.name}`))
       }
 

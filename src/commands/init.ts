@@ -1,7 +1,7 @@
+import * as fs from 'node:fs'
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-import * as fs from 'node:fs'
 
 import {
   configExists,
@@ -19,8 +19,8 @@ import {createSymlink} from '../lib/symlink.js'
 
 export default class Init extends Command {
   static override description = 'Initialize dotsloth on this machine'
-static override examples = ['<%= config.bin %> <%= command.id %>']
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>']
+  static override flags = {
     force: Flags.boolean({char: 'f', description: 'Overwrite existing configuration'}),
     'skip-secrets': Flags.boolean({description: 'Skip secrets extraction from zprofile'}),
     'skip-ssh': Flags.boolean({description: 'Skip SSH keychain setup'}),
@@ -192,7 +192,7 @@ Host github.com
     for (const syncedFile of config.syncedFiles) {
       // Sequential on purpose: each link reports its own line, and parallel
       // filesystem mutation would interleave the backup messages.
-      // eslint-disable-next-line no-await-in-loop
+      // biome-ignore lint/performance/noAwaitInLoops: see above
       const result = await createSymlink({
         backup: true,
         source: syncedFile.source,

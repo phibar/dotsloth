@@ -7,8 +7,8 @@ import {PATHS} from '../../lib/paths.js'
 
 export default class EnvPush extends Command {
   static override description = 'Copy env files from your repos into the dotsloth store'
-static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
+  static override flags = {
     'dry-run': Flags.boolean({description: 'Show what would be copied without writing'}),
     force: Flags.boolean({char: 'f', description: 'Overwrite store entries that differ'}),
   }

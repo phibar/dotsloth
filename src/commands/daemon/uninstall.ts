@@ -5,7 +5,7 @@ import {isInstalled, uninstall} from '../../lib/daemon.js'
 
 export default class DaemonUninstall extends Command {
   static override description = 'Remove the periodic sync agent'
-static override examples = ['<%= config.bin %> <%= command.id %>']
+  static override examples = ['<%= config.bin %> <%= command.id %>']
 
   public async run(): Promise<void> {
     if (!isInstalled()) {

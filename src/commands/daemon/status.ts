@@ -5,7 +5,7 @@ import {isInstalled, isLoaded, PLIST_PATH, readInterval, tailLog} from '../../li
 
 export default class DaemonStatus extends Command {
   static override description = 'Show whether periodic sync is installed and when it last ran'
-static override examples = ['<%= config.bin %> <%= command.id %>']
+  static override examples = ['<%= config.bin %> <%= command.id %>']
 
   public async run(): Promise<void> {
     this.log(chalk.bold('\n🦥 periodic sync\n'))

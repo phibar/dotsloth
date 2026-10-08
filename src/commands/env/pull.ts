@@ -1,7 +1,7 @@
-import {Command, Flags} from '@oclif/core'
-import chalk from 'chalk'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import {Command, Flags} from '@oclif/core'
+import chalk from 'chalk'
 
 import {loadConfig} from '../../lib/config.js'
 import {compare, copyFromStore, scanStore} from '../../lib/env.js'
@@ -9,8 +9,8 @@ import {PATHS} from '../../lib/paths.js'
 
 export default class EnvPull extends Command {
   static override description = 'Restore env files from the dotsloth store into your repos'
-static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --force']
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --force']
+  static override flags = {
     'dry-run': Flags.boolean({description: 'Show what would be restored without writing'}),
     force: Flags.boolean({char: 'f', description: 'Overwrite local files that differ'}),
   }

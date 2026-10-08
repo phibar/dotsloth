@@ -64,7 +64,10 @@ export function discoverProjects(githubRoot: string): ClaudeProject[] {
   if (!fs.existsSync(PROJECTS_DIR)) return projects
 
   const existingSlugs = new Set(
-    fs.readdirSync(PROJECTS_DIR, {withFileTypes: true}).filter((d) => d.isDirectory()).map((d) => d.name),
+    fs
+      .readdirSync(PROJECTS_DIR, {withFileTypes: true})
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name),
   )
 
   for (const repoPath of findRepos(githubRoot)) {

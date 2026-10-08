@@ -15,8 +15,8 @@ import {
 
 export default class MailRestore extends Command {
   static override description = 'Recreate Mail signatures and rules, and list the accounts to re-add'
-static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
+  static override flags = {
     'accounts-only': Flags.boolean({description: 'Only print the account checklist'}),
     'dry-run': Flags.boolean({description: 'Show what would be recreated without changing Mail'}),
   }

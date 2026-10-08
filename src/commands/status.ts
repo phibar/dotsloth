@@ -8,8 +8,8 @@ import {checkSymlinks} from '../lib/symlink.js'
 
 export default class Status extends Command {
   static override description = 'Show current dotsloth configuration status'
-static override examples = ['<%= config.bin %> <%= command.id %>']
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>']
+  static override flags = {
     verbose: Flags.boolean({char: 'v', description: 'Show detailed status'}),
   }
 
@@ -120,9 +120,7 @@ static override flags = {
       const parts = relPath.split('/')
       if (parts.length > 0) {
         const orgFolder = parts[0]
-        const org = config.organizations.find(
-          (o) => o.folderName.toLowerCase() === orgFolder.toLowerCase(),
-        )
+        const org = config.organizations.find((o) => o.folderName.toLowerCase() === orgFolder.toLowerCase())
         if (org) {
           this.log(`  ${chalk.green('✓')} In ${chalk.cyan(org.name)} org`)
           this.log(`    Git identity: ${org.gitUsername} <${org.gitEmail}>`)

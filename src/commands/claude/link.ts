@@ -1,14 +1,14 @@
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 
-import {claudeInstalled, configFiles, seedStore, SHARED_CONFIG_FILES} from '../../lib/claude.js'
+import {claudeInstalled, configFiles, SHARED_CONFIG_FILES, seedStore} from '../../lib/claude.js'
 import {loadConfig, saveConfig} from '../../lib/config.js'
 import {createSymlink} from '../../lib/symlink.js'
 
 export default class ClaudeLink extends Command {
   static override description = 'Share Claude Code settings between machines via the dotsloth store'
-static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
-static override flags = {
+  static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
+  static override flags = {
     'dry-run': Flags.boolean({description: 'Show what would change without writing'}),
   }
 
@@ -46,7 +46,7 @@ static override flags = {
         continue
       }
 
-      // eslint-disable-next-line no-await-in-loop
+      // biome-ignore lint/performance/noAwaitInLoops: sequential on purpose, each link reports its own line
       const result = await createSymlink({backup: true, source: file.storePath, target: file.localPath})
       if (result.isValid) {
         this.log(chalk.green('✓') + ` ${file.name}`)

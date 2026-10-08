@@ -73,7 +73,7 @@ npm run build
 
 ```bash
 npm run build      # Clean and compile TypeScript (shx rm -rf dist && tsc -b)
-npm run lint       # Run ESLint
+npm run lint       # Run Biome (lint, formatting, import order)
 npm run test       # Run Mocha tests
 npm run prepack    # Generate oclif manifest and readme (for releases)
 ```

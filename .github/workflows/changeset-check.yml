@@ -44,7 +44,7 @@ jobs:
           # empty changeset (npm run changeset -- --empty) bumps nothing, so
           # `status` reports no packages and would wrongly fail the check.
           added=$(git diff --name-only --diff-filter=A "origin/${BASE_REF}...HEAD" -- '.changeset/*.md' \
-                  | grep -v '/README.md$' | wc -l | tr -d ' ')
+                  | { grep -v '/README.md$' || true; } | wc -l | tr -d ' ')
           echo "added=$added" >> "$GITHUB_OUTPUT"
 
           if echo "$LABELS" | grep -q '"skip-changeset"'; then

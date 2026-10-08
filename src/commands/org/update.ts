@@ -1,11 +1,12 @@
-import {Args, Command, Flags} from '@oclif/core'
+import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-import {autoSync} from '../../cli/autosync.js'
-import {addOrganization, loadConfig} from '../../lib/config.js'
-import type {Organization} from '../../types/index.js'
+import {printAutoSync} from '../../cli/autosync.js'
+import {BaseCommand} from '../../cli/base-command.js'
+import {getConfig} from '../../core/config.js'
+import {getOrg, updateOrg} from '../../core/orgs.js'
 
-export default class OrgUpdate extends Command {
+export default class OrgUpdate extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Organization name to update'}),
   }
@@ -23,31 +24,23 @@ export default class OrgUpdate extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(OrgUpdate)
 
-    const config = loadConfig(false) // Don't auto-sync yet
-    if (!config || config.organizations.length === 0) {
+    const config = getConfig()
+    if (config.organizations.length === 0) {
       this.error('No organizations configured. Run "dotsloth org add" first.')
     }
 
-    // Select organization
-    let orgName = args.name
-    if (!orgName) {
-      const {selectedOrg} = await Enquirer.prompt<{selectedOrg: string}>({
-        choices: config.organizations.map((o) => ({
-          message: `${o.name} (${o.gitEmail})`,
-          name: o.name,
-        })),
-        message: 'Select organization to update:',
-        name: 'selectedOrg',
-        type: 'select',
-      })
-      orgName = selectedOrg
-    }
+    const orgName =
+      args.name ??
+      (
+        await Enquirer.prompt<{selectedOrg: string}>({
+          choices: config.organizations.map((o) => ({message: `${o.name} (${o.gitEmail})`, name: o.name})),
+          message: 'Select organization to update:',
+          name: 'selectedOrg',
+          type: 'select',
+        })
+      ).selectedOrg
 
-    // Find organization
-    const org = config.organizations.find((o) => o.name.toLowerCase() === orgName!.toLowerCase())
-    if (!org) {
-      this.error(`Organization '${orgName}' not found`)
-    }
+    const org = getOrg(orgName, config)
 
     this.log('')
     this.log(chalk.bold(`Updating ${org.name}:`))
@@ -55,62 +48,51 @@ export default class OrgUpdate extends Command {
     this.log(chalk.dim(`  Current username: ${org.gitUsername}`))
     this.log('')
 
-    // Get new email
-    let newEmail = flags.email
-    if (!newEmail) {
-      const response = await Enquirer.prompt<{email: string}>({
-        initial: org.gitEmail,
-        message: 'Git email:',
-        name: 'email',
-        type: 'input',
-        validate(input) {
-          if (input.length === 0) return 'Email is required'
-          if (!input.includes('@')) return 'Invalid email format'
-          return true
-        },
-      })
-      newEmail = response.email
-    }
+    const gitEmail =
+      flags.email ??
+      (
+        await Enquirer.prompt<{email: string}>({
+          initial: org.gitEmail,
+          message: 'Git email:',
+          name: 'email',
+          type: 'input',
+          validate(input) {
+            if (input.length === 0) return 'Email is required'
+            if (!input.includes('@')) return 'Invalid email format'
+            return true
+          },
+        })
+      ).email
 
-    // Get new username
-    let newUsername = flags.username
-    if (!newUsername) {
-      const response = await Enquirer.prompt<{username: string}>({
-        initial: org.gitUsername,
-        message: 'Git username:',
-        name: 'username',
-        type: 'input',
-        validate: (input) => (input.length > 0 ? true : 'Username is required'),
-      })
-      newUsername = response.username
-    }
+    const gitUsername =
+      flags.username ??
+      (
+        await Enquirer.prompt<{username: string}>({
+          initial: org.gitUsername,
+          message: 'Git username:',
+          name: 'username',
+          type: 'input',
+          validate: (input) => (input.length > 0 ? true : 'Username is required'),
+        })
+      ).username
 
-    // Check if anything changed
-    if (newEmail === org.gitEmail && newUsername === org.gitUsername) {
+    const result = await updateOrg(org.name, {gitEmail, gitUsername})
+    if (!result.changed) {
       this.log(chalk.yellow('No changes made'))
       return
     }
 
-    // Update organization
-    const updatedOrg: Organization = {
-      ...org,
-      gitEmail: newEmail,
-      gitUsername: newUsername,
-    }
-
-    addOrganization(updatedOrg) // saves config.json; autoSync below regenerates the gitconfigs
-
     this.log('')
     this.log(chalk.green(`✓ Organization '${org.name}' updated`))
-    if (newEmail !== org.gitEmail) {
-      this.log(chalk.dim(`  Email: ${org.gitEmail} → ${newEmail}`))
+    if (result.after.gitEmail !== result.before.gitEmail) {
+      this.log(chalk.dim(`  Email: ${result.before.gitEmail} → ${result.after.gitEmail}`))
     }
 
-    if (newUsername !== org.gitUsername) {
-      this.log(chalk.dim(`  Username: ${org.gitUsername} → ${newUsername}`))
+    if (result.after.gitUsername !== result.before.gitUsername) {
+      this.log(chalk.dim(`  Username: ${result.before.gitUsername} → ${result.after.gitUsername}`))
     }
 
     this.log('')
-    await autoSync(this.log.bind(this))
+    if (result.sync) printAutoSync(this.log.bind(this), result.sync)
   }
 }

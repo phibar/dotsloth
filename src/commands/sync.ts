@@ -2,7 +2,7 @@ import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 
 import {printSyncResult} from '../cli/format.js'
-import {runSync} from '../lib/sync.js'
+import {runSync} from '../core/sync.js'
 
 export default class Sync extends Command {
   static override description = 'Sync configurations from iCloud Drive'

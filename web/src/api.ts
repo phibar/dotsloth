@@ -1,5 +1,6 @@
 import type {CloneEvent, ClonePlan, CloneResult, CloneTarget} from '../../src/core/clone.js'
 import type {DaemonStatus, InstallDaemonResult} from '../../src/core/daemon.js'
+import type {EnvEntry, EnvTransfer, EnvTransferOptions, EnvTransferResult} from '../../src/core/env.js'
 import type {AddOrgResult, OrgInfo, OrgInput, RemoveOrgResult, UpdateOrgResult} from '../../src/core/orgs.js'
 import type {Status} from '../../src/core/status.js'
 import type {SyncOptions, SyncResult} from '../../src/core/sync.js'
@@ -17,6 +18,9 @@ export type {
   CloneTarget,
   DaemonStatus,
   DevSlothConfig,
+  EnvEntry,
+  EnvTransfer,
+  EnvTransferResult,
   InstallDaemonResult,
   JobSnapshot,
   OrgInfo,
@@ -87,8 +91,13 @@ export const api = {
     install: (intervalSeconds: number) => call<InstallDaemonResult>('PUT', '/api/daemon', {intervalSeconds}),
     uninstall: () => call<{removed: boolean}>('DELETE', '/api/daemon'),
   },
+  env: {
+    scan: () => call<{entries: EnvEntry[]; githubRoot: string}>('GET', '/api/env'),
+  },
   jobs: {
     clone: (url: string, target?: CloneTarget) => call<JobSnapshot>('POST', '/api/jobs/clone', {target, url}),
+    envPull: (options: EnvTransferOptions) => call<JobSnapshot>('POST', '/api/jobs/env-pull', options),
+    envPush: (options: EnvTransferOptions) => call<JobSnapshot>('POST', '/api/jobs/env-push', options),
     get: (id: string) => call<JobSnapshot>('GET', `/api/jobs/${id}`),
     sync: (options: SyncOptions = {}) => call<JobSnapshot>('POST', '/api/jobs/sync', options),
   },
@@ -99,6 +108,14 @@ export const api = {
       call<RemoveOrgResult>('DELETE', `/api/orgs/${encodeURIComponent(name)}`, options),
     update: (name: string, changes: Partial<Pick<OrgInput, 'gitEmail' | 'gitUsername' | 'signingKey'>>) =>
       call<UpdateOrgResult>('PUT', `/api/orgs/${encodeURIComponent(name)}`, changes),
+  },
+  secrets: {
+    list: () => call<{names: string[]}>('GET', '/api/secrets'),
+    remove: (name: string) => call<{name: string}>('DELETE', `/api/secrets/${encodeURIComponent(name)}`),
+    reveal: async (name: string) =>
+      (await call<{value: string}>('POST', `/api/secrets/${encodeURIComponent(name)}/reveal`)).value,
+    set: (name: string, value: string, overwrite = false) =>
+      call<{created: boolean; name: string}>('POST', '/api/secrets', {name, overwrite, value}),
   },
   status: () => call<Status>('GET', '/api/status'),
 }

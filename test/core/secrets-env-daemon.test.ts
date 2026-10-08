@@ -8,7 +8,7 @@ import type {CoreError} from '../../src/core/errors.js'
 import {listSecretNames, removeSecret, revealSecret, secretExists, setSecret} from '../../src/core/secrets.js'
 import {PLIST_PATH} from '../../src/lib/daemon.js'
 import {PATHS} from '../../src/lib/paths.js'
-import {fakeBinaries, resetHome} from '../helpers.js'
+import {FAKE_SECURITY, fakeBinaries, resetHome} from '../helpers.js'
 
 function codeOf(fn: () => unknown): string | undefined {
   try {
@@ -19,29 +19,6 @@ function codeOf(fn: () => unknown): string | undefined {
 
   return undefined
 }
-
-/**
- * A stand-in for macOS `security` that keeps one file per secret in
- * $FAKE_KEYCHAIN and prints dump-keychain in the real format.
- */
-const FAKE_SECURITY = String.raw`
-cmd=$1; shift; name=""; value=""
-while [ $# -gt 0 ]; do
-  case "$1" in
-    -s) name=$2; shift ;;
-    -w) if [ $# -gt 1 ]; then value=$2; shift; fi ;;
-  esac
-  shift
-done
-file="$FAKE_KEYCHAIN/$name"
-case "$cmd" in
-  add-generic-password) printf '%s' "$value" > "$file" ;;
-  find-generic-password) [ -f "$file" ] || exit 44; cat "$file"; echo ;;
-  delete-generic-password) [ -f "$file" ] || exit 44; rm "$file" ;;
-  dump-keychain) for f in "$FAKE_KEYCHAIN"/*; do [ -f "$f" ] || continue
-    echo '    "acct"<blob>="dotsloth"'; echo "    \"svce\"<blob>=\"$(basename "$f")\""; done ;;
-esac
-`
 
 describe('core/secrets', () => {
   let restorePath: () => void

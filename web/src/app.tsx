@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react'
 import {ApiError, api, type Status} from './api.js'
 import {DaemonPage} from './pages/daemon.js'
 import {Dashboard} from './pages/dashboard.js'
+import {OrganizationsPage} from './pages/orgs.js'
 import {Placeholder} from './pages/placeholder.js'
 import {SECTIONS, type Section, useRoute} from './routes.js'
 import {type Theme, useTheme} from './theme.js'
@@ -79,6 +80,7 @@ export function App() {
 const PAGES: Record<string, () => React.JSX.Element> = {
   daemon: DaemonPage,
   dashboard: Dashboard,
+  orgs: OrganizationsPage,
 }
 
 function Page({section}: {section: Section}) {

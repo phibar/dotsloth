@@ -488,3 +488,80 @@ input {
   gap: 0.5rem;
   margin-top: 1rem;
 }
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.55rem 0.5rem;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table th {
+  border-top: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+.inline-form,
+.field-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+
+.inline-form input,
+.field-row input,
+.clone-plan select {
+  flex: 1 1 220px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.45rem 0.6rem;
+}
+
+.clone-plan {
+  margin-top: 0.75rem;
+}
+
+.clone-plan legend {
+  margin-bottom: 0.4rem;
+}
+
+.danger-option {
+  margin-top: 0.75rem;
+  color: var(--error);
+}

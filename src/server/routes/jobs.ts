@@ -2,12 +2,21 @@ import {Hono} from 'hono'
 import {type SSEStreamingApi, streamSSE} from 'hono/streaming'
 import {z} from 'zod'
 
+import {clone} from '../../core/clone.js'
 import {CoreError} from '../../core/errors.js'
 import {runSync} from '../../core/sync.js'
 import {readBody} from '../body.js'
 import {type JobRunner, UpdateQueue} from '../jobs.js'
 
 const SyncBody = z.object({dryRun: z.boolean().optional(), force: z.boolean().optional()}).strict()
+
+const CloneTarget = z.discriminatedUnion('kind', [
+  z.object({kind: z.literal('org'), name: z.string()}).strict(),
+  z.object({gitEmail: z.string(), gitUsername: z.string(), kind: z.literal('new-org')}).strict(),
+  z.object({kind: z.literal('none')}).strict(),
+])
+
+const CloneBody = z.object({org: z.string().optional(), target: CloneTarget.optional(), url: z.string()}).strict()
 
 /**
  * Write a job's events from `from` on, then follow it until it ends. Events
@@ -48,24 +57,34 @@ async function streamJob(stream: SSEStreamingApi, runner: JobRunner, id: string,
 }
 
 export function jobRoutes(runner: JobRunner) {
-  return new Hono()
-    .post('/sync', async (c) => {
-      const options = await readBody(c, SyncBody)
-      return c.json(
-        runner.start('sync', () => runSync(options)),
-        202,
-      )
-    })
-    .get('/:id', (c) => {
-      const job = runner.get(c.req.param('id'))
-      if (!job) throw new CoreError('NOT_FOUND', 'No such job')
-      return c.json(job)
-    })
-    .get('/:id/events', (c) => {
-      const id = c.req.param('id')
-      if (!runner.get(id)) throw new CoreError('NOT_FOUND', 'No such job')
-      const lastEventId = Number(c.req.header('last-event-id'))
-      const from = Number.isInteger(lastEventId) && lastEventId >= 0 ? lastEventId + 1 : 0
-      return streamSSE(c, (stream) => streamJob(stream, runner, id, from))
-    })
+  return (
+    new Hono()
+      .post('/sync', async (c) => {
+        const options = await readBody(c, SyncBody)
+        return c.json(
+          runner.start('sync', () => runSync(options)),
+          202,
+        )
+      })
+      // Never interactive: git cannot prompt a browser, so it is told not to.
+      .post('/clone', async (c) => {
+        const {org, target, url} = await readBody(c, CloneBody)
+        return c.json(
+          runner.start('clone', (emit) => clone(url, {org, target}, emit)),
+          202,
+        )
+      })
+      .get('/:id', (c) => {
+        const job = runner.get(c.req.param('id'))
+        if (!job) throw new CoreError('NOT_FOUND', 'No such job')
+        return c.json(job)
+      })
+      .get('/:id/events', (c) => {
+        const id = c.req.param('id')
+        if (!runner.get(id)) throw new CoreError('NOT_FOUND', 'No such job')
+        const lastEventId = Number(c.req.header('last-event-id'))
+        const from = Number.isInteger(lastEventId) && lastEventId >= 0 ? lastEventId + 1 : 0
+        return streamSSE(c, (stream) => streamJob(stream, runner, id, from))
+      })
+  )
 }

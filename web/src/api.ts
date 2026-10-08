@@ -1,4 +1,6 @@
+import type {CloneEvent, ClonePlan, CloneResult, CloneTarget} from '../../src/core/clone.js'
 import type {DaemonStatus, InstallDaemonResult} from '../../src/core/daemon.js'
+import type {AddOrgResult, OrgInfo, OrgInput, RemoveOrgResult, UpdateOrgResult} from '../../src/core/orgs.js'
 import type {Status} from '../../src/core/status.js'
 import type {SyncOptions, SyncResult} from '../../src/core/sync.js'
 import type {ApiError as ApiErrorBody} from '../../src/server/errors.js'
@@ -7,7 +9,21 @@ import type {DevSlothConfig} from '../../src/types/index.js'
 
 // Result types come straight from the server code (type-only imports), so the
 // UI and the API cannot drift apart unnoticed.
-export type {DaemonStatus, DevSlothConfig, InstallDaemonResult, JobSnapshot, Status, SyncResult}
+export type {
+  AddOrgResult,
+  CloneEvent,
+  ClonePlan,
+  CloneResult,
+  CloneTarget,
+  DaemonStatus,
+  DevSlothConfig,
+  InstallDaemonResult,
+  JobSnapshot,
+  OrgInfo,
+  OrgInput,
+  Status,
+  SyncResult,
+}
 
 export class ApiError extends Error {
   readonly code: string
@@ -37,6 +53,9 @@ async function call<T>(method: string, path: string, body?: unknown): Promise<T>
 }
 
 export const api = {
+  clone: {
+    plan: (url: string) => call<ClonePlan>('POST', '/api/clone/plan', {url}),
+  },
   config: {
     get: () => call<DevSlothConfig>('GET', '/api/config'),
     put: (config: DevSlothConfig) => call<DevSlothConfig>('PUT', '/api/config', config),
@@ -47,8 +66,17 @@ export const api = {
     uninstall: () => call<{removed: boolean}>('DELETE', '/api/daemon'),
   },
   jobs: {
+    clone: (url: string, target?: CloneTarget) => call<JobSnapshot>('POST', '/api/jobs/clone', {target, url}),
     get: (id: string) => call<JobSnapshot>('GET', `/api/jobs/${id}`),
     sync: (options: SyncOptions = {}) => call<JobSnapshot>('POST', '/api/jobs/sync', options),
+  },
+  orgs: {
+    add: (input: OrgInput) => call<AddOrgResult>('POST', '/api/orgs', input),
+    list: () => call<OrgInfo[]>('GET', '/api/orgs'),
+    remove: (name: string, options: {confirm?: string; deleteRepos?: boolean} = {}) =>
+      call<RemoveOrgResult>('DELETE', `/api/orgs/${encodeURIComponent(name)}`, options),
+    update: (name: string, changes: Partial<Pick<OrgInput, 'gitEmail' | 'gitUsername' | 'signingKey'>>) =>
+      call<UpdateOrgResult>('PUT', `/api/orgs/${encodeURIComponent(name)}`, changes),
   },
   status: () => call<Status>('GET', '/api/status'),
 }

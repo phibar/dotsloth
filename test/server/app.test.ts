@@ -1,3 +1,4 @@
+import {execFileSync} from 'node:child_process'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
@@ -6,6 +7,7 @@ import {Hono} from 'hono'
 
 import {replaceConfig} from '../../src/core/config.js'
 import {getDefaultConfig} from '../../src/lib/config.js'
+import {PATHS} from '../../src/lib/paths.js'
 import {createApp} from '../../src/server/app.js'
 import {startServer} from '../../src/server/index.js'
 import {JobRunner} from '../../src/server/jobs.js'
@@ -175,6 +177,80 @@ describe('web server', () => {
         expect(await (await send('DELETE')).json()).to.deep.equal({removed: true})
       } finally {
         restore()
+      }
+    })
+  })
+
+  describe('organizations and clone API', () => {
+    const send = (method: string, url: string, body?: unknown) =>
+      request(url, {
+        body: body === undefined ? undefined : JSON.stringify(body),
+        headers: {'content-type': 'application/json', origin: ORIGIN},
+        method,
+      })
+    const acme = {gitEmail: 'dev@acme.test', gitUsername: 'dev', name: 'acme'}
+
+    it('adds, lists, updates and removes organizations', async () => {
+      expect((await send('POST', '/api/orgs', {...acme, gitEmail: 'broken'})).status).to.equal(400)
+      expect((await send('POST', '/api/orgs', acme)).status).to.equal(201)
+      expect((await send('POST', '/api/orgs', acme)).status).to.equal(409)
+
+      const orgs = await (await request('/api/orgs')).json()
+      expect(orgs.map((o: {name: string}) => o.name)).to.deep.equal(['acme'])
+
+      const updated = await (await send('PUT', '/api/orgs/acme', {gitUsername: 'renamed'})).json()
+      expect(updated).to.include({changed: true})
+
+      expect((await send('DELETE', '/api/orgs/acme', {})).status).to.equal(200)
+      expect((await send('DELETE', '/api/orgs/acme', {})).status).to.equal(404)
+    })
+
+    it('deletes repositories only when the request echoes the org name', async () => {
+      await send('POST', '/api/orgs', acme)
+      const repo = path.join(PATHS.githubRoot, 'acme', 'repo')
+      fs.mkdirSync(repo, {recursive: true})
+
+      expect((await send('DELETE', '/api/orgs/acme', {deleteRepos: true})).status).to.equal(400)
+      expect((await send('DELETE', '/api/orgs/acme', {confirm: 'other', deleteRepos: true})).status).to.equal(400)
+      expect(fs.existsSync(repo)).to.equal(true)
+
+      const removed = await (await send('DELETE', '/api/orgs/acme', {confirm: 'acme', deleteRepos: true})).json()
+      expect(removed).to.include({deletedFolder: true})
+      expect(fs.existsSync(repo)).to.equal(false)
+    })
+
+    it('plans a clone and runs it as a job with streamed output', async () => {
+      replaceConfig(getDefaultConfig())
+      const sources = fs.mkdtempSync(path.join(os.tmpdir(), 'dotsloth-sources-'))
+      const work = path.join(sources, 'work')
+      fs.mkdirSync(work)
+      const git = (...args: string[]) =>
+        execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], {stdio: 'pipe'})
+      git('-C', work, 'init', '-q')
+      git('-C', work, 'commit', '-q', '--allow-empty', '-m', 'initial')
+      git('clone', '-q', '--bare', work, path.join(sources, 'stranger', 'web.git'))
+      Object.assign(process.env, {
+        GIT_CONFIG_COUNT: '1',
+        GIT_CONFIG_KEY_0: `url.file://${sources}/.insteadOf`,
+        GIT_CONFIG_VALUE_0: 'https://example.test/',
+      })
+
+      try {
+        const url = 'https://example.test/stranger/web.git'
+        const plan = await (await send('POST', '/api/clone/plan', {url})).json()
+        expect(plan).to.include({org: null, orgName: 'stranger', repo: 'web'})
+
+        const job = await (await send('POST', '/api/jobs/clone', {target: {kind: 'none'}, url})).json()
+        const events = await readSse(await request(`/api/jobs/${job.id}/events`))
+        const [, final] = events.at(-1) as [string, {result: {repoPath: string}; status: string}]
+        expect(final.status).to.equal('succeeded')
+        expect(final.result.repoPath).to.equal(path.join(PATHS.githubRoot, 'stranger', 'web'))
+        expect(events.some(([name, data]) => name === 'event' && (data as {type: string}).type === 'output')).to.equal(
+          true,
+        )
+      } finally {
+        for (const key of ['GIT_CONFIG_COUNT', 'GIT_CONFIG_KEY_0', 'GIT_CONFIG_VALUE_0']) delete process.env[key]
+        fs.rmSync(sources, {force: true, recursive: true})
       }
     })
   })

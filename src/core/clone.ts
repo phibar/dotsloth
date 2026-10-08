@@ -11,6 +11,8 @@ import {ignoreEvents} from './events.js'
 import {addOrg, getOrg, safeOrgFolder} from './orgs.js'
 
 export interface ClonePlan {
+  /** Where org folders live; the clone lands in <githubRoot>/<org folder>/<repo>. */
+  githubRoot: string
   host: string
   /** The org the repository maps to, when one is configured. */
   org: null | Organization
@@ -43,7 +45,14 @@ export function planClone(url: string, {org: override}: {org?: string} = {}): Cl
   const parsed = parse(url)
   const orgName = override || parsed.org
   const org = config.organizations.find((o) => o.name.toLowerCase() === orgName.toLowerCase()) ?? null
-  return {...parsed, org, orgName, organizations: config.organizations, url: url.trim()}
+  return {
+    ...parsed,
+    githubRoot: config.paths.githubRoot,
+    org,
+    orgName,
+    organizations: config.organizations,
+    url: url.trim(),
+  }
 }
 
 export type CloneEvent =

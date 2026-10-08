@@ -10,8 +10,10 @@ import {JobRunner} from './jobs.js'
 import {cloneRoutes} from './routes/clone.js'
 import {configRoutes} from './routes/config.js'
 import {daemonRoutes} from './routes/daemon.js'
+import {envRoutes} from './routes/env.js'
 import {jobRoutes} from './routes/jobs.js'
 import {orgRoutes} from './routes/orgs.js'
+import {secretRoutes} from './routes/secrets.js'
 import {statusRoutes} from './routes/status.js'
 import {checkHost, checkOrigin, cookieName, requireSession, securityHeaders, tokensMatch} from './security.js'
 
@@ -53,6 +55,8 @@ export function createApp({port, token, webRoot = null}: AppOptions) {
   app.route('/api/daemon', daemonRoutes)
   app.route('/api/orgs', orgRoutes)
   app.route('/api/clone', cloneRoutes)
+  app.route('/api/secrets', secretRoutes)
+  app.route('/api/env', envRoutes)
   app.route('/api/jobs', jobRoutes(runner))
   app.all('/api/*', (c) => c.json({code: 'NOT_FOUND', details: [], message: 'No such endpoint'}, 404))
 

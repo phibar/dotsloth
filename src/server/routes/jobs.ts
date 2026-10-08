@@ -3,6 +3,7 @@ import {type SSEStreamingApi, streamSSE} from 'hono/streaming'
 import {z} from 'zod'
 
 import {clone} from '../../core/clone.js'
+import {pullEnv, pushEnv} from '../../core/env.js'
 import {CoreError} from '../../core/errors.js'
 import {runSync} from '../../core/sync.js'
 import {readBody} from '../body.js'
@@ -15,6 +16,10 @@ const CloneTarget = z.discriminatedUnion('kind', [
   z.object({gitEmail: z.string(), gitUsername: z.string(), kind: z.literal('new-org')}).strict(),
   z.object({kind: z.literal('none')}).strict(),
 ])
+
+const EnvBody = z
+  .object({dryRun: z.boolean().optional(), force: z.union([z.boolean(), z.array(z.string())]).optional()})
+  .strict()
 
 const CloneBody = z.object({org: z.string().optional(), target: CloneTarget.optional(), url: z.string()}).strict()
 
@@ -71,6 +76,20 @@ export function jobRoutes(runner: JobRunner) {
         const {org, target, url} = await readBody(c, CloneBody)
         return c.json(
           runner.start('clone', (emit) => clone(url, {org, target}, emit)),
+          202,
+        )
+      })
+      .post('/env-push', async (c) => {
+        const options = await readBody(c, EnvBody)
+        return c.json(
+          runner.start('env-push', () => pushEnv(options)),
+          202,
+        )
+      })
+      .post('/env-pull', async (c) => {
+        const options = await readBody(c, EnvBody)
+        return c.json(
+          runner.start('env-pull', () => pullEnv(options)),
           202,
         )
       })

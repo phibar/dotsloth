@@ -79,7 +79,9 @@ code {
 
 .layout {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  /* minmax(0, ...) lets wide content (tables, paths) scroll inside its card
+     instead of stretching the page past the viewport. */
+  grid-template-columns: 220px minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -131,6 +133,7 @@ code {
   padding: 1.5rem 2rem;
   max-width: 1100px;
   width: 100%;
+  min-width: 0;
 }
 
 .page-header {
@@ -235,7 +238,8 @@ input {
 
 @media (max-width: 720px) {
   .layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
   }
 
   .sidebar {

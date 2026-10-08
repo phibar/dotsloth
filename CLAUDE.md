@@ -21,36 +21,35 @@
 
 ### Directory Structure
 
+The CLI and the web UI share one implementation. Logic lives in `src/core`;
+everything else is a front end to it.
+
 ```
 src/
-├── commands/           # oclif command implementations
-│   ├── clone.ts       # Clone repos to correct org folder
-│   ├── init.ts        # Initialize dotsloth on a machine
-│   ├── status.ts      # Show current configuration status
-│   ├── sync.ts        # Sync configurations from iCloud
-│   ├── org/           # Organization management subcommands
-│   │   ├── add.ts
-│   │   ├── list.ts
-│   │   ├── remove.ts
-│   │   └── update.ts
-│   └── secret/        # Secret management subcommands
-│       ├── add.ts
-│       ├── export.ts
-│       ├── get.ts
-│       ├── list.ts
-│       ├── load.ts    # Outputs shell export statements
-│       └── remove.ts
-├── lib/               # Core library modules
-│   ├── config.ts      # Config loading/saving, org management
-│   ├── git.ts         # Gitconfig generation, URL parsing
-│   ├── keychain.ts    # macOS Keychain operations via `security` CLI
-│   ├── paths.ts       # Centralized path definitions
-│   ├── secrets.ts     # Secret extraction from shell profiles
-│   └── symlink.ts     # Symlink creation and verification
-├── types/
-│   └── index.ts       # Zod schemas and TypeScript types
-└── index.ts           # Main export
+├── core/        # business logic: explicit inputs, typed results, StepEvent/job events
+│                #   no prompts, no printing, no process.cwd(); errors are CoreError(code)
+├── lib/         # low-level helpers: config, git, keychain, exec, fs, mail, claude, ...
+├── cli/         # terminal formatting (chalk), BaseCommand (turns CoreError into an error)
+├── commands/    # oclif commands: parse flags -> prompt (enquirer) -> core -> format
+├── server/      # Hono API for `dotsloth ui`: security middleware, routes/, JobRunner (SSE)
+├── types/       # Zod schemas (also bundled into the web app for validation)
+└── index.ts
+web/             # Vite + React app, built to dist/web and served by the server
+test/
+├── setup.ts     # points HOME at a temp dir before anything imports src/lib/paths.ts
+├── helpers.ts   # resetHome(), fakeBinaries() and fakes for security/ssh-add/osascript
+├── core/ lib/ server/
 ```
+
+Rules that keep the layers honest (Biome enforces the first two):
+
+- `src/lib` and `src/core` never import chalk, enquirer or @oclif/core and never use `console`.
+- Every process call goes through `src/lib/exec.ts` with an argv array - never a shell string.
+- Reading config is pure (`readConfig`); `loadConfig()` additionally regenerates org gitconfigs
+  and is for CLI commands only. `saveConfig` validates and writes atomically.
+- Core mutations that change git identities (`addOrg`, `updateOrg`, `removeOrg`) run `runSync`
+  themselves and return its result, so CLI and web behave the same.
+- The web app imports server and core types with `import type` only (plus the Zod schemas).
 
 ### Key Path Locations (defined in `src/lib/paths.ts`)
 
@@ -90,9 +89,12 @@ npm run prepack    # Generate oclif manifest and readme (for releases)
 
 ### Testing
 
-- Test framework: Mocha with Chai
-- Test files: `test/**/*.test.ts` (currently no tests exist)
-- Config: `.mocharc.json` with the tsx loader
+- Node code: Mocha + Chai, `test/**/*.test.ts`, run through the tsx loader (`.mocharc.json`)
+- Web app: Vitest + Testing Library, `web/src/**/*.test.tsx` (jsdom)
+- `npm test` runs both, then Biome
+- Tests never touch the real machine: `test/setup.ts` gives every run a temp `HOME`, and
+  `fakeBinaries()` puts stand-ins for `security`, `ssh-add`, `osascript` and `launchctl` first on
+  `PATH` (`EMPTY_SYSTEM` covers the defaults). Keep it that way when adding tests.
 - Tests run in CI on Ubuntu and macOS across Node LTS versions
 
 ## Code Conventions
@@ -140,9 +142,10 @@ export default class MyCommand extends Command {
 
 ### Error Handling
 
-- Use `this.error('message')` for fatal errors (exits with code 1)
+- Core throws `CoreError(code, message, details)`; codes are stable because the API maps them to
+  HTTP status codes (`src/server/errors.ts`). Commands extend `BaseCommand`, which prints them.
+- Use `this.error('message')` for fatal errors in commands (exits with code 1)
 - Use `this.log(chalk.red(...))` for non-fatal errors
-- Catch errors from external commands and provide user-friendly messages
 
 ### Interactive Prompts
 
@@ -224,21 +227,26 @@ The `sync` command:
 
 ## Common Patterns
 
-### Loading Config with Auto-sync
+### Reading Config
 ```typescript
-const config = loadConfig() // Also syncs org gitconfigs
-if (!config) {
-  this.error('No configuration found. Run "dotsloth init" first.')
-}
+import {getConfig} from '../core/config.js'
+
+const config = getConfig() // throws CoreError CONFIG_MISSING / CONFIG_INVALID
 ```
 
 ### Creating Organizations
 ```typescript
-import {addOrganization} from '../lib/config.js'
-import {writeOrgGitconfig} from '../lib/git.js'
+import {addOrg} from '../core/orgs.js'
 
-addOrganization(org)     // Updates config.json
-writeOrgGitconfig(org)   // Creates org-specific gitconfig
+const result = await addOrg({gitEmail, gitUsername, name}) // config, gitconfig, folder, then sync
+printAutoSync(this.log.bind(this), result.sync)
+```
+
+### Long-running Operations
+Core reports progress through an `onEvent` callback. The CLI prints the events; the server runs
+the operation as a job (`JobRunner`, one at a time) and streams them over SSE:
+```typescript
+runner.start('doctor', (emit) => runDoctor({offline}, emit))
 ```
 
 ### Safe Symlink Creation
@@ -258,3 +266,9 @@ const result = await createSymlink({
 - SSH keys are added to agent with `--apple-use-keychain` for persistence
 - The `secret load` command outputs to stdout for `eval` - be cautious with logging
 - Config.json may contain email addresses but no secrets
+- `dotsloth ui` listens on 127.0.0.1 only and checks Host, the session cookie and (for anything
+  that changes state) Origin on every request (`src/server/security.ts`). New routes are covered
+  automatically - do not add routes outside `createApp`.
+- The API returns secret values one at a time (`POST /api/secrets/:name/reveal`) and never env
+  file contents; core has no bulk secret read, keep it that way.
+- Request bodies are validated with strict Zod schemas (`readBody`); unknown fields are a 400.

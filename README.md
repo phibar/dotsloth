@@ -30,6 +30,7 @@ config — in sync across machines via iCloud Drive and the macOS Keychain.
 - **Pre-reinstall safety.** `dotsloth doctor` refuses to say "safe to wipe"
   while anything would be lost.
 - **Periodic sync.** A launchd agent keeps everything current.
+- **Web UI.** `dotsloth ui` opens a local web interface for all of the above.
 
 ## Quick start
 
@@ -39,6 +40,49 @@ dotsloth init
 dotsloth org add phibar --email you@phibar.work --username phibar
 dotsloth clone git@github.com:phibar/some-repo.git
 ```
+
+## Web UI
+
+```sh
+dotsloth ui
+```
+
+Starts a local server, prints a sign-in link and opens it in your browser.
+Everything the CLI does is there: a dashboard with sync, organizations and
+cloning, a config editor, secrets, env files, doctor, Mail, Claude Code and
+the periodic sync. Press Ctrl+C to stop it.
+
+![Organizations](./docs/screenshots/ui-organizations.png)
+
+<details><summary>More screenshots</summary>
+
+![Secrets](./docs/screenshots/ui-secrets.png)
+![Env files](./docs/screenshots/ui-env-files.png)
+
+</details>
+
+| Flag | |
+|---|---|
+| `--port <n>` | Listen on a fixed port (default: a free one) |
+| `--no-open` | Print the link without opening the browser |
+
+**Security model.** The server can reach your Keychain, config and every
+repository, so it only answers the browser tab it opened:
+
+- It listens on `127.0.0.1` only.
+- The printed link carries a random token. Opening it swaps the token for an
+  HttpOnly, SameSite=Strict session cookie and removes it from the address
+  bar; every other request needs that cookie. The link stays valid while this
+  `dotsloth ui` runs (so you can sign in again after closing the browser) -
+  treat it like a password, and stop the server when you are done.
+- Requests with a foreign `Host` (DNS rebinding) or, for anything that
+  changes state, a foreign `Origin` (CSRF) are refused.
+- Secret values are fetched one at a time when you click Reveal or Copy;
+  there is no way to read several at once. Env file contents are never sent.
+- Deleting an organization's repositories requires typing its name, and the
+  server checks it again.
+- Mail is only contacted when you ask: it is driven via AppleScript, and
+  macOS asks once for permission to control it.
 
 ## Reinstalling your Mac
 
@@ -71,10 +115,22 @@ And on the new machine: Homebrew → node → iCloud sign-in → dotsloth → SS
 
 ```sh
 npm install
-npm run build
-npm test          # mocha + biome
+npm run build     # CLI (tsc) and web app (vite) into dist/
+npm test          # mocha + vitest + biome
 ./bin/run.js <command>
 ```
+
+Working on the web app with hot reload:
+
+```sh
+./bin/run.js ui --no-open                      # prints http://127.0.0.1:<port>/?token=...
+DOTSLOTH_UI_URL='<that link>' npm run dev:web  # Vite proxies /api to it
+```
+
+The code is layered so the CLI and the web UI share one implementation:
+`src/core` holds the logic (typed results, no prompts or printing),
+`src/commands` and `src/cli` are the terminal front end, `src/server` is the
+web API, and `web/` is the React app.
 
 <!-- toc -->
 * [Usage](#usage)

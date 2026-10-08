@@ -3,6 +3,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 
 import {ApiError, api} from './api.js'
 import {App} from './app.js'
+import {mockApi} from './test-utils.js'
 import {ToastProvider, useToast} from './toast.js'
 
 function respond(status: number, body: unknown) {
@@ -28,8 +29,15 @@ describe('app shell', () => {
   })
 
   it('shows every section and follows the hash route', async () => {
-    vi.stubGlobal('fetch', respond(200, STATUS))
-    render(<App />)
+    mockApi({
+      'GET /api/daemon': [200, {installed: false, loaded: false, recentLog: []}],
+      'GET /api/status': [200, STATUS],
+    })
+    render(
+      <ToastProvider>
+        <App />
+      </ToastProvider>,
+    )
 
     expect(await screen.findByText('Connected')).toBeTruthy()
     expect(screen.getByRole('heading', {level: 1}).textContent).toBe('Dashboard')

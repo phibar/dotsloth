@@ -158,6 +158,27 @@ describe('web server', () => {
     })
   })
 
+  describe('daemon API', () => {
+    it('reports, installs with a validated interval, and uninstalls', async () => {
+      const restore = fakeBinaries({launchctl: 'exit 0'})
+      const send = (method: string, body?: unknown) =>
+        request('/api/daemon', {
+          body: body === undefined ? undefined : JSON.stringify(body),
+          headers: {'content-type': 'application/json', origin: ORIGIN},
+          method,
+        })
+      try {
+        expect(await (await request('/api/daemon')).json()).to.include({installed: false})
+        expect((await send('PUT', {intervalSeconds: 30})).status).to.equal(400)
+        expect((await send('PUT', {intervalSeconds: 3600})).status).to.equal(200)
+        expect(await (await request('/api/daemon')).json()).to.include({installed: true, intervalSeconds: 3600})
+        expect(await (await send('DELETE')).json()).to.deep.equal({removed: true})
+      } finally {
+        restore()
+      }
+    })
+  })
+
   describe('web app', () => {
     it('serves the built app, and its index for every client route', async () => {
       const webRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dotsloth-web-'))

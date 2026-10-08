@@ -1,3 +1,4 @@
+import type {DaemonStatus, InstallDaemonResult} from '../../src/core/daemon.js'
 import type {Status} from '../../src/core/status.js'
 import type {SyncOptions, SyncResult} from '../../src/core/sync.js'
 import type {ApiError as ApiErrorBody} from '../../src/server/errors.js'
@@ -6,7 +7,7 @@ import type {DevSlothConfig} from '../../src/types/index.js'
 
 // Result types come straight from the server code (type-only imports), so the
 // UI and the API cannot drift apart unnoticed.
-export type {DevSlothConfig, JobSnapshot, Status, SyncResult}
+export type {DaemonStatus, DevSlothConfig, InstallDaemonResult, JobSnapshot, Status, SyncResult}
 
 export class ApiError extends Error {
   readonly code: string
@@ -39,6 +40,11 @@ export const api = {
   config: {
     get: () => call<DevSlothConfig>('GET', '/api/config'),
     put: (config: DevSlothConfig) => call<DevSlothConfig>('PUT', '/api/config', config),
+  },
+  daemon: {
+    get: () => call<DaemonStatus>('GET', '/api/daemon'),
+    install: (intervalSeconds: number) => call<InstallDaemonResult>('PUT', '/api/daemon', {intervalSeconds}),
+    uninstall: () => call<{removed: boolean}>('DELETE', '/api/daemon'),
   },
   jobs: {
     get: (id: string) => call<JobSnapshot>('GET', `/api/jobs/${id}`),

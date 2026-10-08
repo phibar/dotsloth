@@ -1,10 +1,10 @@
-import {Args, Command, Flags} from '@oclif/core'
+import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
+import {BaseCommand} from '../../cli/base-command.js'
+import {normalizeSecretName, secretExists, setSecret} from '../../core/secrets.js'
 
-import {addSecret, getSecret} from '../../lib/keychain.js'
-
-export default class SecretAdd extends Command {
+export default class SecretAdd extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Secret name (e.g., AWS_ACCESS_KEY_ID)', required: true}),
   }
@@ -20,11 +20,10 @@ export default class SecretAdd extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(SecretAdd)
 
-    const name = args.name.toUpperCase()
+    const name = normalizeSecretName(args.name)
 
-    // Check if secret already exists
-    const existing = getSecret(name)
-    if (existing) {
+    const exists = secretExists(name)
+    if (exists) {
       const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
         initial: false,
         message: `Secret '${name}' already exists. Overwrite?`,
@@ -38,28 +37,18 @@ export default class SecretAdd extends Command {
       }
     }
 
-    // Get value
-    let {value} = flags
-    if (!value) {
-      const response = await Enquirer.prompt<{value: string}>({
-        message: `Enter value for ${name}:`,
-        name: 'value',
-        type: 'password',
-      })
-      value = response.value
-    }
+    const value =
+      flags.value ||
+      (
+        await Enquirer.prompt<{value: string}>({
+          message: `Enter value for ${name}:`,
+          name: 'value',
+          type: 'password',
+        })
+      ).value
 
-    if (!value) {
-      this.error('Secret value cannot be empty')
-    }
-
-    // Store in keychain
-    try {
-      addSecret(name, value)
-      this.log(chalk.green(`✓ Secret '${name}' stored in Keychain`))
-      this.log(chalk.dim('  This will sync across your devices via iCloud Keychain'))
-    } catch (error) {
-      this.error(`Failed to store secret: ${error instanceof Error ? error.message : error}`)
-    }
+    setSecret(name, value, {overwrite: exists})
+    this.log(chalk.green(`✓ Secret '${name}' stored in Keychain`))
+    this.log(chalk.dim('  This will sync across your devices via iCloud Keychain'))
   }
 }

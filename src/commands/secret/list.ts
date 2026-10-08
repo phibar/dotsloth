@@ -1,7 +1,7 @@
 import {Command} from '@oclif/core'
 import chalk from 'chalk'
 
-import {listSecretNames} from '../../lib/keychain.js'
+import {listSecretNames} from '../../core/secrets.js'
 
 export default class SecretList extends Command {
   static override description = 'List all secret names stored in Keychain'

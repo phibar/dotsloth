@@ -1,10 +1,10 @@
-import {Args, Command, Flags} from '@oclif/core'
+import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
+import {BaseCommand} from '../../cli/base-command.js'
+import {normalizeSecretName, removeSecret, secretExists} from '../../core/secrets.js'
 
-import {deleteSecret, getSecret} from '../../lib/keychain.js'
-
-export default class SecretRemove extends Command {
+export default class SecretRemove extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Secret name to remove', required: true}),
   }
@@ -17,15 +17,11 @@ export default class SecretRemove extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(SecretRemove)
 
-    const name = args.name.toUpperCase()
-
-    // Check if secret exists
-    const existing = getSecret(name)
-    if (existing === null) {
+    const name = normalizeSecretName(args.name)
+    if (!secretExists(name)) {
       this.error(`Secret '${name}' not found`)
     }
 
-    // Confirm deletion
     if (!flags.force) {
       const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
         initial: false,
@@ -40,12 +36,7 @@ export default class SecretRemove extends Command {
       }
     }
 
-    // Delete from keychain
-    const success = deleteSecret(name)
-    if (success) {
-      this.log(chalk.green(`✓ Secret '${name}' removed from Keychain`))
-    } else {
-      this.error(`Failed to remove secret '${name}'`)
-    }
+    removeSecret(name)
+    this.log(chalk.green(`✓ Secret '${name}' removed from Keychain`))
   }
 }

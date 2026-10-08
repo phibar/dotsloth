@@ -1,11 +1,10 @@
-import {Command, Flags} from '@oclif/core'
+import {Flags} from '@oclif/core'
 import chalk from 'chalk'
+import {BaseCommand} from '../../cli/base-command.js'
+import {printEnvTransfer} from '../../cli/env.js'
+import {pushEnv} from '../../core/env.js'
 
-import {loadConfig} from '../../lib/config.js'
-import {compare, copyToStore, DEFAULT_ENV_PATTERNS, scanAll} from '../../lib/env.js'
-import {PATHS} from '../../lib/paths.js'
-
-export default class EnvPush extends Command {
+export default class EnvPush extends BaseCommand {
   static override description = 'Copy env files from your repos into the dotsloth store'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']
   static override flags = {
@@ -15,46 +14,21 @@ export default class EnvPush extends Command {
 
   public async run(): Promise<void> {
     const {flags} = await this.parse(EnvPush)
-    const config = loadConfig()
-    const githubRoot = config?.paths.githubRoot ?? PATHS.githubRoot
-
-    const entries = scanAll(githubRoot, DEFAULT_ENV_PATTERNS).map((f) => compare(f))
-    let copied = 0
-    let skipped = 0
 
     this.log(chalk.bold('\n🦥 env push\n'))
 
-    for (const entry of entries) {
-      const label = `${entry.file.org}/${entry.file.repo}/${entry.file.relativePath}`
-
-      if (entry.state === 'identical' || entry.state === 'store-only') continue
-
-      // A store copy that differs may be newer work from the other machine.
-      // Overwriting it blind is how you lose the thing you were protecting.
-      if (entry.state === 'differs' && !flags.force) {
-        this.log(chalk.yellow('!') + ` ${label} ${chalk.dim('differs from store — use --force to overwrite')}`)
-        skipped++
-        continue
-      }
-
-      if (flags['dry-run']) {
-        this.log(chalk.dim(`  would copy ${label}`))
-        copied++
-        continue
-      }
-
-      copyToStore(entry.file)
-      this.log(chalk.green('✓') + ` ${label}`)
-      copied++
+    const result = pushEnv({dryRun: flags['dry-run'], force: flags.force})
+    for (const transfer of result.transfers) {
+      printEnvTransfer(this.log.bind(this), transfer, {conflict: 'differs from store', verb: 'copy'})
     }
 
     this.log('')
-    this.log(`${copied} copied, ${skipped} skipped`)
-    if (skipped > 0) {
+    this.log(`${result.copied} copied, ${result.skipped} skipped`)
+    if (result.skipped > 0) {
       this.log(chalk.yellow('Resolve conflicts by hand, or re-run with --force'))
     }
 
-    this.log(chalk.dim(`Store: ${PATHS.icloudEnvs}`))
+    this.log(chalk.dim(`Store: ${result.store}`))
     this.log('')
   }
 }

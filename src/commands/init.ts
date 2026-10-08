@@ -2,7 +2,7 @@ import * as fs from 'node:fs'
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-
+import {printLinkResult} from '../cli/format.js'
 import {
   configExists,
   ensureIcloudStructure,
@@ -199,11 +199,7 @@ Host github.com
         target: syncedFile.target,
       })
 
-      if (result.isValid) {
-        this.log(chalk.green('✓') + ` ${result.target}`)
-      } else {
-        this.log(chalk.red('✗') + ` ${result.target}: ${result.error}`)
-      }
+      printLinkResult(this.log.bind(this), result.target, result)
     }
 
     // Add SSH key to keychain

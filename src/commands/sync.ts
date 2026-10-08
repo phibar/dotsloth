@@ -1,17 +1,8 @@
 import {Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 
-import type {SyncResult} from '../lib/sync.js'
-
+import {printSyncResult} from '../cli/format.js'
 import {runSync} from '../lib/sync.js'
-
-/** Render a sync result as the familiar tick/cross list. */
-export function printSyncResult(log: (message?: string) => void, result: SyncResult): void {
-  for (const step of result.steps) {
-    const mark = step.ok ? chalk.green('✓') : chalk.red('✗')
-    log(`${mark} ${step.label}${step.detail ? chalk.dim(` — ${step.detail}`) : ''}`)
-  }
-}
 
 export default class Sync extends Command {
   static override description = 'Sync configurations from iCloud Drive'

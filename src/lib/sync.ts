@@ -1,8 +1,8 @@
 import * as fs from 'node:fs'
 
-import type {DevSlothConfig} from '../types/index.js'
+import type {DevSlothConfig, SymlinkStatus} from '../types/index.js'
 
-import {isIcloudAccessible, loadConfig, saveConfig} from './config.js'
+import {ConfigError, isIcloudAccessible, readConfig, saveConfig} from './config.js'
 import {generateMainGitconfig, readPublicKey, writeAllowedSigners, writeOrgGitconfig} from './git.js'
 import {getIcloudDotfilePath} from './paths.js'
 import {createSymlink} from './symlink.js'
@@ -26,6 +26,27 @@ export interface SyncResult {
 }
 
 /**
+ * A pure read - runSync regenerates the org gitconfigs itself. A missing or
+ * broken config becomes a failed step rather than an exception.
+ */
+function readConfigStep(add: (ok: boolean, label: string, detail?: string) => void): DevSlothConfig | null {
+  try {
+    const config = readConfig()
+    if (!config) add(false, 'No configuration found', 'Run "dotsloth init" first')
+    return config
+  } catch (error) {
+    if (!(error instanceof ConfigError)) throw error
+    add(false, 'Configuration is invalid', error.issues.join('; ') || error.message)
+    return null
+  }
+}
+
+function linkDetail(result: SymlinkStatus): string | undefined {
+  if (result.error) return result.error
+  return result.backupPath ? `backed up to ${result.backupPath}` : undefined
+}
+
+/**
  * Apply the full dotsloth configuration to this machine.
  *
  * This is the single implementation behind `dotsloth sync` and the implicit
@@ -43,10 +64,8 @@ export async function runSync(options: SyncOptions = {}): Promise<SyncResult> {
     return {ok: false, steps}
   }
 
-  // autoSync=false: runSync regenerates org gitconfigs itself, below.
-  const config: DevSlothConfig | null = loadConfig(false)
+  const config = readConfigStep(add)
   if (!config) {
-    add(false, 'No configuration found', 'Run "dotsloth init" first')
     return {ok: false, steps}
   }
 
@@ -96,7 +115,7 @@ export async function runSync(options: SyncOptions = {}): Promise<SyncResult> {
 
     // biome-ignore lint/performance/noAwaitInLoops: sequential on purpose, each link reports its own line
     const result = await createSymlink({backup: !force, source: syncedFile.source, target: syncedFile.target})
-    add(result.isValid, result.target, result.error)
+    add(result.isValid, result.target, linkDetail(result))
   }
 
   if (!dryRun) {

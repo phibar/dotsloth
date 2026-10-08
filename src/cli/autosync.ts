@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 
-import {runSync} from './sync.js'
+import {runSync} from '../lib/sync.js'
 
 /**
  * Run a sync on behalf of a command that just changed the configuration.

@@ -1,7 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-import {autoSync} from '../../lib/autosync.js'
+import {autoSync} from '../../cli/autosync.js'
 import {addOrganization, loadConfig} from '../../lib/config.js'
 import type {Organization} from '../../types/index.js'
 
@@ -98,7 +98,7 @@ export default class OrgUpdate extends Command {
       gitUsername: newUsername,
     }
 
-    addOrganization(updatedOrg) // This saves and auto-syncs gitconfig
+    addOrganization(updatedOrg) // saves config.json; autoSync below regenerates the gitconfigs
 
     this.log('')
     this.log(chalk.green(`✓ Organization '${org.name}' updated`))

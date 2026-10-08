@@ -1,6 +1,9 @@
+import type {ClaudeLinkEvent, ClaudeStatus, HistoryPlan, MemoryPlan} from '../../src/core/claude.js'
 import type {CloneEvent, ClonePlan, CloneResult, CloneTarget} from '../../src/core/clone.js'
 import type {DaemonStatus, InstallDaemonResult} from '../../src/core/daemon.js'
+import type {DoctorEvent, DoctorReport, RepoAtRisk} from '../../src/core/doctor.js'
 import type {EnvEntry, EnvTransfer, EnvTransferOptions, EnvTransferResult} from '../../src/core/env.js'
+import type {MailEvent, MailExportResult, MailRestoreEvent, MailRestorePlan, MailStatus} from '../../src/core/mail.js'
 import type {AddOrgResult, OrgInfo, OrgInput, RemoveOrgResult, UpdateOrgResult} from '../../src/core/orgs.js'
 import type {Status} from '../../src/core/status.js'
 import type {SyncOptions, SyncResult} from '../../src/core/sync.js'
@@ -12,19 +15,31 @@ import type {DevSlothConfig} from '../../src/types/index.js'
 // UI and the API cannot drift apart unnoticed.
 export type {
   AddOrgResult,
+  ClaudeLinkEvent,
+  ClaudeStatus,
   CloneEvent,
   ClonePlan,
   CloneResult,
   CloneTarget,
   DaemonStatus,
   DevSlothConfig,
+  DoctorEvent,
+  DoctorReport,
   EnvEntry,
   EnvTransfer,
   EnvTransferResult,
+  HistoryPlan,
   InstallDaemonResult,
   JobSnapshot,
+  MailEvent,
+  MailExportResult,
+  MailRestoreEvent,
+  MailRestorePlan,
+  MailStatus,
+  MemoryPlan,
   OrgInfo,
   OrgInput,
+  RepoAtRisk,
   Status,
   SyncResult,
 }
@@ -76,7 +91,20 @@ const versioned = ({data, response}: {data: DevSlothConfig; response: Response})
   version: (response.headers.get('etag') ?? '').replaceAll('"', ''),
 })
 
+export type SyncDirection = 'pull' | 'push'
+
 export const api = {
+  claude: {
+    historyPlan: (direction: 'status' | SyncDirection, retentionDays?: number) =>
+      call<HistoryPlan>(
+        'GET',
+        `/api/claude/history/plan?direction=${direction}${retentionDays ? `&retention=${retentionDays}` : ''}`,
+      ),
+    link: (dryRun = false) => call<ClaudeLinkEvent[]>('POST', '/api/claude/link', {dryRun}),
+    memoryPlan: (direction: 'status' | SyncDirection) =>
+      call<MemoryPlan>('GET', `/api/claude/memory/plan?direction=${direction}`),
+    status: () => call<ClaudeStatus>('GET', '/api/claude'),
+  },
   clone: {
     plan: (url: string) => call<ClonePlan>('POST', '/api/clone/plan', {url}),
   },
@@ -96,10 +124,20 @@ export const api = {
   },
   jobs: {
     clone: (url: string, target?: CloneTarget) => call<JobSnapshot>('POST', '/api/jobs/clone', {target, url}),
+    claudeHistory: (direction: SyncDirection, retentionDays: number) =>
+      call<JobSnapshot>('POST', '/api/jobs/claude-history', {direction, retentionDays}),
+    claudeMemory: (direction: SyncDirection) => call<JobSnapshot>('POST', '/api/jobs/claude-memory', {direction}),
+    doctor: (offline: boolean) => call<JobSnapshot>('POST', '/api/jobs/doctor', {offline}),
     envPull: (options: EnvTransferOptions) => call<JobSnapshot>('POST', '/api/jobs/env-pull', options),
     envPush: (options: EnvTransferOptions) => call<JobSnapshot>('POST', '/api/jobs/env-push', options),
     get: (id: string) => call<JobSnapshot>('GET', `/api/jobs/${id}`),
+    mailExport: (dryRun: boolean) => call<JobSnapshot>('POST', '/api/jobs/mail-export', {dryRun}),
+    mailRestore: () => call<JobSnapshot>('POST', '/api/jobs/mail-restore', {}),
     sync: (options: SyncOptions = {}) => call<JobSnapshot>('POST', '/api/jobs/sync', options),
+  },
+  mail: {
+    restorePlan: () => call<MailRestorePlan>('GET', '/api/mail/restore-plan'),
+    status: () => call<MailStatus>('GET', '/api/mail'),
   },
   orgs: {
     add: (input: OrgInput) => call<AddOrgResult>('POST', '/api/orgs', input),

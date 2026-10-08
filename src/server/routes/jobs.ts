@@ -2,9 +2,12 @@ import {Hono} from 'hono'
 import {type SSEStreamingApi, streamSSE} from 'hono/streaming'
 import {z} from 'zod'
 
+import {applyHistorySync, applyMemorySync} from '../../core/claude.js'
 import {clone} from '../../core/clone.js'
+import {runDoctor} from '../../core/doctor.js'
 import {pullEnv, pushEnv} from '../../core/env.js'
 import {CoreError} from '../../core/errors.js'
+import {applyMailRestore, exportMail} from '../../core/mail.js'
 import {runSync} from '../../core/sync.js'
 import {readBody} from '../body.js'
 import {type JobRunner, UpdateQueue} from '../jobs.js'
@@ -19,6 +22,14 @@ const CloneTarget = z.discriminatedUnion('kind', [
 
 const EnvBody = z
   .object({dryRun: z.boolean().optional(), force: z.union([z.boolean(), z.array(z.string())]).optional()})
+  .strict()
+
+const DoctorBody = z.object({offline: z.boolean().optional()}).strict()
+const DryRunBody = z.object({dryRun: z.boolean().optional()}).strict()
+const EmptyBody = z.object({}).strict()
+const MemoryBody = z.object({direction: z.enum(['push', 'pull'])}).strict()
+const HistoryBody = z
+  .object({direction: z.enum(['push', 'pull']), retentionDays: z.number().int().min(1).optional()})
   .strict()
 
 const CloneBody = z.object({org: z.string().optional(), target: CloneTarget.optional(), url: z.string()}).strict()
@@ -90,6 +101,42 @@ export function jobRoutes(runner: JobRunner) {
         const options = await readBody(c, EnvBody)
         return c.json(
           runner.start('env-pull', () => pullEnv(options)),
+          202,
+        )
+      })
+      .post('/doctor', async (c) => {
+        const options = await readBody(c, DoctorBody)
+        return c.json(
+          runner.start('doctor', (emit) => runDoctor(options, emit)),
+          202,
+        )
+      })
+      .post('/mail-export', async (c) => {
+        const options = await readBody(c, DryRunBody)
+        return c.json(
+          runner.start('mail-export', (emit) => exportMail(options, emit)),
+          202,
+        )
+      })
+      // No plan in the body: the restore always rebuilds it from the store.
+      .post('/mail-restore', async (c) => {
+        await readBody(c, EmptyBody)
+        return c.json(
+          runner.start('mail-restore', (emit) => applyMailRestore(emit)),
+          202,
+        )
+      })
+      .post('/claude-memory', async (c) => {
+        const {direction} = await readBody(c, MemoryBody)
+        return c.json(
+          runner.start('claude-memory', () => applyMemorySync(direction)),
+          202,
+        )
+      })
+      .post('/claude-history', async (c) => {
+        const {direction, retentionDays} = await readBody(c, HistoryBody)
+        return c.json(
+          runner.start('claude-history', () => applyHistorySync(direction, {retentionDays})),
           202,
         )
       })

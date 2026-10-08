@@ -81,7 +81,7 @@ npm run prepack    # Generate oclif manifest and readme (for releases)
 ### Running Locally
 
 ```bash
-# Via bin scripts (uses ts-node)
+# Via bin scripts (uses tsx)
 ./bin/dev.js <command>
 
 # Or after building
@@ -92,8 +92,8 @@ npm run prepack    # Generate oclif manifest and readme (for releases)
 
 - Test framework: Mocha with Chai
 - Test files: `test/**/*.test.ts` (currently no tests exist)
-- Config: `.mocharc.json` with ts-node ESM loader
-- Tests run in CI on Ubuntu and Windows across Node LTS versions
+- Config: `.mocharc.json` with the tsx loader
+- Tests run in CI on Ubuntu and macOS across Node LTS versions
 
 ## Code Conventions
 

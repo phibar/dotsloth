@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.4.0
+
+### Minor Changes
+
+- [#89](https://github.com/phibar/dotsloth/pull/89) [`d59980c`](https://github.com/phibar/dotsloth/commit/d59980c8e115af8103261b149f6acabfa324b0c4) Thanks [@phibar](https://github.com/phibar)! - Add `dotsloth ui`: a local web interface for everything dotsloth does - dashboard and sync, organizations and cloning, a validated config editor, Keychain secrets, env files, doctor, Mail, Claude Code and the periodic sync. It listens on 127.0.0.1 only, signs the browser in through a link with a random token, and refuses foreign hosts and origins.
+
 ## 0.3.0
 
 ### Minor Changes

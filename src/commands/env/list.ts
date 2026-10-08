@@ -1,18 +1,16 @@
-import {Command, Flags} from '@oclif/core'
+import {Flags} from '@oclif/core'
 import chalk from 'chalk'
-
-import {loadConfig} from '../../lib/config.js'
-import {compare, DEFAULT_ENV_PATTERNS, scanAll} from '../../lib/env.js'
-import {PATHS} from '../../lib/paths.js'
+import {BaseCommand} from '../../cli/base-command.js'
+import {scanEnv} from '../../core/env.js'
 
 const STATE_LABEL = {
   differs: chalk.yellow('differs'),
   identical: chalk.green('in sync'),
   'local-only': chalk.red('not backed up'),
   'store-only': chalk.cyan('store only'),
-} as const
+}
 
-export default class EnvList extends Command {
+export default class EnvList extends BaseCommand {
   static override description = 'List env files found in your repos and whether they are backed up'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --unsaved']
   static override flags = {
@@ -21,10 +19,8 @@ export default class EnvList extends Command {
 
   public async run(): Promise<void> {
     const {flags} = await this.parse(EnvList)
-    const config = loadConfig()
-    const githubRoot = config?.paths.githubRoot ?? PATHS.githubRoot
 
-    const entries = scanAll(githubRoot, DEFAULT_ENV_PATTERNS).map((f) => compare(f))
+    const {entries, githubRoot} = scanEnv()
     const shown = flags.unsaved ? entries.filter((e) => e.state !== 'identical') : entries
 
     if (shown.length === 0) {
@@ -33,15 +29,16 @@ export default class EnvList extends Command {
     }
 
     this.log(chalk.bold(`\n🦥 env files under ${githubRoot}\n`))
+
     let lastRepo = ''
     for (const entry of shown) {
-      const repoKey = `${entry.file.org}/${entry.file.repo}`
+      const repoKey = `${entry.org}/${entry.repo}`
       if (repoKey !== lastRepo) {
         this.log(chalk.bold(repoKey))
         lastRepo = repoKey
       }
 
-      this.log(`  ${STATE_LABEL[entry.state].padEnd(22)} ${entry.file.relativePath}`)
+      this.log(`  ${STATE_LABEL[entry.state].padEnd(22)} ${entry.relativePath}`)
     }
 
     const unsaved = entries.filter((e) => e.state === 'local-only').length

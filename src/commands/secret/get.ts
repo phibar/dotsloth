@@ -1,8 +1,8 @@
-import {Args, Command} from '@oclif/core'
+import {Args} from '@oclif/core'
+import {BaseCommand} from '../../cli/base-command.js'
+import {revealSecret} from '../../core/secrets.js'
 
-import {getSecret} from '../../lib/keychain.js'
-
-export default class SecretGet extends Command {
+export default class SecretGet extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Secret name to retrieve', required: true}),
   }
@@ -12,14 +12,7 @@ export default class SecretGet extends Command {
   public async run(): Promise<void> {
     const {args} = await this.parse(SecretGet)
 
-    const name = args.name.toUpperCase()
-    const value = getSecret(name)
-
-    if (value === null) {
-      this.error(`Secret '${name}' not found`)
-    }
-
     // Output just the value for easy piping
-    this.log(value)
+    this.log(revealSecret(args.name))
   }
 }

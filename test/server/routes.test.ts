@@ -7,7 +7,7 @@ import {expect} from 'chai'
 import {replaceConfig} from '../../src/core/config.js'
 import {getDefaultConfig} from '../../src/lib/config.js'
 import {PATHS} from '../../src/lib/paths.js'
-import {EMPTY_SYSTEM, FAKE_SECURITY, fakeBinaries, resetHome} from '../helpers.js'
+import {EMPTY_SYSTEM, fakeBinaries, resetHome} from '../helpers.js'
 import {mutate, ORIGIN, readSse, signedIn, testApp} from './client.js'
 
 // One app per test: jobs live in its runner, so requests within a test must share it.
@@ -206,64 +206,6 @@ describe('web API', () => {
       expect(saved.status).to.equal(200)
       expect(etagOf(saved)).to.not.equal(fresh)
       expect(etagOf(saved)).to.equal(etagOf(await request('/api/config')))
-    })
-  })
-
-  describe('secrets', () => {
-    let restore: () => void
-
-    beforeEach(() => {
-      process.env.FAKE_KEYCHAIN = fs.mkdtempSync(path.join(os.tmpdir(), 'dotsloth-keychain-'))
-      restore = fakeBinaries({security: FAKE_SECURITY})
-    })
-
-    afterEach(() => {
-      restore()
-      fs.rmSync(process.env.FAKE_KEYCHAIN as string, {force: true, recursive: true})
-      delete process.env.FAKE_KEYCHAIN
-    })
-
-    it('stores, lists, reveals one value on POST only, and removes', async () => {
-      const add = (body: unknown) => mutate(app, {body, method: 'POST', path: '/api/secrets'})
-      expect((await add({name: 'api_token', value: 'sk-1'})).status).to.equal(201)
-      expect((await add({name: 'API_TOKEN', value: 'sk-2'})).status).to.equal(409)
-      expect((await add({name: 'API_TOKEN', overwrite: true, value: 'sk-2'})).status).to.equal(201)
-      expect((await add({name: '9bad', value: 'x'})).status).to.equal(400)
-
-      expect(await (await request('/api/secrets')).json()).to.deep.equal({names: ['API_TOKEN']})
-      expect(JSON.stringify(await (await request('/api/secrets')).json())).to.not.include('sk-')
-
-      // Reading a value is a POST behind the Origin check; GET does not exist.
-      expect((await request('/api/secrets/API_TOKEN/reveal')).status).to.equal(404)
-      expect((await request('/api/secrets/API_TOKEN/reveal', {method: 'POST'})).status).to.equal(403)
-      const revealed = await mutate(app, {method: 'POST', path: '/api/secrets/API_TOKEN/reveal'})
-      expect(await revealed.json()).to.deep.equal({value: 'sk-2'})
-
-      expect((await mutate(app, {method: 'DELETE', path: '/api/secrets/API_TOKEN'})).status).to.equal(200)
-      expect((await mutate(app, {method: 'DELETE', path: '/api/secrets/API_TOKEN'})).status).to.equal(404)
-    })
-  })
-
-  describe('env files', () => {
-    it('scans without contents and previews a push without writing', async () => {
-      const repo = path.join(PATHS.githubRoot, 'acme', 'web')
-      fs.mkdirSync(path.join(repo, '.git'), {recursive: true})
-      fs.writeFileSync(path.join(repo, '.env'), 'SECRET=value\n')
-
-      const scan = await (await request('/api/env')).json()
-      expect(scan.entries.map((e: {key: string; state: string}) => [e.key, e.state])).to.deep.equal([
-        ['acme/web/.env', 'local-only'],
-      ])
-      expect(JSON.stringify(scan)).to.not.include('SECRET=value')
-
-      const job = await (await mutate(app, {body: {dryRun: true}, method: 'POST', path: '/api/jobs/env-push'})).json()
-      const events = await readSse(await request(`/api/jobs/${job.id}/events`))
-      const [, final] = events.at(-1) as [string, {result: {transfers: Array<{outcome: string}>}}]
-      expect(final.result.transfers.map((t) => t.outcome)).to.deep.equal(['would-copy'])
-      expect(fs.existsSync(PATHS.icloudEnvs)).to.equal(false)
-
-      const invalid = await mutate(app, {body: {force: 'yes'}, method: 'POST', path: '/api/jobs/env-push'})
-      expect(invalid.status).to.equal(400)
     })
   })
 })

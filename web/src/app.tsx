@@ -1,10 +1,13 @@
 import {useEffect, useState} from 'react'
 
 import {ApiError, api, type Status} from './api.js'
+import {ClaudePage} from './pages/claude.js'
 import {ConfigPage} from './pages/config.js'
 import {DaemonPage} from './pages/daemon.js'
 import {Dashboard} from './pages/dashboard.js'
+import {DoctorPage} from './pages/doctor.js'
 import {EnvPage} from './pages/env.js'
+import {MailPage} from './pages/mail.js'
 import {OrganizationsPage} from './pages/orgs.js'
 import {Placeholder} from './pages/placeholder.js'
 import {SecretsPage} from './pages/secrets.js'
@@ -81,10 +84,13 @@ export function App() {
 }
 
 const PAGES: Record<string, () => React.JSX.Element> = {
+  claude: ClaudePage,
   config: ConfigPage,
   daemon: DaemonPage,
   dashboard: Dashboard,
+  doctor: DoctorPage,
   env: EnvPage,
+  mail: MailPage,
   orgs: OrganizationsPage,
   secrets: SecretsPage,
 }

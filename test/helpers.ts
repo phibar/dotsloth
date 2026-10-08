@@ -31,8 +31,8 @@ export function fakeBinaries(scripts: Record<string, string>): () => void {
   }
 }
 
-/** No secrets in the Keychain, no keys in the agent. */
-export const EMPTY_SYSTEM = {security: 'exit 0', 'ssh-add': 'exit 1'}
+/** No secrets in the Keychain, no keys in the agent, and a Mail that answers nothing - never the real one. */
+export const EMPTY_SYSTEM = {osascript: 'exit 0', security: 'exit 0', 'ssh-add': 'exit 1'}
 
 /**
  * A stand-in for macOS `security` that keeps one file per secret in

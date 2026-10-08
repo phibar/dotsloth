@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react'
 
 import {ApiError, api, type Status} from './api.js'
+import {ConfigPage} from './pages/config.js'
 import {DaemonPage} from './pages/daemon.js'
 import {Dashboard} from './pages/dashboard.js'
 import {OrganizationsPage} from './pages/orgs.js'
@@ -78,6 +79,7 @@ export function App() {
 }
 
 const PAGES: Record<string, () => React.JSX.Element> = {
+  config: ConfigPage,
   daemon: DaemonPage,
   dashboard: Dashboard,
   orgs: OrganizationsPage,

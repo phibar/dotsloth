@@ -39,26 +39,48 @@ export class ApiError extends Error {
   }
 }
 
-async function call<T>(method: string, path: string, body?: unknown): Promise<T> {
+async function send<T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  headers: Record<string, string> = {},
+): Promise<{data: T; response: Response}> {
   const response = await fetch(path, {
     body: body === undefined ? undefined : JSON.stringify(body),
     credentials: 'same-origin',
-    headers: body === undefined ? undefined : {'content-type': 'application/json'},
+    headers: body === undefined ? headers : {'content-type': 'application/json', ...headers},
     method,
   })
 
   const data = await response.json().catch(() => ({}))
   if (!response.ok) throw new ApiError(response.status, data)
-  return data as T
+  return {data: data as T, response}
 }
+
+async function call<T>(method: string, path: string, body?: unknown): Promise<T> {
+  return (await send<T>(method, path, body)).data
+}
+
+/** The config plus the version (ETag) it was read at. */
+export interface VersionedConfig {
+  config: DevSlothConfig
+  version: string
+}
+
+const versioned = ({data, response}: {data: DevSlothConfig; response: Response}): VersionedConfig => ({
+  config: data,
+  version: (response.headers.get('etag') ?? '').replaceAll('"', ''),
+})
 
 export const api = {
   clone: {
     plan: (url: string) => call<ClonePlan>('POST', '/api/clone/plan', {url}),
   },
   config: {
-    get: () => call<DevSlothConfig>('GET', '/api/config'),
-    put: (config: DevSlothConfig) => call<DevSlothConfig>('PUT', '/api/config', config),
+    get: async () => versioned(await send<DevSlothConfig>('GET', '/api/config')),
+    /** Refused with 409 when the file changed since `version` was read. */
+    put: async (config: DevSlothConfig, version: string) =>
+      versioned(await send<DevSlothConfig>('PUT', '/api/config', config, {'if-match': `"${version}"`})),
   },
   daemon: {
     get: () => call<DaemonStatus>('GET', '/api/daemon'),

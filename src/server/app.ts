@@ -8,6 +8,7 @@ import {setCookie} from 'hono/cookie'
 import {toApiError} from './errors.js'
 import {JobRunner} from './jobs.js'
 import {configRoutes} from './routes/config.js'
+import {daemonRoutes} from './routes/daemon.js'
 import {jobRoutes} from './routes/jobs.js'
 import {statusRoutes} from './routes/status.js'
 import {checkHost, checkOrigin, cookieName, requireSession, securityHeaders, tokensMatch} from './security.js'
@@ -47,6 +48,7 @@ export function createApp({port, token, webRoot = null}: AppOptions) {
 
   app.route('/api/status', statusRoutes)
   app.route('/api/config', configRoutes)
+  app.route('/api/daemon', daemonRoutes)
   app.route('/api/jobs', jobRoutes(runner))
   app.all('/api/*', (c) => c.json({code: 'NOT_FOUND', details: [], message: 'No such endpoint'}, 404))
 

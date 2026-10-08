@@ -1,8 +1,10 @@
 import {useEffect, useState} from 'react'
 
 import {ApiError, api, type Status} from './api.js'
+import {DaemonPage} from './pages/daemon.js'
+import {Dashboard} from './pages/dashboard.js'
 import {Placeholder} from './pages/placeholder.js'
-import {SECTIONS, useRoute} from './routes.js'
+import {SECTIONS, type Section, useRoute} from './routes.js'
 import {type Theme, useTheme} from './theme.js'
 
 const THEMES: Theme[] = ['system', 'light', 'dark']
@@ -67,11 +69,21 @@ export function App() {
             </p>
           </section>
         ) : (
-          <Placeholder section={section} />
+          <Page section={section} />
         )}
       </main>
     </div>
   )
+}
+
+const PAGES: Record<string, () => React.JSX.Element> = {
+  daemon: DaemonPage,
+  dashboard: Dashboard,
+}
+
+function Page({section}: {section: Section}) {
+  const Component = PAGES[section.id]
+  return Component ? <Component /> : <Placeholder section={section} />
 }
 
 function ConnectionBadge({connection, status}: {connection: string; status: null | Status}) {

@@ -1,11 +1,10 @@
-import * as fs from 'node:fs'
-import {Command, Flags} from '@oclif/core'
+import {Flags} from '@oclif/core'
 import chalk from 'chalk'
+import {BaseCommand} from '../../cli/base-command.js'
+import {listOrgs} from '../../core/orgs.js'
+import {readConfig} from '../../lib/config.js'
 
-import {loadConfig} from '../../lib/config.js'
-import {getOrgRepoPath} from '../../lib/paths.js'
-
-export default class OrgList extends Command {
+export default class OrgList extends BaseCommand {
   static override description = 'List configured organizations'
   static override examples = ['<%= config.bin %> <%= command.id %>']
   static override flags = {
@@ -15,46 +14,29 @@ export default class OrgList extends Command {
   public async run(): Promise<void> {
     const {flags} = await this.parse(OrgList)
 
-    const config = loadConfig()
-
-    if (!config || config.organizations.length === 0) {
-      if (flags.json) {
-        this.log(JSON.stringify([], null, 2))
-      } else {
-        this.log(chalk.yellow('No organizations configured'))
-        this.log(chalk.dim("Run 'dotsloth org add' to add an organization"))
-      }
-
-      return
-    }
+    const config = readConfig()
+    const orgs = config ? listOrgs(config) : []
 
     if (flags.json) {
-      this.log(JSON.stringify(config.organizations, null, 2))
+      // The configured organizations as stored, without the computed folder info.
+      this.log(JSON.stringify(config?.organizations ?? [], null, 2))
       return
     }
 
-    this.log(chalk.bold(`\n📁 Organizations (${config.organizations.length}):\n`))
+    if (orgs.length === 0) {
+      this.log(chalk.yellow('No organizations configured'))
+      this.log(chalk.dim("Run 'dotsloth org add' to add an organization"))
+      return
+    }
 
-    for (const org of config.organizations) {
-      const orgPath = getOrgRepoPath(org.folderName)
-      const exists = fs.existsSync(orgPath)
+    this.log(chalk.bold(`\n📁 Organizations (${orgs.length}):\n`))
 
-      // Count repos in directory
-      let repoCount = 0
-      if (exists) {
-        try {
-          const entries = fs.readdirSync(orgPath, {withFileTypes: true})
-          repoCount = entries.filter((e) => e.isDirectory() && !e.name.startsWith('.')).length
-        } catch {
-          // Ignore errors
-        }
-      }
-
+    for (const org of orgs) {
       this.log(`  ${chalk.cyan(org.name)}`)
       this.log(`    Email:    ${org.gitEmail}`)
       this.log(`    Username: ${org.gitUsername}`)
       this.log(
-        `    Path:     ${orgPath} ${exists ? chalk.green(`(${repoCount} repos)`) : chalk.yellow('(not created)')}`,
+        `    Path:     ${org.path} ${org.exists ? chalk.green(`(${org.repoCount} repos)`) : chalk.yellow('(not created)')}`,
       )
       this.log('')
     }

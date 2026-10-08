@@ -1,14 +1,11 @@
-import * as fs from 'node:fs'
-import {Args, Command, Flags} from '@oclif/core'
+import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
+import {printAutoSync} from '../../cli/autosync.js'
+import {BaseCommand} from '../../cli/base-command.js'
+import {getOrg, removeOrg} from '../../core/orgs.js'
 
-import {autoSync} from '../../cli/autosync.js'
-import {loadConfig, removeOrganization} from '../../lib/config.js'
-import {deleteOrgGitconfig} from '../../lib/git.js'
-import {getOrgRepoPath} from '../../lib/paths.js'
-
-export default class OrgRemove extends Command {
+export default class OrgRemove extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Organization name to remove', required: true}),
   }
@@ -22,78 +19,44 @@ export default class OrgRemove extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(OrgRemove)
 
-    const config = loadConfig()
-    if (!config) {
-      this.error('No configuration found. Run "dotsloth init" first.')
+    const org = getOrg(args.name)
+
+    if (!(flags.force || (await this.confirm(this.removeMessage(org.name, org.repoCount, org.path))))) {
+      this.log(chalk.yellow('Cancelled'))
+      return
     }
 
-    // Find organization
-    const org = config.organizations.find((o) => o.name.toLowerCase() === args.name.toLowerCase())
-    if (!org) {
-      this.error(`Organization '${args.name}' not found`)
-    }
+    // Deleting repositories gets its own, explicit confirmation unless forced.
+    const deleteRepos =
+      flags['delete-repos'] &&
+      org.exists &&
+      (flags.force ||
+        (await this.confirm(chalk.red(`DELETE ${org.path} and all ${org.repoCount} repos? This cannot be undone!`))))
 
-    // Check for repos
-    const orgPath = getOrgRepoPath(org.folderName)
-    let repoCount = 0
-    if (fs.existsSync(orgPath)) {
-      try {
-        const entries = fs.readdirSync(orgPath, {withFileTypes: true})
-        repoCount = entries.filter((e) => e.isDirectory() && !e.name.startsWith('.')).length
-      } catch {
-        // Ignore errors
-      }
-    }
+    const result = await removeOrg(org.name, {deleteRepos})
 
-    // Confirm deletion
-    if (!flags.force) {
-      let message = `Are you sure you want to remove '${org.name}'?`
-      if (repoCount > 0) {
-        message += ` (${repoCount} repos in ${orgPath})`
-      }
-
-      const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
-        initial: false,
-        message,
-        name: 'confirm',
-        type: 'confirm',
-      })
-
-      if (!confirm) {
-        this.log(chalk.yellow('Cancelled'))
-        return
-      }
-    }
-
-    // Delete org gitconfig
-    deleteOrgGitconfig(org.name)
     this.log(chalk.dim('Removed organization git config'))
-
-    // Optionally delete repos folder
-    if (flags['delete-repos'] && fs.existsSync(orgPath)) {
-      if (flags.force) {
-        fs.rmSync(orgPath, {force: true, recursive: true})
-        this.log(chalk.dim(`Deleted: ${orgPath}`))
-      } else {
-        const {confirmDelete} = await Enquirer.prompt<{confirmDelete: boolean}>({
-          initial: false,
-          message: chalk.red(`DELETE ${orgPath} and all ${repoCount} repos? This cannot be undone!`),
-          name: 'confirmDelete',
-          type: 'confirm',
-        })
-
-        if (confirmDelete) {
-          fs.rmSync(orgPath, {force: true, recursive: true})
-          this.log(chalk.dim(`Deleted: ${orgPath}`))
-        }
-      }
+    if (result.deletedFolder) {
+      this.log(chalk.dim(`Deleted: ${org.path}`))
     }
-
-    // Remove from config
-    removeOrganization(org.name)
 
     this.log('')
     this.log(chalk.green(`✓ Organization '${org.name}' removed`))
-    await autoSync(this.log.bind(this))
+    printAutoSync(this.log.bind(this), result.sync)
+  }
+
+  private async confirm(message: string): Promise<boolean> {
+    const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
+      initial: false,
+      message,
+      name: 'confirm',
+      type: 'confirm',
+    })
+    return confirm
+  }
+
+  private removeMessage(name: string, repoCount: number, path: string): string {
+    const repos = repoCount > 0 ? ` (${repoCount} repos in ${path})` : ''
+    return `Are you sure you want to remove '${name}'?${repos}`
   }
 }

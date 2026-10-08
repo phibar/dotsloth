@@ -1,14 +1,11 @@
-import * as fs from 'node:fs'
-import {Args, Command, Flags} from '@oclif/core'
+import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
 import Enquirer from 'enquirer'
-import {autoSync} from '../../cli/autosync.js'
-import {addOrganization, ensureIcloudStructure, loadConfig} from '../../lib/config.js'
-import {writeOrgGitconfig} from '../../lib/git.js'
-import {getOrgRepoPath} from '../../lib/paths.js'
-import type {Organization} from '../../types/index.js'
+import {printAutoSync} from '../../cli/autosync.js'
+import {BaseCommand} from '../../cli/base-command.js'
+import {addOrg, findOrg} from '../../core/orgs.js'
 
-export default class OrgAdd extends Command {
+export default class OrgAdd extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Organization name (e.g., phibar)'}),
   }
@@ -25,24 +22,18 @@ export default class OrgAdd extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(OrgAdd)
 
-    // Ensure iCloud structure exists
-    ensureIcloudStructure()
+    const name =
+      args.name ??
+      (
+        await Enquirer.prompt<{name: string}>({
+          message: 'Organization name (as it appears on GitHub):',
+          name: 'name',
+          type: 'input',
+          validate: (input) => (input.length > 0 ? true : 'Name is required'),
+        })
+      ).name
 
-    // Get organization name
-    let {name} = args
-    if (!name) {
-      const response = await Enquirer.prompt<{name: string}>({
-        message: 'Organization name (as it appears on GitHub):',
-        name: 'name',
-        type: 'input',
-        validate: (input) => (input.length > 0 ? true : 'Name is required'),
-      })
-      name = response.name
-    }
-
-    // Check if org already exists
-    const config = loadConfig()
-    const existing = config?.organizations.find((o) => o.name.toLowerCase() === name.toLowerCase())
+    const existing = findOrg(name)
     if (existing) {
       const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
         initial: false,
@@ -57,64 +48,47 @@ export default class OrgAdd extends Command {
       }
     }
 
-    // Get email
-    let {email} = flags
-    if (!email) {
-      const response = await Enquirer.prompt<{email: string}>({
-        initial: existing?.gitEmail,
-        message: 'Git email for this organization:',
-        name: 'email',
-        type: 'input',
-        validate(input) {
-          if (input.length === 0) return 'Email is required'
-          if (!input.includes('@')) return 'Invalid email format'
-          return true
-        },
-      })
-      email = response.email
-    }
+    const email =
+      flags.email ??
+      (
+        await Enquirer.prompt<{email: string}>({
+          initial: existing?.gitEmail,
+          message: 'Git email for this organization:',
+          name: 'email',
+          type: 'input',
+          validate(input) {
+            if (input.length === 0) return 'Email is required'
+            if (!input.includes('@')) return 'Invalid email format'
+            return true
+          },
+        })
+      ).email
 
-    // Get username
-    let {username} = flags
-    if (!username) {
-      const response = await Enquirer.prompt<{username: string}>({
-        initial: existing?.gitUsername,
-        message: 'Git username for this organization:',
-        name: 'username',
-        type: 'input',
-        validate: (input) => (input.length > 0 ? true : 'Username is required'),
-      })
-      username = response.username
-    }
+    const username =
+      flags.username ??
+      (
+        await Enquirer.prompt<{username: string}>({
+          initial: existing?.gitUsername,
+          message: 'Git username for this organization:',
+          name: 'username',
+          type: 'input',
+          validate: (input) => (input.length > 0 ? true : 'Username is required'),
+        })
+      ).username
 
-    // Create organization object
-    const org: Organization = {
-      folderName: name, // Keep original case for folder
-      gitEmail: email,
-      gitUsername: username,
-      name,
-    }
+    const result = await addOrg({gitEmail: email, gitUsername: username, name}, {overwrite: Boolean(existing)})
 
-    // Add to config
-    addOrganization(org)
-
-    // Create org gitconfig
-    const gitconfigPath = writeOrgGitconfig(org)
-    this.log(chalk.dim(`Created git config: ${gitconfigPath}`))
-
-    // Create org directory if it doesn't exist
-    const orgPath = getOrgRepoPath(org.folderName)
-    if (!fs.existsSync(orgPath)) {
-      fs.mkdirSync(orgPath, {recursive: true})
-      this.log(chalk.dim(`Created directory: ${orgPath}`))
+    this.log(chalk.dim(`Created git config: ${result.gitconfigPath}`))
+    if (result.createdFolder) {
+      this.log(chalk.dim(`Created directory: ${result.org.path}`))
     }
 
     this.log('')
     this.log(chalk.green(`✓ Organization '${name}' configured`))
     this.log(chalk.dim(`  Email: ${email}`))
     this.log(chalk.dim(`  Username: ${username}`))
-    this.log(chalk.dim(`  Path: ${orgPath}`))
+    this.log(chalk.dim(`  Path: ${result.org.path}`))
     this.log('')
-    await autoSync(this.log.bind(this))
+    printAutoSync(this.log.bind(this), result.sync)
   }
 }

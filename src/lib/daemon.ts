@@ -1,7 +1,7 @@
-import {execFileSync} from 'node:child_process'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
+import {run} from './exec.js'
 
 export const DAEMON_LABEL = 'com.phibar.dotsloth.sync'
 
@@ -91,7 +91,7 @@ export function isInstalled(): boolean {
 
 export function isLoaded(): boolean {
   try {
-    execFileSync('launchctl', ['print', `${domainTarget()}/${DAEMON_LABEL}`], {stdio: 'pipe'})
+    run('launchctl', ['print', `${domainTarget()}/${DAEMON_LABEL}`])
     return true
   } catch {
     return false
@@ -105,17 +105,17 @@ export function install(options: DaemonOptions): void {
 
   // bootout first so install doubles as "reinstall with new settings"
   try {
-    execFileSync('launchctl', ['bootout', `${domainTarget()}/${DAEMON_LABEL}`], {stdio: 'pipe'})
+    run('launchctl', ['bootout', `${domainTarget()}/${DAEMON_LABEL}`])
   } catch {
     // not loaded — fine
   }
 
-  execFileSync('launchctl', ['bootstrap', domainTarget(), PLIST_PATH], {stdio: 'pipe'})
+  run('launchctl', ['bootstrap', domainTarget(), PLIST_PATH])
 }
 
 export function uninstall(): boolean {
   try {
-    execFileSync('launchctl', ['bootout', `${domainTarget()}/${DAEMON_LABEL}`], {stdio: 'pipe'})
+    run('launchctl', ['bootout', `${domainTarget()}/${DAEMON_LABEL}`])
   } catch {
     // not loaded — fine
   }
@@ -129,7 +129,7 @@ export function uninstall(): boolean {
 }
 
 export function runNow(): void {
-  execFileSync('launchctl', ['kickstart', '-k', `${domainTarget()}/${DAEMON_LABEL}`], {stdio: 'pipe'})
+  run('launchctl', ['kickstart', '-k', `${domainTarget()}/${DAEMON_LABEL}`])
 }
 
 export function readInterval(): null | number {

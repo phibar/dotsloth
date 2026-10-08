@@ -1,7 +1,6 @@
-import {execFileSync} from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-
+import {run} from './exec.js'
 import {PATHS} from './paths.js'
 
 /**
@@ -41,10 +40,7 @@ export function pendingUploads(dir: string = PATHS.icloudDotsloth): string[] {
 /** Ask brctl to block until sync settles. Returns false if it could not be confirmed. */
 export function waitForSync(timeoutSeconds = 120): boolean {
   try {
-    execFileSync('brctl', ['log', '--wait', '--shorten'], {
-      stdio: 'pipe',
-      timeout: timeoutSeconds * 1000,
-    })
+    run('brctl', ['log', '--wait', '--shorten'], {timeout: timeoutSeconds * 1000})
     return true
   } catch {
     // brctl --wait streams until interrupted; a timeout here is expected and

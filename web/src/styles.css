@@ -565,3 +565,86 @@ input {
   margin-top: 0.75rem;
   color: var(--error);
 }
+
+.code-editor {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-muted);
+  color: var(--text);
+  padding: 0.75rem;
+  resize: vertical;
+}
+
+.error-list {
+  color: var(--error);
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.config-form fieldset.field {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+}
+
+.config-form legend {
+  padding: 0 0.3rem;
+  font-weight: 600;
+}
+
+.synced-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.synced-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.dialog-wide {
+  width: min(760px, 100%);
+}
+
+.diff {
+  margin: 0;
+  max-height: 55vh;
+  overflow: auto;
+  background: var(--surface-muted);
+  border-radius: 8px;
+  padding: 0.5rem 0;
+  font-size: 0.82rem;
+}
+
+.diff > div {
+  padding: 0 0.75rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.diff-add {
+  background: color-mix(in srgb, var(--ok) 16%, transparent);
+}
+
+.diff-remove {
+  background: color-mix(in srgb, var(--error) 16%, transparent);
+}
+
+.diff-gap {
+  color: var(--text-muted);
+  text-align: center;
+}

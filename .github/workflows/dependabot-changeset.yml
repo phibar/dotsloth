@@ -5,8 +5,9 @@ on:
     branches: [main]
     types: [opened, synchronize, reopened]
 
-# Dependabot never writes a changeset, so without this its PRs could never
-# satisfy the changeset check and would be permanently unmergeable.
+# Dependabot never writes a changeset. Production dependency bumps ship to
+# users and need a patch changeset, so this commits one for them. All other
+# Dependabot updates pass the changeset check without a file.
 permissions:
   contents: write
 
@@ -20,7 +21,7 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Write a changeset matching the dependency type
+      - name: Write a patch changeset for production dependency bumps
         env:
           BASE_REF: ${{ github.base_ref }}
           PR_TITLE: ${{ github.event.pull_request.title }}
@@ -34,44 +35,25 @@ jobs:
             exit 0
           fi
 
-          git diff "origin/${BASE_REF}...HEAD" -- package.json > /tmp/pkg.diff || true
-
-          # Production dependencies install on users' machines, so bumping one
-          # changes what users actually run and earns a patch release.
-          # devDependencies never reach the published package, so an empty
-          # changeset records "no release" deliberately.
-          #
-          # The list is read from package.json rather than hardcoded so it
-          # cannot drift, and matched as a fixed string - a dependency name
-          # contains dots and slashes that would misbehave as a regex.
-          git show "origin/${BASE_REF}:package.json" \
-            | node -p "Object.keys(JSON.parse(require('fs').readFileSync(0)).dependencies||{}).join('\n')" \
-            > /tmp/prod.txt
-
-          kind=none
-          while IFS= read -r dep; do
-            [ -z "$dep" ] && continue
-            if grep -F -q "\"${dep}\"" /tmp/pkg.diff; then
-              echo "Production dependency changed: ${dep}"
-              kind=patch
-              break
-            fi
-          done < /tmp/prod.txt
+          # Only production dependency bumps need a changeset: they change
+          # what users install and earn a patch release. Everything else
+          # (devDependencies, GitHub Actions) passes the changeset check
+          # without a file, so no commit is pushed and `@dependabot rebase`
+          # keeps working.
+          if ! dep=$(bash .github/scripts/prod-deps-changed.sh "origin/${BASE_REF}"); then
+            echo "No production dependency changed - no changeset needed."
+            exit 0
+          fi
+          echo "Production dependency changed: ${dep}"
 
           file=".changeset/dependabot-$(date +%s).md"
-          if [ "$kind" = "patch" ]; then
-            {
-              echo '---'
-              echo '"@phibar/dotsloth": patch'
-              echo '---'
-              echo
-              echo "${PR_TITLE}"
-            } > "$file"
-            echo "Wrote a patch changeset."
-          else
-            printf -- '---\n---\n' > "$file"
-            echo "Wrote an empty changeset: development dependencies only."
-          fi
+          {
+            echo '---'
+            echo '"@phibar/dotsloth": patch'
+            echo '---'
+            echo
+            echo "${PR_TITLE}"
+          } > "$file"
 
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"

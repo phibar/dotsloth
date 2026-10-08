@@ -192,7 +192,7 @@ Host github.com
     for (const syncedFile of config.syncedFiles) {
       // Sequential on purpose: each link reports its own line, and parallel
       // filesystem mutation would interleave the backup messages.
-      // eslint-disable-next-line no-await-in-loop
+      // biome-ignore lint/performance/noAwaitInLoops: see above
       const result = await createSymlink({
         backup: true,
         source: syncedFile.source,

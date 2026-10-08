@@ -46,7 +46,7 @@ static override flags = {
         continue
       }
 
-      // eslint-disable-next-line no-await-in-loop
+      // biome-ignore lint/performance/noAwaitInLoops: sequential on purpose, each link reports its own line
       const result = await createSymlink({backup: true, source: file.storePath, target: file.localPath})
       if (result.isValid) {
         this.log(chalk.green('✓') + ` ${file.name}`)

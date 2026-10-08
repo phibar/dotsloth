@@ -94,7 +94,7 @@ export async function runSync(options: SyncOptions = {}): Promise<SyncResult> {
       continue
     }
 
-    // eslint-disable-next-line no-await-in-loop
+    // biome-ignore lint/performance/noAwaitInLoops: sequential on purpose, each link reports its own line
     const result = await createSymlink({backup: !force, source: syncedFile.source, target: syncedFile.target})
     add(result.isValid, result.target, result.error)
   }

@@ -18,7 +18,7 @@ dotsloth is a macOS CLI tool for syncing dotfiles and development environment co
 - **Package Manager**: npm
 - **Schema Validation**: Zod
 - **Testing**: Mocha with Chai
-- **Linting**: ESLint with oclif config and Prettier
+- **Linting**: Biome (lint, formatting and import order)
 
 ## Project Structure
 

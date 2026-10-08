@@ -72,7 +72,7 @@ And on the new machine: Homebrew → node → iCloud sign-in → dotsloth → SS
 ```sh
 npm install
 npm run build
-npm test          # mocha + eslint
+npm test          # mocha + biome
 ./bin/run.js <command>
 ```
 

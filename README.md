@@ -123,9 +123,13 @@ npm test          # mocha + vitest + biome
 Working on the web app with hot reload:
 
 ```sh
-./bin/run.js ui --no-open                      # prints http://127.0.0.1:<port>/?token=...
-DOTSLOTH_UI_URL='<that link>' npm run dev:web  # Vite proxies /api to it
+npm run dev:ui
 ```
+
+It starts `dotsloth ui` from source, then Vite with the server's sign-in link
+(so `/api` is proxied with the session cookie), and opens
+http://localhost:5173. Ctrl+C stops both. `npm run dev:web` starts only Vite;
+it reads the link from `DOTSLOTH_UI_URL`.
 
 The code is layered so the CLI and the web UI share one implementation:
 `src/core` holds the logic (typed results, no prompts or printing),

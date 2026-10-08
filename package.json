@@ -101,6 +101,7 @@
   "scripts": {
     "build": "shx rm -rf dist && tsc -b && tsc -p web && vite build",
     "changeset": "changeset",
+    "dev:ui": "node scripts/dev-ui.mjs",
     "dev:web": "vite",
     "lint": "biome check",
     "postpack": "shx rm -f oclif.manifest.json",

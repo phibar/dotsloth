@@ -1,0 +1,19 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:e0bb7ec1c9c7a8bb0128b89a5dbda303d20ee6bf",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@e0bb7ec1c9c7a8bb0128b89a5dbda303d20ee6bf"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "CI required a changeset on PR #98 (fix/release-rebase). The workflow fix carries no user-facing change, so an empty changeset was added.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Empty changeset (--empty) for the release workflow rebase fix — no version bump warranted for an internal CI change."
+        }
+      ]
+    }
+  ]
+}

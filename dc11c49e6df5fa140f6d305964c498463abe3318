@@ -1,0 +1,45 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:dc11c49e6df5fa140f6d305964c498463abe3318",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@dc11c49e6df5fa140f6d305964c498463abe3318"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Philipp wants to know when a new dotsloth version is out and to update easily. The CLI is installed globally via npm.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Notify after every command (via BaseCommand.finally) when a newer version exists on npm, one dim line: \"dotsloth X.Y.Z available — run: dotsloth update\""
+        },
+        {
+          "@type": "Decision",
+          "text": "Suppress notification on the update command itself (this.id !== 'update')"
+        },
+        {
+          "@type": "Decision",
+          "text": "Cache the npm registry check in state.json for 24h so it does not add latency on every run; only the first run after 24h does a network call"
+        },
+        {
+          "@type": "Decision",
+          "text": "dotsloth update runs npm install -g @phibar/dotsloth@<latest>; on failure prints the manual command"
+        },
+        {
+          "@type": "Decision",
+          "text": "State stored in ~/.config/dotsloth/state.json (PATHS.localState, already defined, previously unused)"
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "src/lib/state.ts, src/lib/update-check.ts, src/core/update.ts, src/commands/update.ts, src/cli/base-command.ts (finally hook added)."
+        }
+      ],
+      "discussed": [
+        "Background fetch considered but avoided: fetch keeps the event loop alive; instead the check runs at the end of the command and awaits with a 5s timeout — acceptable since it happens at most once per 24h after the command's own output is done",
+        "isNewer uses numeric semver comparison (not string) to handle 1.0.10 > 1.0.9"
+      ]
+    }
+  ]
+}

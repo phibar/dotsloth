@@ -121,6 +121,42 @@ export function syncTopicSymlinks({topicsRoot, topicMap, dryRun}: TopicSyncConte
   return steps
 }
 
+function pruneTopicDir(topicDir: string, topic: string, validTargets: Set<string>, dryRun: boolean): SyncStep[] {
+  const steps: SyncStep[] = []
+  let links: fs.Dirent[]
+  try {
+    links = fs.readdirSync(topicDir, {withFileTypes: true})
+  } catch {
+    return steps
+  }
+
+  for (const link of links) {
+    if (!link.isSymbolicLink()) continue
+    let target: string
+    try {
+      target = fs.readlinkSync(path.join(topicDir, link.name))
+    } catch {
+      continue
+    }
+
+    if (validTargets.has(target)) continue
+
+    if (dryRun) {
+      steps.push({label: `remove ${topic}/${link.name}`, ok: true})
+      continue
+    }
+
+    try {
+      fs.unlinkSync(path.join(topicDir, link.name))
+      steps.push({label: `removed ${topic}/${link.name}`, ok: true})
+    } catch (error) {
+      steps.push({detail: errorDetail(error), label: `remove ${topic}/${link.name}`, ok: false})
+    }
+  }
+
+  return steps
+}
+
 export function pruneTopicSymlinks({topicsRoot, topicMap, dryRun}: TopicSyncContext): SyncStep[] {
   const steps: SyncStep[] = []
   if (!fs.existsSync(topicsRoot)) return steps
@@ -135,45 +171,11 @@ export function pruneTopicSymlinks({topicsRoot, topicMap, dryRun}: TopicSyncCont
   for (const entry of topicDirs) {
     if (!entry.isDirectory()) continue
     const topicDir = path.join(topicsRoot, entry.name)
-    const validTargets = new Set(
-      (topicMap.get(entry.name) ?? []).map((rp) => path.relative(topicDir, rp)),
-    )
+    const validTargets = new Set((topicMap.get(entry.name) ?? []).map((rp) => path.relative(topicDir, rp)))
+    const removed = pruneTopicDir(topicDir, entry.name, validTargets, dryRun)
+    steps.push(...removed)
 
-    let links: fs.Dirent[]
-    try {
-      links = fs.readdirSync(topicDir, {withFileTypes: true})
-    } catch {
-      continue
-    }
-
-    let removedCount = 0
-    for (const link of links) {
-      if (!link.isSymbolicLink()) continue
-      const linkPath = path.join(topicDir, link.name)
-      let target: string
-      try {
-        target = fs.readlinkSync(linkPath)
-      } catch {
-        continue
-      }
-
-      if (validTargets.has(target)) continue
-
-      if (dryRun) {
-        steps.push({label: `remove ${entry.name}/${link.name}`, ok: true})
-        continue
-      }
-
-      try {
-        fs.unlinkSync(linkPath)
-        removedCount++
-        steps.push({label: `removed ${entry.name}/${link.name}`, ok: true})
-      } catch (error) {
-        steps.push({detail: errorDetail(error), label: `remove ${entry.name}/${link.name}`, ok: false})
-      }
-    }
-
-    if (!dryRun && removedCount > 0) {
+    if (!dryRun && removed.some((s) => s.label.startsWith('removed'))) {
       try {
         if (fs.readdirSync(topicDir).length === 0) fs.rmdirSync(topicDir)
       } catch {

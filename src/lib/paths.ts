@@ -35,6 +35,7 @@ export const PATHS = {
   sshConfig: path.join(home, '.ssh/config'),
   // SSH
   sshDir: path.join(home, '.ssh'),
+  topicsRoot: path.join(home, 'github', 'topics'),
   zprofile: path.join(home, '.zprofile'),
 } as const
 

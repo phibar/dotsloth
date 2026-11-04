@@ -1,0 +1,13 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:029268eb8fd54e6d517d5dbfc2d0e5732174f593",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@029268eb8fd54e6d517d5dbfc2d0e5732174f593"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Changeset file added after learning from the topics PR that this repo requires one on every PR via a shell-based CI check (not metatrom-ag/Changeset)."
+    }
+  ]
+}

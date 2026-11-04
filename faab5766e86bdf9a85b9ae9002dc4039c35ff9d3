@@ -1,0 +1,27 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:faab5766e86bdf9a85b9ae9002dc4039c35ff9d3",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@faab5766e86bdf9a85b9ae9002dc4039c35ff9d3"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Philipp noticed the update notice was missing from dotsloth ui. The CLI's finally hook doesn't fire in the web UI since it goes through the server directly.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "GET /api/update endpoint: takes version from AppOptions (passed by ui.ts via this.config.version), calls checkForUpdate, returns {current, latest} or null"
+        },
+        {
+          "@type": "Decision",
+          "text": "web app fetches /api/update on load, shows a top banner when an update is available"
+        },
+        {
+          "@type": "Decision",
+          "text": "banner uses --accent color and prompts to run dotsloth update in the terminal"
+        }
+      ]
+    }
+  ]
+}

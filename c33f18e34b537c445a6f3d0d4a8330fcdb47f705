@@ -1,0 +1,19 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:c33f18e34b537c445a6f3d0d4a8330fcdb47f705",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@c33f18e34b537c445a6f3d0d4a8330fcdb47f705"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Dependabot PR #94 bumped dev deps including biome from an older version to ^2.5.15. CI installed 2.6.4 (the latest resolving ^2.5.15) which formats markdown tables differently and has a new schema version. Local biome was still 2.5.15 so the check passed locally but failed in CI.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Upgrade local biome to 2.6.4, run biome migrate --write and biome format --write, commit the reformatted files alongside the dep bump."
+        }
+      ]
+    }
+  ]
+}

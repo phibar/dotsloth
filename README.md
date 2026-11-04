@@ -1,5 +1,4 @@
-dotsloth
-=================
+# dotsloth
 
 **Sync your dots, be a sloth.** A macOS CLI that keeps your development
 environment — git identities, dotfiles, secrets, env files and Claude Code
@@ -61,10 +60,10 @@ the periodic sync. Press Ctrl+C to stop it.
 
 </details>
 
-| Flag | |
-|---|---|
+| Flag         |                                              |
+| ------------ | -------------------------------------------- |
 | `--port <n>` | Listen on a fixed port (default: a free one) |
-| `--no-open` | Print the link without opening the browser |
+| `--no-open`  | Print the link without opening the browser   |
 
 **Security model.** The server can reach your Keychain, config and every
 repository, so it only answers the browser tab it opened:
@@ -101,15 +100,15 @@ And on the new machine: Homebrew → node → iCloud sign-in → dotsloth → SS
 
 ## Where things live
 
-| What | Where |
-|---|---|
-| Config | `~/Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/config.json` |
-| Dotfiles | `.../development/dotsloth/dotfiles/` |
-| Org gitconfigs | `.../development/dotsloth/organizations/` |
-| Env files | `.../development/dotsloth/envs/<org>/<repo>/` |
-| Claude Code | `.../development/dotsloth/claude/` |
-| Secrets | macOS Keychain, account `dotsloth` |
-| Repos | `~/github/<org>/<repo>` |
+| What           | Where                                                                             |
+| -------------- | --------------------------------------------------------------------------------- |
+| Config         | `~/Library/Mobile Documents/com~apple~CloudDocs/development/dotsloth/config.json` |
+| Dotfiles       | `.../development/dotsloth/dotfiles/`                                              |
+| Org gitconfigs | `.../development/dotsloth/organizations/`                                         |
+| Env files      | `.../development/dotsloth/envs/<org>/<repo>/`                                     |
+| Claude Code    | `.../development/dotsloth/claude/`                                                |
+| Secrets        | macOS Keychain, account `dotsloth`                                                |
+| Repos          | `~/github/<org>/<repo>`                                                           |
 
 ## Development
 
@@ -137,10 +136,11 @@ The code is layered so the CLI and the web UI share one implementation:
 web API, and `web/` is the React app.
 
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
 # Usage
+
 <!-- usage -->
 ```sh-session
 $ npm install -g @phibar/dotsloth
@@ -155,8 +155,9 @@ USAGE
 ```
 <!-- usagestop -->
 # Commands
+
 <!-- commands -->
-* [`dotsloth help [COMMAND]`](#dotsloth-help-command)
+- [`dotsloth help [COMMAND]`](#dotsloth-help-command)
 
 ## `dotsloth help [COMMAND]`
 

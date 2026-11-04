@@ -65,11 +65,13 @@ npm test
 ## Code Conventions
 
 ### TypeScript
+
 - Use strict TypeScript with ES2022 target
 - Use Zod schemas for runtime type validation
 - Export types from `src/types/index.ts`
 
 ### CLI Commands
+
 - Extend `Command` from `@oclif/core`
 - Use static `description`, `examples`, `flags`, and `args` properties
 - Use `chalk` for colored terminal output
@@ -77,18 +79,20 @@ npm test
 - Follow oclif conventions for command structure
 
 ### Imports
+
 - Use `node:` prefix for Node.js built-in modules (e.g., `node:fs`, `node:path`)
 - When importing local TypeScript modules, use `.js` extension (not `.ts`). This is an ESM requirement where TypeScript compiles to JavaScript, so imports must reference the compiled output extension:
+
   ```typescript
   // Correct
   import { loadConfig } from '../lib/config.js'
-  
-  // Incorrect
+    // Incorrect
   import { loadConfig } from '../lib/config.ts'
   import { loadConfig } from '../lib/config'
   ```
 
 ### Error Handling
+
 - Use `this.error()` for fatal errors in commands
 - Use `this.log()` with chalk for user feedback
 

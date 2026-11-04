@@ -1,0 +1,19 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:4b20fac3dcb37a30d9d4ff4d127f6eb67b67e44d",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@4b20fac3dcb37a30d9d4ff4d127f6eb67b67e44d"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Biome 2.6.4 (installed in CI via ^2.5.15 after the dep bump in PR #94) reformats .changeset/*.md YAML frontmatter into markdown headings, breaking the changeset tool. The fix excludes .changeset/*.md from both formatter and linter via a biome.json override.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Override in biome.json: includes [\".changeset/*.md\"], formatter disabled, linter disabled — the correct Biome 2.6.4 API for file exclusion"
+        }
+      ]
+    }
+  ]
+}

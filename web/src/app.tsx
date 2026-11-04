@@ -21,6 +21,7 @@ export function App() {
   const [theme, setTheme] = useTheme()
   const [status, setStatus] = useState<null | Status>(null)
   const [connection, setConnection] = useState<'error' | 'loading' | 'ok' | 'signed-out'>('loading')
+  const [update, setUpdate] = useState<null | {current: string; latest: string}>(null)
 
   useEffect(() => {
     api
@@ -32,12 +33,21 @@ export function App() {
       .catch((error: unknown) =>
         setConnection(error instanceof ApiError && error.status === 401 ? 'signed-out' : 'error'),
       )
+    api
+      .update()
+      .then(setUpdate)
+      .catch(() => null)
   }, [])
 
   const section = SECTIONS.find((s) => s.id === route) ?? SECTIONS[0]
 
   return (
     <div className="layout">
+      {update && (
+        <div className="update-banner">
+          dotsloth {update.latest} available — run <code>dotsloth update</code> in your terminal
+        </div>
+      )}
       <aside className="sidebar">
         <div className="brand">
           <span aria-hidden="true">🦥</span> dotsloth

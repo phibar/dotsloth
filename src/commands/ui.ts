@@ -18,7 +18,7 @@ export default class Ui extends BaseCommand {
   public async run(): Promise<void> {
     const {flags} = await this.parse(Ui)
 
-    const server = await startServer({port: flags.port})
+    const server = await startServer({port: flags.port, version: this.config.version})
 
     this.log(chalk.bold('\n🦥 dotsloth ui\n'))
     this.log(`  ${chalk.cyan(server.url)}`)

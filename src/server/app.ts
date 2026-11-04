@@ -17,6 +17,7 @@ import {mailRoutes} from './routes/mail.js'
 import {orgRoutes} from './routes/orgs.js'
 import {secretRoutes} from './routes/secrets.js'
 import {statusRoutes} from './routes/status.js'
+import {updateRoutes} from './routes/update.js'
 import {checkHost, checkOrigin, cookieName, requireSession, securityHeaders, tokensMatch} from './security.js'
 
 export interface AppOptions {
@@ -24,6 +25,8 @@ export interface AppOptions {
   port: () => number
   /** The secret the opened URL carries. */
   token: string
+  /** Package version — shown in the UI's update banner. */
+  version: string
   /** The built web app (dist/web); null when it has not been built. */
   webRoot?: null | string
 }
@@ -31,7 +34,7 @@ export interface AppOptions {
 const NOT_BUILT =
   '<!doctype html><title>dotsloth</title><p>The web app has not been built. Run <code>npm run build</code>.</p>'
 
-export function createApp({port, token, webRoot = null}: AppOptions) {
+export function createApp({port, token, version, webRoot = null}: AppOptions) {
   const runner = new JobRunner()
   const app = new Hono()
 
@@ -62,6 +65,7 @@ export function createApp({port, token, webRoot = null}: AppOptions) {
   app.route('/api/mail', mailRoutes)
   app.route('/api/claude', claudeRoutes)
   app.route('/api/jobs', jobRoutes(runner))
+  app.route('/api/update', updateRoutes(version))
   app.all('/api/*', (c) => c.json({code: 'NOT_FOUND', details: [], message: 'No such endpoint'}, 404))
 
   if (webRoot) {

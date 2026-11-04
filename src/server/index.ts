@@ -26,10 +26,10 @@ export function findWebRoot(): null | string {
 }
 
 /** Start the web UI server on 127.0.0.1. Port 0 picks a free one. */
-export function startServer({port = 0} = {}): Promise<RunningServer> {
+export function startServer({port = 0, version = '0.0.0'} = {}): Promise<RunningServer> {
   const token = randomBytes(32).toString('base64url')
   let actualPort = port
-  const app = createApp({port: () => actualPort, token, webRoot: findWebRoot()})
+  const app = createApp({port: () => actualPort, token, version, webRoot: findWebRoot()})
 
   return new Promise((resolve, reject) => {
     const server = serve({fetch: app.fetch, hostname: '127.0.0.1', port}, (info: AddressInfo) => {

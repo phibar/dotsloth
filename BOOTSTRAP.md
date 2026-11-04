@@ -100,7 +100,7 @@ dotsloth env pull        # skips repos that are not cloned yet
 dotsloth env list        # confirm
 ```
 
-Run this *after* cloning. `env pull` will not scatter files into a tree that is
+Run this _after_ cloning. `env pull` will not scatter files into a tree that is
 not there yet.
 
 ### 9. Mail
@@ -136,13 +136,13 @@ dotsloth daemon status
 
 ## What is deliberately not restored
 
-| Thing | Why |
-|---|---|
-| SSH private keys | Safer to regenerate and re-add to GitHub |
-| AWS credentials | Re-authenticate |
-| `mkcert` / localhost certs | `mkcert` regenerates them |
-| `node_modules`, build output | Reinstall from the lockfile |
-| `~/.claude` caches, shell snapshots, session env | Machine-local runtime state |
+| Thing                                            | Why                                      |
+| ------------------------------------------------ | ---------------------------------------- |
+| SSH private keys                                 | Safer to regenerate and re-add to GitHub |
+| AWS credentials                                  | Re-authenticate                          |
+| `mkcert` / localhost certs                       | `mkcert` regenerates them                |
+| `node_modules`, build output                     | Reinstall from the lockfile              |
+| `~/.claude` caches, shell snapshots, session env | Machine-local runtime state              |
 
 ## Verify
 

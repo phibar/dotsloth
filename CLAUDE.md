@@ -157,7 +157,7 @@ const {value} = await Enquirer.prompt<{value: string}>({
   type: 'input', // or 'select', 'confirm', 'password'
   name: 'value',
   message: 'Prompt text:',
-  validate: (input) => input.length > 0 ? true : 'Required',
+  validate: (input) => (input.length > 0 ? true : 'Required'),
 })
 ```
 
@@ -202,6 +202,7 @@ All secrets use account name `dotsloth` for grouping.
 ### Git Configuration Strategy
 
 1. Main `~/.gitconfig` uses `includeIf` directives:
+
    ```ini
    [includeIf "gitdir:~/github/OrgName/"]
        path = ~/Library/Mobile Documents/.../organizations/orgname.gitconfig
@@ -228,6 +229,7 @@ The `sync` command:
 ## Common Patterns
 
 ### Reading Config
+
 ```typescript
 import {getConfig} from '../core/config.js'
 
@@ -235,6 +237,7 @@ const config = getConfig() // throws CoreError CONFIG_MISSING / CONFIG_INVALID
 ```
 
 ### Creating Organizations
+
 ```typescript
 import {addOrg} from '../core/orgs.js'
 
@@ -243,6 +246,7 @@ printAutoSync(this.log.bind(this), result.sync)
 ```
 
 ### Long-running Operations
+
 Core reports progress through an `onEvent` callback. The CLI prints the events; the server runs
 the operation as a job (`JobRunner`, one at a time) and streams them over SSE:
 ```typescript
@@ -250,13 +254,14 @@ runner.start('doctor', (emit) => runDoctor({offline}, emit))
 ```
 
 ### Safe Symlink Creation
+
 ```typescript
 import {createSymlink} from '../lib/symlink.js'
 
 const result = await createSymlink({
   source: '/path/in/icloud',
   target: '/path/local',
-  backup: true,  // Backs up existing files
+  backup: true, // Backs up existing files
 })
 ```
 

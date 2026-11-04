@@ -1,0 +1,22 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:c6399ec45bde4a2ee1261ec22e357ab85b185745",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@c6399ec45bde4a2ee1261ec22e357ab85b185745"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Biome rejected pruneTopicSymlinks for noExcessiveCognitiveComplexity (score 34, max 20). CI caught it; lint was not run locally before the first commit.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Extracted pruneTopicDir to hold the inner per-link loop, bringing both functions within the complexity limit."
+        }
+      ],
+      "discussed": [
+        "Should have run `node_modules/.bin/biome check` before committing — adding this to the local pre-commit checklist going forward."
+      ]
+    }
+  ]
+}

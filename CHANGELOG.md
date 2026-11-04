@@ -1,5 +1,13 @@
 # @phibar/dotsloth
 
+## 0.5.0
+
+### Minor Changes
+
+- [#96](https://github.com/phibar/dotsloth/pull/96) [`673655f`](https://github.com/phibar/dotsloth/commit/673655ffab6edaef62a495be03a126593dda6cfa) Thanks [@phibar](https://github.com/phibar)! - Add `dotsloth topics` command that syncs `~/github/topics/<topic>/<repo>` symlinks from GitHub repository topics. Run with `--dry-run` to preview or `--offline` to only prune stale symlinks without calling GitHub.
+
+- [#97](https://github.com/phibar/dotsloth/pull/97) [`029268e`](https://github.com/phibar/dotsloth/commit/029268eb8fd54e6d517d5dbfc2d0e5732174f593) Thanks [@phibar](https://github.com/phibar)! - Add `dotsloth update` command and automatic update notifications. After each command, dotsloth checks npm once per 24h and prints a one-liner if a newer version is available. `dotsloth update` applies the update via `npm install -g`.
+
 ## 0.4.0
 
 ### Minor Changes

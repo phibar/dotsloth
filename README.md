@@ -147,7 +147,7 @@ $ npm install -g @phibar/dotsloth
 $ dotsloth COMMAND
 running command...
 $ dotsloth (--version)
-@phibar/dotsloth/0.4.0 linux-x64 node-v24.21.0
+@phibar/dotsloth/0.5.0 linux-x64 node-v26.13.0
 $ dotsloth --help [COMMAND]
 USAGE
   $ dotsloth COMMAND

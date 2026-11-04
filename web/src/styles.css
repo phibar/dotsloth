@@ -77,6 +77,21 @@ code {
   border-radius: 4px;
 }
 
+.update-banner {
+  grid-column: 1 / -1;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.update-banner code {
+  background: rgb(255 255 255 / 20%);
+  border-radius: 3px;
+  padding: 0 0.3em;
+}
+
 .layout {
   display: grid;
   /* minmax(0, ...) lets wide content (tables, paths) scroll inside its card

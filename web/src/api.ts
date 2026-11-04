@@ -156,4 +156,5 @@ export const api = {
       call<{created: boolean; name: string}>('POST', '/api/secrets', {name, overwrite, value}),
   },
   status: () => call<Status>('GET', '/api/status'),
+  update: () => call<null | {current: string; latest: string}>('GET', '/api/update'),
 }

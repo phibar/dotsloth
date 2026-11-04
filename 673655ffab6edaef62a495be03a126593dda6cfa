@@ -1,0 +1,13 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:673655ffab6edaef62a495be03a126593dda6cfa",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@673655ffab6edaef62a495be03a126593dda6cfa"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "The changeset-check CI job requires a .changeset/*.md file on every PR. Missing it because the tree uses Changeset but the check workflow does not use metatrom-ag/Changeset — only a shell check — so the rule in changeset.md did not trigger. Added minor bump entry for the new command."
+    }
+  ]
+}

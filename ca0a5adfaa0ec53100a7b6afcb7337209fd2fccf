@@ -1,0 +1,19 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:ca0a5adfaa0ec53100a7b6afcb7337209fd2fccf",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@ca0a5adfaa0ec53100a7b6afcb7337209fd2fccf"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Release workflow for PR #96 failed with \"push rejected - fetch first\" because two PRs merged in quick succession. The concurrency group queues jobs but cannot prevent a job from checking out before the previous merge lands. Added git pull --rebase before the push.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "git pull --rebase origin main before git push in \"Commit and push\" step — rebases the version bump on top of any commits that arrived since checkout; since the concurrency group ensures one job at a time, the conflict surface is effectively zero"
+        }
+      ]
+    }
+  ]
+}

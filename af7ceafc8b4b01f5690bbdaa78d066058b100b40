@@ -1,0 +1,31 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:af7ceafc8b4b01f5690bbdaa78d066058b100b40",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@af7ceafc8b4b01f5690bbdaa78d066058b100b40"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Philipp wanted worktree management commands tied to GitHub issues — create a worktree for an issue, list worktrees, clean merged ones.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "`worktree new <issue>`: fetches issue title via gh, creates branch feature/<n>-<slug>, worktree under .worktrees/<n>-<slug>/ inside the repo"
+        },
+        {
+          "@type": "Decision",
+          "text": "`worktree list`: parses git worktree list --porcelain, extracts issue number from branch name"
+        },
+        {
+          "@type": "Decision",
+          "text": "`worktree clean`: Promise.all for merge checks, sequential removal (biome-ignore) to avoid corrupting git internals"
+        },
+        {
+          "@type": "Decision",
+          "text": "Worktrees live inside the repo (not ~/github/topics style) — works from cwd, no dotsloth config needed"
+        }
+      ]
+    }
+  ]
+}

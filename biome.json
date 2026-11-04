@@ -400,6 +400,15 @@
           }
         }
       }
+    },
+    {
+      "includes": [".changeset/*.md"],
+      "formatter": {
+        "enabled": false
+      },
+      "linter": {
+        "enabled": false
+      }
     }
   ],
   "assist": {

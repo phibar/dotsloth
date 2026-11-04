@@ -1,0 +1,19 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:8399a3fab30e0f4b0d6cfc4f6c07dcf91787e944",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@8399a3fab30e0f4b0d6cfc4f6c07dcf91787e944"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Forgot to include a changeset with the ui update banner commit — CI caught it.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Changeset required on every PR with user-facing change; forgot it again despite knowing the rule"
+        }
+      ]
+    }
+  ]
+}

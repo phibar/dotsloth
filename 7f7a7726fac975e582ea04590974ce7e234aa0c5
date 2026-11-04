@@ -1,0 +1,53 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:7f7a7726fac975e582ea04590974ce7e234aa0c5",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@7f7a7726fac975e582ea04590974ce7e234aa0c5"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Philipp introduced GitHub topics to their repos and wanted a local folder tree at ~/github/topics/<topic>/<repo> — symlinks to locally cloned repos grouped by GitHub topic tag.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "flat layout per topic (~/github/topics/<topic>/<repo>, repo name only, not <org>/<repo>)",
+          "by": "Philipp"
+        },
+        {
+          "@type": "Decision",
+          "text": "collision fallback to <org>-<repo> when two orgs share a repo name",
+          "by": "Philipp"
+        },
+        {
+          "@type": "Decision",
+          "text": "Symlinks relative so they survive githubRoot moves"
+        },
+        {
+          "@type": "Decision",
+          "text": "Fetch via `gh repo list <org> --json name,repositoryTopics --limit 1000`"
+        },
+        {
+          "@type": "Decision",
+          "text": "Not wired into `dotsloth sync` — standalone command"
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "src/lib/topics.ts, src/core/topics.ts, src/commands/topics.ts, test/lib/topics.test.ts, src/lib/paths.ts (topicsRoot added)."
+        }
+      ],
+      "discussed": [
+        "`repositoryTopics` is null from GitHub for repos with no topics (not an empty array) — guarded with `?? []`",
+        "TopicSyncContext interface extracted to avoid a repeated parameter signature between syncTopicSymlinks and pruneTopicSymlinks"
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "How dotsloth updates itself when a new version is out — Philipp wants to plan this next."
+        }
+      ]
+    }
+  ]
+}

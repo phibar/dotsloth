@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.7.0
+
+### Minor Changes
+
+- [#100](https://github.com/phibar/dotsloth/pull/100) [`8399a3f`](https://github.com/phibar/dotsloth/commit/8399a3fab30e0f4b0d6cfc4f6c07dcf91787e944) Thanks [@phibar](https://github.com/phibar)! - Show an update banner in the web UI (`dotsloth ui`) when a newer version is available on npm.
+
 ## 0.6.0
 
 ### Minor Changes

@@ -1,0 +1,19 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:527135250acf855b52269ebc2b565dbb62f0ac6b",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@527135250acf855b52269ebc2b565dbb62f0ac6b"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Repeated CI failures from biome version drift (^2.5.15 → 2.6.4 in CI).",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Pin biome to exact version 2.6.4 (no ^ caret) so npm install in CI always matches the local install"
+        }
+      ]
+    }
+  ]
+}

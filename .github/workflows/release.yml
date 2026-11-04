@@ -121,6 +121,12 @@ jobs:
             echo "[skip ci]"
           } | git commit -F -
 
+          # Rebase on any commits that landed since checkout (e.g. a second PR
+          # merged while this job was versioning). The concurrency group ensures
+          # only one release job runs at a time, so the rebase conflict surface
+          # is effectively zero — but the push would be rejected without it.
+          git pull --rebase origin main
+
           # Push BEFORE publishing. npm releases are effectively permanent, so
           # if the push is rejected we must fail here with nothing published,
           # rather than leave npm ahead of main.

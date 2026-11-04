@@ -136,8 +136,9 @@ The code is layered so the CLI and the web UI share one implementation:
 web API, and `web/` is the React app.
 
 <!-- toc -->
-- [Usage](#usage)
-- [Commands](#commands)
+* [dotsloth](#dotsloth)
+* [Usage](#usage)
+* [Commands](#commands)
 <!-- tocstop -->
 # Usage
 
@@ -147,7 +148,7 @@ $ npm install -g @phibar/dotsloth
 $ dotsloth COMMAND
 running command...
 $ dotsloth (--version)
-@phibar/dotsloth/0.5.0 linux-x64 node-v26.13.0
+@phibar/dotsloth/0.6.0 linux-x64 node-v26.13.0
 $ dotsloth --help [COMMAND]
 USAGE
   $ dotsloth COMMAND
@@ -157,7 +158,7 @@ USAGE
 # Commands
 
 <!-- commands -->
-- [`dotsloth help [COMMAND]`](#dotsloth-help-command)
+* [`dotsloth help [COMMAND]`](#dotsloth-help-command)
 
 ## `dotsloth help [COMMAND]`
 
@@ -177,5 +178,5 @@ DESCRIPTION
   Display help for dotsloth.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/7.0.2/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/7.0.6/src/commands/help.ts)_
 <!-- commandsstop -->

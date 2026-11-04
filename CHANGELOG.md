@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.6.0
+
+### Minor Changes
+
+- [#99](https://github.com/phibar/dotsloth/pull/99) [`af7ceaf`](https://github.com/phibar/dotsloth/commit/af7ceafc8b4b01f5690bbdaa78d066058b100b40) Thanks [@phibar](https://github.com/phibar)! - Add `dotsloth worktree` commands: create a worktree for a GitHub issue (`worktree new <issue>`), list worktrees in the current repo (`worktree list`), and remove merged ones (`worktree clean`).
+
 ## 0.5.0
 
 ### Minor Changes

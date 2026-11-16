@@ -17,6 +17,7 @@ export const SECTIONS: Section[] = [
   {id: 'doctor', issue: 73, label: 'Doctor', summary: 'Would anything be lost if this machine were wiped?'},
   {id: 'mail', issue: 73, label: 'Mail', summary: 'Mail accounts, rules and signatures.'},
   {id: 'claude', issue: 73, label: 'Claude Code', summary: 'Shared settings, project memory and history.'},
+  {id: 'runners', issue: 106, label: 'Runners', summary: 'Self-hosted GitHub Actions runners on this Mac.'},
   {id: 'daemon', issue: 69, label: 'Daemon', summary: 'Periodic background sync.'},
 ]
 

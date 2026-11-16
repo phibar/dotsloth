@@ -1,0 +1,32 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:1d1aa1635132a540d8c2da06b1bc0803dbdb5ed2",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@1d1aa1635132a540d8c2da06b1bc0803dbdb5ed2"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Philipp asked to merge the open Dependabot PRs. #102 bumps Biome 2.6.4 → 2.6.7 (still pinned exactly, per 5271352), whose formatter rejected CLAUDE.md and .github/copilot-instructions.md.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Format on the Dependabot branch with 2.6.7 (`biome migrate --write`, `biome format --write`) rather than holding Biome back — only blank lines and the schema URL change"
+        },
+        {
+          "@type": "Decision",
+          "text": "Committing on the Dependabot branch ends Dependabot's own rebases of #102; it is merged right after",
+          "governs": [
+            {
+              "@id": "oasis://github:phibar/dotsloth/issues/102"
+            }
+          ]
+        }
+      ],
+      "discussed": [
+        "claude-review fails on every Dependabot PR: runs triggered by Dependabot get Dependabot secrets only, so the Claude token is missing — not a finding about the code"
+      ]
+    }
+  ]
+}

@@ -102,13 +102,20 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
-          git add -A
-          # An empty changeset consumes itself without changing the version.
-          if git diff --cached --quiet; then
-            echo "Nothing to commit - changesets were empty."
+          # Only a new version is a release. Empty changesets (a PR with
+          # nothing for users) change no version, yet consuming them deletes
+          # their files and regenerates the README - committing that wrote a
+          # second "release" of the same version and conflicted with open PRs.
+          # They stay on main and are consumed by the next real release.
+          if [ "$version" = "$(git show HEAD:package.json | node -p "JSON.parse(require('fs').readFileSync(0)).version")" ]; then
+            echo "Version unchanged ($version) - only empty changesets, nothing to release."
+            # `npm run version` staged the README; discard index and files.
+            git reset -q --hard HEAD
             echo "released=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
+          git add -A
 
           # Put the changelog section changesets just wrote into the commit
           # body, so `git log` explains each release without opening the file.

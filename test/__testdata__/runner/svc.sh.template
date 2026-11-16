@@ -1,0 +1,24 @@
+#!/bin/sh
+# Purpose: Stand in for the svc.sh the runner's config.sh generates, so tests
+# install, start, stop and uninstall a runner without touching launchd.
+# Intention: written by the fake config.sh; keeps the real script's
+# SVC_NAME line and .service record, writes the plist under the test HOME,
+# and marks a loaded agent as a file in $FAKE_LAUNCHD, which the fake
+# launchctl of test/core/runners.test.ts reads.
+
+SVC_NAME="{{SvcNameVar}}"
+echo "svc.sh $1" >> "$FAKE_LOG"
+plist="$HOME/Library/LaunchAgents/$SVC_NAME.plist"
+logs="$HOME/Library/Logs/$SVC_NAME"
+
+case $1 in
+  install)
+    mkdir -p "$HOME/Library/LaunchAgents" "$logs"
+    echo plist > "$plist"
+    echo "$plist" > .service
+    printf 'Listening for Jobs\nRunning job: e2e\nJob e2e completed\n' > "$logs/stdout.log"
+    ;;
+  start) touch "$FAKE_LAUNCHD/$SVC_NAME" ;;
+  stop) rm -f "$FAKE_LAUNCHD/$SVC_NAME" ;;
+  uninstall) rm -f "$FAKE_LAUNCHD/$SVC_NAME" "$plist" .service ;;
+esac

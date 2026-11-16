@@ -1,0 +1,19 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:42c5975b0111f8154ecbcaaba3b2ea367236bbd8",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@42c5975b0111f8154ecbcaaba3b2ea367236bbd8"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Opening the README fix PR with label skip-changeset failed: the label does not exist, and labels are not created unasked. Amending the fix commit with the changeset was blocked by the permission check (amend + force-push), so the empty changeset is its own commit, as 8399a3f did for the banner.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Empty changeset (`---\\n---`) instead of a new label; it bumps nothing"
+        }
+      ]
+    }
+  ]
+}

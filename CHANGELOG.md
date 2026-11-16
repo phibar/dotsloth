@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.8.1
+
+### Patch Changes
+
+- [#111](https://github.com/phibar/dotsloth/pull/111) [`6f24d7c`](https://github.com/phibar/dotsloth/commit/6f24d7c7e772f7d1301e5a1551c7b5ee3f3331e4) Thanks [@phibar](https://github.com/phibar)! - `dotsloth update` asks npm for the latest version every time instead of trusting the 24h cache, so it finds a release published since the last check.
+
 ## 0.8.0
 
 ### Minor Changes

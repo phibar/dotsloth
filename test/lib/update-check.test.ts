@@ -40,5 +40,18 @@ describe('update-check', () => {
       const state = readState()
       expect(state.updateCheck?.latestVersion).to.equal('2.0.0')
     })
+
+    it('asks npm despite a fresh cache when asked for fresh, and refreshes the cache', async () => {
+      saveUpdateCheckState({checkedAt: new Date().toISOString(), latestVersion: '1.0.0'})
+      const original = globalThis.fetch
+      globalThis.fetch = (async () => new Response(JSON.stringify({version: '1.1.0'}))) as typeof fetch
+      try {
+        const result = await checkForUpdate('1.0.0', {fresh: true})
+        expect(result).to.deep.equal({current: '1.0.0', latest: '1.1.0'})
+        expect(readState().updateCheck?.latestVersion).to.equal('1.1.0')
+      } finally {
+        globalThis.fetch = original
+      }
+    })
   })
 })

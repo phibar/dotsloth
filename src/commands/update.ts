@@ -16,7 +16,7 @@ export default class Update extends BaseCommand {
   public async run(): Promise<void> {
     this.log(chalk.bold('\n🦥 dotsloth update\n'))
 
-    const update = await checkForUpdate(this.config.version)
+    const update = await checkForUpdate(this.config.version, {fresh: true})
     if (!update) {
       this.log(chalk.green('✓') + ` Already on the latest version (${this.config.version})`)
       this.log('')

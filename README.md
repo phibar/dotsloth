@@ -178,5 +178,5 @@ DESCRIPTION
   Display help for dotsloth.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/7.0.6/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/7.0.7/src/commands/help.ts)_
 <!-- commandsstop -->

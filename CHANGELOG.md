@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.8.0
+
+### Minor Changes
+
+- [#107](https://github.com/phibar/dotsloth/pull/107) [`fc63b73`](https://github.com/phibar/dotsloth/commit/fc63b73dea99da5bf2e4011058b8ded82ed796fa) Thanks [@phibar](https://github.com/phibar)! - Add `dotsloth runner add|list|start|stop|logs|remove`: self-hosted GitHub Actions runners for your organizations on this Mac, in `~/github/<Org>/.runners/<name>/`, registered through `gh` (needs `admin:org`) and run as a LaunchAgent.
+
 ## 0.7.0
 
 ### Minor Changes

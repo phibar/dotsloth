@@ -71,6 +71,16 @@
           "text": "A real `runner add metatrom-ag` has not run yet"
         }
       ]
+    },
+    {
+      "@type": "Take",
+      "scene": "Philipp decided on the VPN idea raised during the runner work.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "VPN for jobs (Surfshark) is left out — Philipp's call on 2026-11-16; no issue is opened for it"
+        }
+      ]
     }
   ]
 }

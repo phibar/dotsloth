@@ -1,0 +1,76 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:fc63b73dea99da5bf2e4011058b8ded82ed796fa",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@fc63b73dea99da5bf2e4011058b8ded82ed796fa"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Philipp wants GitHub Actions runners for his orgs on his Mac mini: a 5-hour e2e suite would eat the 2000 private minutes, free runs make it daily, and macOS apps build on owned Apple Silicon. Interviewed into #104 (sub-issues #105 CLI, #106 web UI); this commit is #105.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Steering only on the machine that installed a runner; folder + LaunchAgent are the record, config.json unchanged (rejected: runners in synced config with a host field)"
+        },
+        {
+          "@type": "Decision",
+          "text": "Runners in ~/github/<Org>/.runners/<name>/ — hidden, so countRepos and the env scan skip them (rejected: visible actions-runner/ folder, ~/Library outside the org)"
+        },
+        {
+          "@type": "Decision",
+          "text": "Several runners per org supported, one expected; default name = short hostname, then -2, -3"
+        },
+        {
+          "@type": "Decision",
+          "text": "The runner's own svc.sh (LaunchAgent), not a dotsloth plist; service name read from the generated svc.sh, because the runner shortens long names itself (ServiceControlManager.cs)"
+        },
+        {
+          "@type": "Decision",
+          "text": "Tokens via gh api on each add/remove, never stored; --token on argv (1h, single use); organizations only, personal accounts refused"
+        },
+        {
+          "@type": "Decision",
+          "text": "Latest release via gh, SHA-256 from the release notes' BEGIN SHA markers; mismatch stops before tar"
+        },
+        {
+          "@type": "Decision",
+          "text": "remove --force removes locally when GitHub refuses; logs = last 200 lines of ~/Library/Logs/<svc>/stdout.log"
+        },
+        {
+          "@type": "Decision",
+          "text": "Runner self-updates left to the runner (30-day rule if disabled)"
+        },
+        {
+          "@type": "Decision",
+          "text": "core/runners.ts split: folder and naming logic into core/runner-folders.ts (Biome 300-line warning)"
+        }
+      ],
+      "discussed": [
+        "Tried: `launchctl unload` on an unloaded plist prints an error but exits 0 — so svc.sh uninstall works on a stopped runner; a removeService fallback was written and deleted",
+        "Surfshark VPN for jobs: no macOS API/CLI found; options WireGuard config + wg-quick (needs sudo) or IKEv2 + scutil --nc — both untried; VPN routes the whole Mac"
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "#106 web UI for runners",
+          "issue": {
+            "@id": "oasis://github:phibar/dotsloth/issues/106"
+          }
+        },
+        {
+          "@type": "Deferral",
+          "text": "Surfshark VPN for jobs as its own issue (draft pending Philipp's yes)"
+        },
+        {
+          "@type": "Deferral",
+          "text": "README.md on main fails Biome since v0.7.0 (oclif readme writes * bullets) — own small fix"
+        },
+        {
+          "@type": "Deferral",
+          "text": "A real `runner add metatrom-ag` has not run yet"
+        }
+      ]
+    }
+  ]
+}

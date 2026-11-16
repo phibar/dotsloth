@@ -1,0 +1,42 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:87b647b701b429a0be606d3ec074af0458889a52",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@87b647b701b429a0be606d3ec074af0458889a52"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Docs refresh Philipp asked for; mid-way he asked whether the screenshots were exchanged (\"may put some more\").",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Screenshots retaken from a throwaway demo home at /tmp/sam (persona samsloth: sloth-labs, acme, oss — the persona the old screenshots used), with fake security/gh/launchctl/ssh-add/osascript; no real org, path or secret appears. /tmp/sam deleted afterwards"
+        },
+        {
+          "@type": "Decision",
+          "text": "A first take under the scratchpad showed a path with part of the username — retaken under /tmp/sam"
+        },
+        {
+          "@type": "Decision",
+          "text": "Five shots: Dashboard (main), Runners (in the runners section, log open), Organizations, Secrets, Env files (under \"More screenshots\")"
+        },
+        {
+          "@type": "Decision",
+          "text": "runner and worktree topic descriptions in package.json — --help showed one subcommand's text for them"
+        },
+        {
+          "@type": "Decision",
+          "text": "Patch changeset (v0.9.1): --help text changes for users"
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "No script keeps the demo home; retaking screenshots means rebuilding it by hand"
+        }
+      ]
+    }
+  ]
+}

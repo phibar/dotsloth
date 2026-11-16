@@ -109,6 +109,7 @@ npm run prepack    # Generate oclif manifest and readme (for releases)
 ### oclif Patterns
 
 Commands follow this structure:
+
 ```typescript
 import {Command, Flags, Args} from '@oclif/core'
 
@@ -150,6 +151,7 @@ export default class MyCommand extends Command {
 ### Interactive Prompts
 
 Use `enquirer` for user input:
+
 ```typescript
 import Enquirer from 'enquirer'
 
@@ -164,6 +166,7 @@ const {value} = await Enquirer.prompt<{value: string}>({
 ### Schema Validation
 
 Use Zod for config validation (`src/types/index.ts`):
+
 ```typescript
 import {z} from 'zod'
 
@@ -192,6 +195,7 @@ export type MyType = z.infer<typeof MySchema>
 ### Keychain Operations (`src/lib/keychain.ts`)
 
 Uses macOS `security` CLI:
+
 - `security add-generic-password` - Store secrets
 - `security find-generic-password` - Retrieve secrets
 - `security delete-generic-password` - Remove secrets
@@ -213,6 +217,7 @@ All secrets use account name `dotsloth` for grouping.
 ### Secret Extraction Patterns (`src/lib/secrets.ts`)
 
 Detects these export patterns in shell profiles:
+
 - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
 - `*_API_KEY`, `*_API_TOKEN`, `*_SECRET`, `*_TOKEN`
 - `OPENAI_*`, `ANTHROPIC_*`, `CLOUDFLARE_*`
@@ -221,6 +226,7 @@ Detects these export patterns in shell profiles:
 ## File Sync Behavior
 
 The `sync` command:
+
 1. Regenerates all org-specific gitconfigs from config.json
 2. Regenerates main gitconfig with includeIf patterns
 3. Updates allowed_signers file (for SSH commit signing)
@@ -249,6 +255,7 @@ printAutoSync(this.log.bind(this), result.sync)
 
 Core reports progress through an `onEvent` callback. The CLI prints the events; the server runs
 the operation as a job (`JobRunner`, one at a time) and streams them over SSE:
+
 ```typescript
 runner.start('doctor', (emit) => runDoctor({offline}, emit))
 ```

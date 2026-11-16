@@ -1,0 +1,26 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:751f6769ea63d59fd1bfb6d848a52af9c6d0ed8f",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@751f6769ea63d59fd1bfb6d848a52af9c6d0ed8f"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "PR #114 sat CONFLICTING with no pull_request checks: merging #113's empty changeset had made the release bot write another \"chore: release v0.9.0\" commit (bed3fc2) that touched README.md.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Merge main into the docs branch (no force-push), README resolved by taking the branch side and regenerating it with `oclif readme` from a fresh build — 41 commands, identical to the branch"
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "Empty changesets keep producing a release commit with no new version (bae7bee, bed3fc2); release.yml should skip \"Apply versions\" when no changeset bumps anything — item 3 of the session's list, not yet done"
+        }
+      ]
+    }
+  ]
+}

@@ -402,7 +402,7 @@
       }
     },
     {
-      "includes": [".changeset/*.md"],
+      "includes": [".changeset/*.md", "README.md"],
       "formatter": {
         "enabled": false
       },

@@ -1,0 +1,34 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:2b37bc7a8f63f0fdfc23fb0f7a0f9de36bfcedfc",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@2b37bc7a8f63f0fdfc23fb0f7a0f9de36bfcedfc"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "PR #107 had to pick up the README Biome fix (#108) from main before CI could pass.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Merge main into feature/105-runners-cli instead of rebasing: no force-push (the permission check blocks it) and fc63b73 keeps its sha, so its note stays attached",
+          "governs": [
+            {
+              "@id": "oasis://phibar/dotsloth@fc63b73"
+            }
+          ]
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "Release v0.8.0: the workflow's publish step succeeded at 03:13Z (`+ @phibar/dotsloth@0.8.0`, provenance signed), but npm still served 0.7.0 at 03:16Z — not yet confirmed on the registry"
+        },
+        {
+          "@type": "Deferral",
+          "text": "A real `dotsloth runner add <org>` has not run"
+        }
+      ]
+    }
+  ]
+}

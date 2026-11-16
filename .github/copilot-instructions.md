@@ -5,6 +5,7 @@
 dotsloth is a macOS CLI tool for syncing dotfiles and development environment configuration via iCloud. It manages git configurations, SSH keys, and secrets using the macOS Keychain.
 
 **Key features:**
+
 - Sync dotfiles across macOS machines via iCloud Drive
 - Manage multiple GitHub organizations with different git identities
 - Store secrets in macOS Keychain instead of dotfiles
@@ -103,11 +104,13 @@ Tests use Mocha and are located in the `test/` directory. Test files should use 
 ## macOS-Specific Notes
 
 This tool is designed for macOS and uses:
+
 - iCloud Drive (`~/Library/Mobile Documents/com~apple~CloudDocs/`)
 - macOS Keychain (via `security` command)
 - Homebrew paths (`/opt/homebrew/`)
 
 When developing or testing, be aware that some functionality requires:
+
 - iCloud Drive to be enabled and accessible
 - macOS Keychain access permissions
 - SSH keys to be set up

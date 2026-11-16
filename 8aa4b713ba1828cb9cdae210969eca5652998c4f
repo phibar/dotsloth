@@ -1,0 +1,24 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:8aa4b713ba1828cb9cdae210969eca5652998c4f",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@8aa4b713ba1828cb9cdae210969eca5652998c4f"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Building #106 (runners in the web UI), the route tests needed the same gh/tar/launchctl stand-ins as the core runner tests.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Shared fixture test/__testdata__/runner/fakes.ts (installRunnerFakes, calls, orgDir) instead of a second copy; moved by script, the shell bodies verified identical with diff"
+        },
+        {
+          "@type": "Decision",
+          "text": "Its own commit ahead of the feature, as a refactor"
+        }
+      ]
+    }
+  ]
+}

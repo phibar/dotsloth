@@ -1,0 +1,33 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:6f24d7c7e772f7d1301e5a1551c7b5ee3f3331e4",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@6f24d7c7e772f7d1301e5a1551c7b5ee3f3331e4"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Philipp ran `dotsloth update` on the Mac mini after v0.8.0 was published; it answered \"Already on the latest version (0.7.0)\" from the 24h cache written the day before (#110).",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "`checkForUpdate(version, {fresh: true})` for the update command only; hint and banner keep the cache (recorded on dc11c49 as the refinement of its decision)",
+          "governs": [
+            {
+              "@id": "oasis://phibar/dotsloth@dc11c49"
+            }
+          ]
+        },
+        {
+          "@type": "Decision",
+          "text": "Patch changeset (v0.8.1)"
+        }
+      ],
+      "discussed": [
+        "Tried on mini.local: state.json went from 0.7.0 (2026-11-15) to 0.8.0 checked at 03:29:14Z after `./bin/run.js update`",
+        "The new test stubs globalThis.fetch; it fails with `fresh ||` removed"
+      ]
+    }
+  ]
+}

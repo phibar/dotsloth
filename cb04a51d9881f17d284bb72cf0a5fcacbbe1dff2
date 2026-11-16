@@ -1,0 +1,28 @@
+{
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:cb04a51d9881f17d284bb72cf0a5fcacbbe1dff2",
+  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@cb04a51d9881f17d284bb72cf0a5fcacbbe1dff2"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "PR #107 (runner CLI) failed all unit-tests jobs on README.md only: the v0.6.0/v0.7.0 release commits regenerated it with `*` bullets; CI on main was skipped, so nobody saw it.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "README.md joins the existing `.changeset/*.md` override (formatter and linter off), because oclif regenerates it each release (rejected: formatting it by hand — undone by the next release)"
+        },
+        {
+          "@type": "Decision",
+          "text": "Its own PR ahead of #107, no changeset (not user-facing), label skip-changeset",
+          "governs": [
+            {
+              "@id": "oasis://github:phibar/dotsloth/issues/107"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

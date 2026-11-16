@@ -1,0 +1,24 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:1622481de8431b77bec8553fc98ee4fd743ccc11",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@1622481de8431b77bec8553fc98ee4fd743ccc11"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Philipp asked to update the very outdated README. Its command reference listed only `help`.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Cause tried, not guessed: `oclif readme` without dist/ writes 1 command, after a build 41. release.yml ran \"Apply versions\" (npm run version → oclif readme) before \"Build\""
+        },
+        {
+          "@type": "Decision",
+          "text": "Fix by moving Build ahead of Apply versions (it always ran anyway), rather than adding a build to the `version` script, which would build twice per release"
+        }
+      ]
+    }
+  ]
+}

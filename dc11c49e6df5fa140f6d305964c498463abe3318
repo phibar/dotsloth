@@ -1,6 +1,7 @@
 {
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
   "@id": "oasis://phibar/dotsloth@refs/notes/continuity:dc11c49e6df5fa140f6d305964c498463abe3318",
-  "@type": "oasis://metatrom-ag/Continuity/record/Note",
+  "@type": "Note",
   "commit": {
     "@id": "oasis://phibar/dotsloth@dc11c49e6df5fa140f6d305964c498463abe3318"
   },
@@ -39,6 +40,20 @@
       "discussed": [
         "Background fetch considered but avoided: fetch keeps the event loop alive; instead the check runs at the end of the command and awaits with a 5s timeout — acceptable since it happens at most once per 24h after the command's own output is done",
         "isNewer uses numeric semver comparison (not string) to handle 1.0.10 > 1.0.9"
+      ]
+    },
+    {
+      "@type": "Take",
+      "scene": "On 2026-11-16 `dotsloth update` on the Mac mini answered \"Already on the latest version (0.7.0)\" while v0.8.0 was on npm: the 24h cache from the day before answered the explicit update too (#110). Philipp agreed to the refinement.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "The 24h cache stays for the passive hint (BaseCommand) and the web UI banner (GET /api/update) — no latency on every run"
+        },
+        {
+          "@type": "Decision",
+          "text": "An explicit `dotsloth update` asks npm every time (`checkForUpdate(version, {fresh: true})`) and refreshes the cache — it must see what was just released"
+        }
       ]
     }
   ]

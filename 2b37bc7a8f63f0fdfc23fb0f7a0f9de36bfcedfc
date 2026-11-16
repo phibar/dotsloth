@@ -29,6 +29,16 @@
           "text": "A real `dotsloth runner add <org>` has not run"
         }
       ]
+    },
+    {
+      "@type": "Take",
+      "scene": "Checking the v0.8.0 release after Philipp noticed npm still served 0.7.0.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Release v0.8.0 confirmed on npm as latest at 03:16:51Z, about 3 minutes after the publish step; the earlier \"not yet confirmed\" is settled"
+        }
+      ]
     }
   ]
 }

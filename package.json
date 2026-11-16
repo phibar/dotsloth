@@ -94,6 +94,12 @@
       },
       "mail": {
         "description": "Back up and restore Mail accounts, rules and signatures"
+      },
+      "runner": {
+        "description": "Run your organizations' GitHub Actions jobs on this Mac (self-hosted runners)"
+      },
+      "worktree": {
+        "description": "Git worktrees per GitHub issue"
       }
     }
   },

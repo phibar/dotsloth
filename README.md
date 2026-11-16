@@ -189,7 +189,7 @@ $ npm install -g @phibar/dotsloth
 $ dotsloth COMMAND
 running command...
 $ dotsloth (--version)
-@phibar/dotsloth/0.9.0 darwin-arm64 node-v24.20.0
+@phibar/dotsloth/0.9.1 linux-x64 node-v26.13.1
 $ dotsloth --help [COMMAND]
 USAGE
   $ dotsloth COMMAND
@@ -267,7 +267,7 @@ EXAMPLES
   $ dotsloth claude history pull --retention 30
 ```
 
-_See code: [src/commands/claude/history.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/claude/history.ts)_
+_See code: [src/commands/claude/history.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/claude/history.ts)_
 
 ## `dotsloth claude link`
 
@@ -289,7 +289,7 @@ EXAMPLES
   $ dotsloth claude link --dry-run
 ```
 
-_See code: [src/commands/claude/link.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/claude/link.ts)_
+_See code: [src/commands/claude/link.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/claude/link.ts)_
 
 ## `dotsloth claude memory [DIRECTION]`
 
@@ -316,7 +316,7 @@ EXAMPLES
   $ dotsloth claude memory pull
 ```
 
-_See code: [src/commands/claude/memory.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/claude/memory.ts)_
+_See code: [src/commands/claude/memory.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/claude/memory.ts)_
 
 ## `dotsloth claude status`
 
@@ -333,7 +333,7 @@ EXAMPLES
   $ dotsloth claude status
 ```
 
-_See code: [src/commands/claude/status.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/claude/status.ts)_
+_See code: [src/commands/claude/status.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/claude/status.ts)_
 
 ## `dotsloth clone URL`
 
@@ -360,7 +360,7 @@ EXAMPLES
   $ dotsloth clone git@github.com:fork/repo.git --org phibar
 ```
 
-_See code: [src/commands/clone.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/clone.ts)_
+_See code: [src/commands/clone.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/clone.ts)_
 
 ## `dotsloth daemon install`
 
@@ -382,7 +382,7 @@ EXAMPLES
   $ dotsloth daemon install --interval 3600
 ```
 
-_See code: [src/commands/daemon/install.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/daemon/install.ts)_
+_See code: [src/commands/daemon/install.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/daemon/install.ts)_
 
 ## `dotsloth daemon status`
 
@@ -399,7 +399,7 @@ EXAMPLES
   $ dotsloth daemon status
 ```
 
-_See code: [src/commands/daemon/status.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/daemon/status.ts)_
+_See code: [src/commands/daemon/status.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/daemon/status.ts)_
 
 ## `dotsloth daemon uninstall`
 
@@ -416,7 +416,7 @@ EXAMPLES
   $ dotsloth daemon uninstall
 ```
 
-_See code: [src/commands/daemon/uninstall.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/daemon/uninstall.ts)_
+_See code: [src/commands/daemon/uninstall.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/daemon/uninstall.ts)_
 
 ## `dotsloth doctor`
 
@@ -438,7 +438,7 @@ EXAMPLES
   $ dotsloth doctor --offline
 ```
 
-_See code: [src/commands/doctor.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/doctor.ts)_
+_See code: [src/commands/doctor.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/doctor.ts)_
 
 ## `dotsloth env list`
 
@@ -460,7 +460,7 @@ EXAMPLES
   $ dotsloth env list --unsaved
 ```
 
-_See code: [src/commands/env/list.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/env/list.ts)_
+_See code: [src/commands/env/list.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/env/list.ts)_
 
 ## `dotsloth env pull`
 
@@ -483,7 +483,7 @@ EXAMPLES
   $ dotsloth env pull --force
 ```
 
-_See code: [src/commands/env/pull.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/env/pull.ts)_
+_See code: [src/commands/env/pull.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/env/pull.ts)_
 
 ## `dotsloth env push`
 
@@ -506,7 +506,7 @@ EXAMPLES
   $ dotsloth env push --dry-run
 ```
 
-_See code: [src/commands/env/push.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/env/push.ts)_
+_See code: [src/commands/env/push.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/env/push.ts)_
 
 ## `dotsloth help [COMMAND]`
 
@@ -548,7 +548,7 @@ EXAMPLES
   $ dotsloth init
 ```
 
-_See code: [src/commands/init.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/init.ts)_
 
 ## `dotsloth mail export`
 
@@ -570,7 +570,7 @@ EXAMPLES
   $ dotsloth mail export --dry-run
 ```
 
-_See code: [src/commands/mail/export.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/mail/export.ts)_
+_See code: [src/commands/mail/export.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/mail/export.ts)_
 
 ## `dotsloth mail restore`
 
@@ -593,7 +593,7 @@ EXAMPLES
   $ dotsloth mail restore --dry-run
 ```
 
-_See code: [src/commands/mail/restore.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/mail/restore.ts)_
+_See code: [src/commands/mail/restore.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/mail/restore.ts)_
 
 ## `dotsloth mail status`
 
@@ -610,7 +610,7 @@ EXAMPLES
   $ dotsloth mail status
 ```
 
-_See code: [src/commands/mail/status.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/mail/status.ts)_
+_See code: [src/commands/mail/status.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/mail/status.ts)_
 
 ## `dotsloth org add [NAME]`
 
@@ -636,7 +636,7 @@ EXAMPLES
   $ dotsloth org add phibar --email you@phibar.work --username phibar
 ```
 
-_See code: [src/commands/org/add.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/org/add.ts)_
+_See code: [src/commands/org/add.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/org/add.ts)_
 
 ## `dotsloth org list`
 
@@ -656,7 +656,7 @@ EXAMPLES
   $ dotsloth org list
 ```
 
-_See code: [src/commands/org/list.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/org/list.ts)_
+_See code: [src/commands/org/list.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/org/list.ts)_
 
 ## `dotsloth org remove NAME`
 
@@ -680,7 +680,7 @@ EXAMPLES
   $ dotsloth org remove phibar
 ```
 
-_See code: [src/commands/org/remove.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/org/remove.ts)_
+_See code: [src/commands/org/remove.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/org/remove.ts)_
 
 ## `dotsloth org update [NAME]`
 
@@ -708,7 +708,7 @@ EXAMPLES
   $ dotsloth org update phibar --email new@email.com
 ```
 
-_See code: [src/commands/org/update.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/org/update.ts)_
+_See code: [src/commands/org/update.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/org/update.ts)_
 
 ## `dotsloth runner add ORG`
 
@@ -734,7 +734,7 @@ EXAMPLES
   $ dotsloth runner add metatrom-ag --labels e2e,macos-build
 ```
 
-_See code: [src/commands/runner/add.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/runner/add.ts)_
+_See code: [src/commands/runner/add.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/runner/add.ts)_
 
 ## `dotsloth runner list`
 
@@ -757,7 +757,7 @@ EXAMPLES
   $ dotsloth runner list --org metatrom-ag
 ```
 
-_See code: [src/commands/runner/list.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/runner/list.ts)_
+_See code: [src/commands/runner/list.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/runner/list.ts)_
 
 ## `dotsloth runner logs ORG [NAME]`
 
@@ -783,7 +783,7 @@ EXAMPLES
   $ dotsloth runner logs metatrom-ag -n 50
 ```
 
-_See code: [src/commands/runner/logs.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/runner/logs.ts)_
+_See code: [src/commands/runner/logs.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/runner/logs.ts)_
 
 ## `dotsloth runner remove ORG [NAME]`
 
@@ -809,7 +809,7 @@ EXAMPLES
   $ dotsloth runner remove metatrom-ag mac-mini --force
 ```
 
-_See code: [src/commands/runner/remove.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/runner/remove.ts)_
+_See code: [src/commands/runner/remove.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/runner/remove.ts)_
 
 ## `dotsloth runner start ORG [NAME]`
 
@@ -830,7 +830,7 @@ EXAMPLES
   $ dotsloth runner start metatrom-ag
 ```
 
-_See code: [src/commands/runner/start.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/runner/start.ts)_
+_See code: [src/commands/runner/start.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/runner/start.ts)_
 
 ## `dotsloth runner stop ORG [NAME]`
 
@@ -851,7 +851,7 @@ EXAMPLES
   $ dotsloth runner stop metatrom-ag
 ```
 
-_See code: [src/commands/runner/stop.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/runner/stop.ts)_
+_See code: [src/commands/runner/stop.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/runner/stop.ts)_
 
 ## `dotsloth secret add NAME`
 
@@ -876,7 +876,7 @@ EXAMPLES
   $ dotsloth secret add OPENAI_API_KEY --value sk-...
 ```
 
-_See code: [src/commands/secret/add.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/secret/add.ts)_
+_See code: [src/commands/secret/add.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/secret/add.ts)_
 
 ## `dotsloth secret export`
 
@@ -897,7 +897,7 @@ EXAMPLES
   $ dotsloth secret export
 ```
 
-_See code: [src/commands/secret/export.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/secret/export.ts)_
+_See code: [src/commands/secret/export.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/secret/export.ts)_
 
 ## `dotsloth secret get NAME`
 
@@ -917,7 +917,7 @@ EXAMPLES
   $ dotsloth secret get AWS_ACCESS_KEY_ID
 ```
 
-_See code: [src/commands/secret/get.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/secret/get.ts)_
+_See code: [src/commands/secret/get.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/secret/get.ts)_
 
 ## `dotsloth secret list`
 
@@ -934,7 +934,7 @@ EXAMPLES
   $ dotsloth secret list
 ```
 
-_See code: [src/commands/secret/list.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/secret/list.ts)_
+_See code: [src/commands/secret/list.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/secret/list.ts)_
 
 ## `dotsloth secret load`
 
@@ -953,7 +953,7 @@ EXAMPLES
   eval "$(dotsloth secret load)"
 ```
 
-_See code: [src/commands/secret/load.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/secret/load.ts)_
+_See code: [src/commands/secret/load.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/secret/load.ts)_
 
 ## `dotsloth secret remove NAME`
 
@@ -976,7 +976,7 @@ EXAMPLES
   $ dotsloth secret remove AWS_ACCESS_KEY_ID
 ```
 
-_See code: [src/commands/secret/remove.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/secret/remove.ts)_
+_See code: [src/commands/secret/remove.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/secret/remove.ts)_
 
 ## `dotsloth status`
 
@@ -996,7 +996,7 @@ EXAMPLES
   $ dotsloth status
 ```
 
-_See code: [src/commands/status.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/status.ts)_
+_See code: [src/commands/status.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/status.ts)_
 
 ## `dotsloth sync`
 
@@ -1019,7 +1019,7 @@ EXAMPLES
   $ dotsloth sync --dry-run
 ```
 
-_See code: [src/commands/sync.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/sync.ts)_
+_See code: [src/commands/sync.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/sync.ts)_
 
 ## `dotsloth topics`
 
@@ -1044,7 +1044,7 @@ EXAMPLES
   $ dotsloth topics --offline
 ```
 
-_See code: [src/commands/topics.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/topics.ts)_
+_See code: [src/commands/topics.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/topics.ts)_
 
 ## `dotsloth ui`
 
@@ -1067,7 +1067,7 @@ EXAMPLES
   $ dotsloth ui --port 4321 --no-open
 ```
 
-_See code: [src/commands/ui.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/ui.ts)_
+_See code: [src/commands/ui.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/ui.ts)_
 
 ## `dotsloth update`
 
@@ -1084,7 +1084,7 @@ EXAMPLES
   $ dotsloth update
 ```
 
-_See code: [src/commands/update.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/update.ts)_
 
 ## `dotsloth worktree clean`
 
@@ -1106,7 +1106,7 @@ EXAMPLES
   $ dotsloth worktree clean --dry-run
 ```
 
-_See code: [src/commands/worktree/clean.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/worktree/clean.ts)_
+_See code: [src/commands/worktree/clean.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/worktree/clean.ts)_
 
 ## `dotsloth worktree list`
 
@@ -1123,7 +1123,7 @@ EXAMPLES
   $ dotsloth worktree list
 ```
 
-_See code: [src/commands/worktree/list.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/worktree/list.ts)_
+_See code: [src/commands/worktree/list.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/worktree/list.ts)_
 
 ## `dotsloth worktree new ISSUE`
 
@@ -1143,5 +1143,5 @@ EXAMPLES
   $ dotsloth worktree new 42
 ```
 
-_See code: [src/commands/worktree/new.ts](https://github.com/phibar/dotsloth/blob/v0.9.0/src/commands/worktree/new.ts)_
+_See code: [src/commands/worktree/new.ts](https://github.com/phibar/dotsloth/blob/v0.9.1/src/commands/worktree/new.ts)_
 <!-- commandsstop -->

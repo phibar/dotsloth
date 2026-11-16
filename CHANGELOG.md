@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.9.1
+
+### Patch Changes
+
+- [#114](https://github.com/phibar/dotsloth/pull/114) [`87b647b`](https://github.com/phibar/dotsloth/commit/87b647b701b429a0be606d3ec074af0458889a52) Thanks [@phibar](https://github.com/phibar)! - `dotsloth --help` describes the `runner` and `worktree` topics, and the README documents every command again (releases had regenerated it before building, leaving only `help`).
+
 ## 0.9.0
 
 ### Minor Changes

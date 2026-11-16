@@ -76,18 +76,20 @@ jobs:
             echo "$count changeset(s) pending."
           fi
 
+      # Always build: a recovery run has no pending changesets but still
+      # publishes, and the package ships dist/ - publishing without it would
+      # put a broken tarball on npm.
+      # Also before Apply versions: its `oclif readme` reads the commands from
+      # dist/commands and lists only `help` without them.
+      - name: Build
+        run: npm run build
+
       - name: Apply versions
         if: ${{ steps.pending.outputs.count != '0' }}
         run: npm run version
         env:
           # @changesets/changelog-github needs this to build PR links.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Always build: a recovery run has no pending changesets but still
-      # publishes, and the package ships dist/ - publishing without it would
-      # put a broken tarball on npm.
-      - name: Build
-        run: npm run build
 
       - name: Commit and push the version bump
         id: commit

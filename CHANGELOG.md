@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.9.0
+
+### Minor Changes
+
+- [#112](https://github.com/phibar/dotsloth/pull/112) [`295112e`](https://github.com/phibar/dotsloth/commit/295112ee659a3aead090636e4a182d4632cc68bb) Thanks [@phibar](https://github.com/phibar)! - Add a Runners page to `dotsloth ui`: add, start, stop, read the log of and remove self-hosted runners, with live progress for add and remove.
+
 ## 0.8.1
 
 ### Patch Changes

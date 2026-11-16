@@ -1,0 +1,33 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:6cc64f8a6f49ddcfc50e9e3bf87fc97cfa70c404",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@6cc64f8a6f49ddcfc50e9e3bf87fc97cfa70c404"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "After merging the Dependabot PRs #109, #103 and #102, Philipp chose to stop the red Claude review on Dependabot PRs.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Skip the review for runs Dependabot triggers (`if: github.actor != 'dependabot[bot]'`) rather than giving Dependabot the Claude token as a Dependabot secret — bumps are covered by the test matrix"
+        },
+        {
+          "@type": "Decision",
+          "text": "github.actor, not the PR author: a push by Philipp onto a Dependabot branch still runs the review (as on #102)",
+          "governs": [
+            {
+              "@id": "oasis://github:phibar/dotsloth/issues/102"
+            }
+          ]
+        },
+        {
+          "@type": "Decision",
+          "text": "Empty changeset — no release"
+        }
+      ]
+    }
+  ]
+}

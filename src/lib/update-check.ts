@@ -39,10 +39,17 @@ async function fetchLatestVersion(): Promise<string | null> {
   }
 }
 
-export async function checkForUpdate(currentVersion: string): Promise<UpdateInfo | null> {
+/**
+ * The newer version on npm, or null. `fresh` asks npm whatever the cache
+ * holds — for an explicit update, which must see what was just released.
+ */
+export async function checkForUpdate(
+  currentVersion: string,
+  {fresh = false}: {fresh?: boolean} = {},
+): Promise<UpdateInfo | null> {
   const state = readState()
   const cached = state.updateCheck
-  const isStale = !cached || Date.now() - new Date(cached.checkedAt).getTime() > CHECK_INTERVAL_MS
+  const isStale = fresh || !cached || Date.now() - new Date(cached.checkedAt).getTime() > CHECK_INTERVAL_MS
 
   const latestVersion = isStale ? await fetchLatestVersion() : cached.latestVersion
 

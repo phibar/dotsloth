@@ -10,6 +10,7 @@ import {EnvPage} from './pages/env.js'
 import {MailPage} from './pages/mail.js'
 import {OrganizationsPage} from './pages/orgs.js'
 import {Placeholder} from './pages/placeholder.js'
+import {RunnersPage} from './pages/runners.js'
 import {SecretsPage} from './pages/secrets.js'
 import {SECTIONS, type Section, useRoute} from './routes.js'
 import {type Theme, useTheme} from './theme.js'
@@ -102,6 +103,7 @@ const PAGES: Record<string, () => React.JSX.Element> = {
   env: EnvPage,
   mail: MailPage,
   orgs: OrganizationsPage,
+  runners: RunnersPage,
   secrets: SecretsPage,
 }
 

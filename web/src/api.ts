@@ -3,8 +3,16 @@ import type {CloneEvent, ClonePlan, CloneResult, CloneTarget} from '../../src/co
 import type {DaemonStatus, InstallDaemonResult} from '../../src/core/daemon.js'
 import type {DoctorEvent, DoctorReport, RepoAtRisk} from '../../src/core/doctor.js'
 import type {EnvEntry, EnvTransfer, EnvTransferOptions, EnvTransferResult} from '../../src/core/env.js'
+import type {StepEvent} from '../../src/core/events.js'
 import type {MailEvent, MailExportResult, MailRestoreEvent, MailRestorePlan, MailStatus} from '../../src/core/mail.js'
 import type {AddOrgResult, OrgInfo, OrgInput, RemoveOrgResult, UpdateOrgResult} from '../../src/core/orgs.js'
+import type {
+  AddRunnerInput,
+  ListRunnersResult,
+  RemoveRunnerResult,
+  RunnerInfo,
+  RunnerLogs,
+} from '../../src/core/runners.js'
 import type {Status} from '../../src/core/status.js'
 import type {SyncOptions, SyncResult} from '../../src/core/sync.js'
 import type {ApiError as ApiErrorBody} from '../../src/server/errors.js'
@@ -39,8 +47,12 @@ export type {
   MemoryPlan,
   OrgInfo,
   OrgInput,
+  RemoveRunnerResult,
   RepoAtRisk,
+  RunnerInfo,
+  RunnerLogs,
   Status,
+  StepEvent,
   SyncResult,
 }
 
@@ -92,6 +104,8 @@ const versioned = ({data, response}: {data: DevSlothConfig; response: Response})
 })
 
 export type SyncDirection = 'pull' | 'push'
+
+const runnerPath = (org: string, name: string) => `/api/runners/${encodeURIComponent(org)}/${encodeURIComponent(name)}`
 
 export const api = {
   claude: {
@@ -146,6 +160,16 @@ export const api = {
       call<RemoveOrgResult>('DELETE', `/api/orgs/${encodeURIComponent(name)}`, options),
     update: (name: string, changes: Partial<Pick<OrgInput, 'gitEmail' | 'gitUsername' | 'signingKey'>>) =>
       call<UpdateOrgResult>('PUT', `/api/orgs/${encodeURIComponent(name)}`, changes),
+  },
+  runners: {
+    add: (input: AddRunnerInput) => call<JobSnapshot>('POST', '/api/runners', input),
+    list: () => call<ListRunnersResult>('GET', '/api/runners'),
+    logs: (org: string, name: string) => call<RunnerLogs>('GET', `${runnerPath(org, name)}/logs`),
+    /** `force` removes it locally where GitHub refuses. */
+    remove: (org: string, name: string, force = false) =>
+      call<JobSnapshot>('POST', `${runnerPath(org, name)}/remove`, {force}),
+    start: (org: string, name: string) => call<RunnerInfo>('POST', `${runnerPath(org, name)}/start`),
+    stop: (org: string, name: string) => call<RunnerInfo>('POST', `${runnerPath(org, name)}/stop`),
   },
   secrets: {
     list: () => call<{names: string[]}>('GET', '/api/secrets'),

@@ -15,6 +15,7 @@ import {envRoutes} from './routes/env.js'
 import {jobRoutes} from './routes/jobs.js'
 import {mailRoutes} from './routes/mail.js'
 import {orgRoutes} from './routes/orgs.js'
+import {runnerRoutes} from './routes/runners.js'
 import {secretRoutes} from './routes/secrets.js'
 import {statusRoutes} from './routes/status.js'
 import {updateRoutes} from './routes/update.js'
@@ -64,6 +65,7 @@ export function createApp({port, token, version, webRoot = null}: AppOptions) {
   app.route('/api/env', envRoutes)
   app.route('/api/mail', mailRoutes)
   app.route('/api/claude', claudeRoutes)
+  app.route('/api/runners', runnerRoutes(runner))
   app.route('/api/jobs', jobRoutes(runner))
   app.route('/api/update', updateRoutes(version))
   app.all('/api/*', (c) => c.json({code: 'NOT_FOUND', details: [], message: 'No such endpoint'}, 404))

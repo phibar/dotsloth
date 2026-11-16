@@ -1,0 +1,40 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:295112ee659a3aead090636e4a182d4632cc68bb",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@295112ee659a3aead090636e4a182d4632cc68bb"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#106: the Runners page of `dotsloth ui`. Philipp had already added two real runners with 0.8.1 (ExRam/mini, metatrom-ag/mac-mini-phibar); the page showed both running, online and busy.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Routes in src/server/routes/runners.ts, given the app's JobRunner: list, start, stop, logs; add and remove as jobs (runner-add, runner-remove) — not in routes/jobs.ts"
+        },
+        {
+          "@type": "Decision",
+          "text": "Remove is POST /:org/:name/remove with {force}, matching the CLI's --force"
+        },
+        {
+          "@type": "Decision",
+          "text": "Route params via c.req.param() (all strings) — c.req.param('org') types as string | undefined on a plain Context"
+        },
+        {
+          "@type": "Decision",
+          "text": "Page split one purpose per file: runners.tsx, runners/add-runner.tsx, runners/runner-card.tsx, runners/runner-job.ts (stepLine, useGuarded, useRunnerJob) — the copy hook flagged repeated try/catch-toast and JSX openers in one file"
+        },
+        {
+          "@type": "Decision",
+          "text": "Followed the repo's React pages; the ontocratic-frontend web-component rule targets ExtendedKernel's WebView and was not applied here"
+        }
+      ],
+      "discussed": [
+        "Tried: page against the real runners (screenshot), `runner logs ExRam` showed a playwright job and two self-healed connect timeouts",
+        "Mutation: passing false instead of force fails the page test"
+      ]
+    }
+  ]
+}

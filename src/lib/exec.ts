@@ -99,8 +99,11 @@ export function runAsync(
 export interface StreamOptions extends Omit<ExecOptions, 'input' | 'interactive' | 'maxBuffer'> {
   /** Added to the inherited environment. */
   env?: Record<string, string>
-  /** Called for every complete line on stdout or stderr. */
-  onLine: (line: string, stream: 'stderr' | 'stdout') => void
+  /**
+   * Called for every complete line on stdout or stderr. `progress` is true for
+   * a line ended by a bare \r, which the program rewrites with the next one.
+   */
+  onLine: (line: string, stream: 'stderr' | 'stdout', progress: boolean) => void
 }
 
 /**
@@ -122,12 +125,18 @@ export function runStreaming(command: string, args: readonly string[], options: 
       child[stream].setEncoding('utf8')
       child[stream].on('data', (chunk: string) => {
         // git rewrites its progress line with \r, so treat it as a line end too.
-        const parts = (pending + chunk).split(/\r\n|\r|\n/)
-        pending = parts.pop() ?? ''
-        for (const line of parts) if (line) options.onLine(line, stream)
+        const text = pending + chunk
+        let start = 0
+        for (const end of text.matchAll(/\r\n|\r|\n/g)) {
+          const line = text.slice(start, end.index)
+          if (line) options.onLine(line, stream, end[0] === '\r')
+          start = end.index + end[0].length
+        }
+
+        pending = text.slice(start)
       })
       child[stream].on('end', () => {
-        if (pending) options.onLine(pending, stream)
+        if (pending) options.onLine(pending, stream, false)
       })
     }
 

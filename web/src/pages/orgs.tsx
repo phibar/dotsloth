@@ -2,7 +2,7 @@ import {type FormEvent, useEffect, useState} from 'react'
 
 import {api, type CloneEvent, type ClonePlan, type CloneResult, type CloneTarget, type OrgInfo} from '../api.js'
 import {CloneTargetChoice} from '../components/clone-target.js'
-import {JobLog} from '../components/job-log.js'
+import {JobLog, outputLine} from '../components/job-log.js'
 import {Button, Card, ConfirmDialog, Dot, ErrorNote, useLoad} from '../components/ui.js'
 import {useToast} from '../toast.js'
 import {useJob} from '../use-job.js'
@@ -231,7 +231,7 @@ function ClonePanel({onCloned}: {onCloned: () => void}) {
   }
 
   const folder = plan?.org?.folderName ?? (target?.kind === 'org' ? target.name : plan?.orgName)
-  const lines = job.events.filter((e) => e.type === 'output').map((e) => (e as {line: string}).line)
+  const lines = job.events.flatMap((e) => (e.type === 'output' ? [outputLine(e)] : []))
 
   return (
     <Card title="Clone a repository">

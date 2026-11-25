@@ -175,6 +175,53 @@ describe('web API', () => {
         fs.rmSync(sources, {force: true, recursive: true})
       }
     })
+
+    it('plans an organisation by topic and runs its clone as a job, with strict bodies', async () => {
+      replaceConfig(getDefaultConfig())
+      const listing = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'dotsloth-gh-')), 'repos.json')
+      fs.writeFileSync(
+        listing,
+        JSON.stringify([
+          {
+            isArchived: false,
+            isFork: false,
+            name: 'kernel',
+            repositoryTopics: [{name: '0field'}],
+            sshUrl: 'git@example.test:acme/kernel.git',
+          },
+          {
+            isArchived: false,
+            isFork: false,
+            name: 'site',
+            repositoryTopics: null,
+            sshUrl: 'git@example.test:acme/site.git',
+          },
+        ]),
+      )
+      const restore = fakeBinaries({gh: `cat "${listing}"`})
+
+      try {
+        const plan = await send('POST', '/api/clone/org-plan', {owner: 'acme', topics: ['0field']})
+        expect(plan.status).to.equal(200)
+        expect((await plan.json()).repos.map((r: {name: string}) => r.name)).to.deep.equal(['kernel'])
+
+        expect((await send('POST', '/api/clone/org-plan', {owner: 'acme', url: 'x'})).status).to.equal(400)
+        expect((await send('POST', '/api/jobs/clone-org', {owner: 'acme', repos: []})).status).to.equal(400)
+        const withUrl = {owner: 'acme', repos: ['kernel'], sshUrl: 'ext::sh'}
+        expect((await send('POST', '/api/jobs/clone-org', withUrl)).status).to.equal(400)
+
+        // example.test resolves nowhere: the job ends, reporting the repository as failed.
+        const body = {owner: 'acme', repos: ['kernel'], target: {kind: 'none'}, topics: ['0field']}
+        const job = await (await send('POST', '/api/jobs/clone-org', body)).json()
+        const events = await readSse(await request(`/api/jobs/${job.id}/events`))
+        const [, final] = events.at(-1) as [string, {result: {failed: Array<{name: string}>}; status: string}]
+        expect(final.status).to.equal('succeeded')
+        expect(final.result.failed.map((f) => f.name)).to.deep.equal(['kernel'])
+      } finally {
+        restore()
+        fs.rmSync(path.dirname(listing), {force: true, recursive: true})
+      }
+    })
   })
 
   describe('config editing', () => {

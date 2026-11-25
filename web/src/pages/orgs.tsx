@@ -6,6 +6,7 @@ import {JobLog} from '../components/job-log.js'
 import {Button, Card, ConfirmDialog, Dot, ErrorNote, useLoad} from '../components/ui.js'
 import {useToast} from '../toast.js'
 import {useJob} from '../use-job.js'
+import {OrgClonePanel} from './org-clone-panel.js'
 
 type Editing = {mode: 'add'} | {mode: 'edit'; org: OrgInfo}
 
@@ -71,6 +72,7 @@ export function OrganizationsPage() {
       </Card>
 
       <ClonePanel onCloned={orgs.reload} />
+      <OrgClonePanel onCloned={orgs.reload} />
 
       {editing && (
         <OrgForm

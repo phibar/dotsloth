@@ -4,6 +4,7 @@ import {z} from 'zod'
 
 import {applyHistorySync, applyMemorySync} from '../../core/claude.js'
 import {clone} from '../../core/clone.js'
+import {cloneOrg} from '../../core/clone-org.js'
 import {runDoctor} from '../../core/doctor.js'
 import {pullEnv, pushEnv} from '../../core/env.js'
 import {CoreError} from '../../core/errors.js'
@@ -11,6 +12,7 @@ import {applyMailRestore, exportMail} from '../../core/mail.js'
 import {runSync} from '../../core/sync.js'
 import {readBody} from '../body.js'
 import {type JobRunner, UpdateQueue} from '../jobs.js'
+import {OrgFilter} from './clone.js'
 
 const SyncBody = z.object({dryRun: z.boolean().optional(), force: z.boolean().optional()}).strict()
 
@@ -33,6 +35,9 @@ const HistoryBody = z
   .strict()
 
 const CloneBody = z.object({org: z.string().optional(), target: CloneTarget.optional(), url: z.string()}).strict()
+
+// The names only: core lists the repositories again, so git never gets a URL from the browser.
+const CloneOrgBody = OrgFilter.extend({repos: z.array(z.string()).min(1), target: CloneTarget.optional()}).strict()
 
 /**
  * Write a job's events from `from` on, then follow it until it ends. Events
@@ -87,6 +92,13 @@ export function jobRoutes(runner: JobRunner) {
         const {org, target, url} = await readBody(c, CloneBody)
         return c.json(
           runner.start('clone', (emit) => clone(url, {org, target}, emit)),
+          202,
+        )
+      })
+      .post('/clone-org', async (c) => {
+        const {owner, ...options} = await readBody(c, CloneOrgBody)
+        return c.json(
+          runner.start('clone-org', (emit) => cloneOrg(owner, options, emit)),
           202,
         )
       })

@@ -8,7 +8,8 @@ import {Dot} from './ui.js'
  * configured organization — create it, use another, or clone without one.
  *
  * Intention: reports a CloneTarget, or null while the new org's identity is
- * incomplete, to the clone panel that hands it to the clone job.
+ * incomplete, to the clone panels — one repository, or an organisation's —
+ * that hand it to their clone job.
  */
 export function CloneTargetChoice({
   onChange,

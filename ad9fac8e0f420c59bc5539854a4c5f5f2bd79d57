@@ -1,0 +1,44 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:ad9fac8e0f420c59bc5539854a4c5f5f2bd79d57",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@ad9fac8e0f420c59bc5539854a4c5f5f2bd79d57"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#125, found in the browser trial of #124: after cloning Counter the card still offered it.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Re-plan on success with the owner and filter the job was started with, kept in a ref: the effect runs again whenever its inputs change (onCloned after the table reload), and the re-list must happen once per run."
+        },
+        {
+          "@type": "Decision",
+          "text": "The reloaded list ticks every repository still missing again, as a fresh list does; a choice made before the run is not carried over."
+        },
+        {
+          "@type": "Decision",
+          "text": "A failed job keeps its list; it is still accurate."
+        },
+        {
+          "@type": "Decision",
+          "text": "The new test failed before the fix (design stayed enabled) and passes after it."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "Philipp's yes to the commit and to opening its PR, Closes #125; then #126."
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "Not tried in a browser this time; the test drives the job's end by hand."
+        }
+      ]
+    }
+  ]
+}

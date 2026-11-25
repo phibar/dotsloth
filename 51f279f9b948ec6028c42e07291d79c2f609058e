@@ -1,0 +1,53 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:51f279f9b948ec6028c42e07291d79c2f609058e",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@51f279f9b948ec6028c42e07291d79c2f609058e"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#126, found in the browser trial of #124: cloning Counter filled the job log with ~200 progress lines.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Both places the issue offered, each doing its part: runStreaming marks a bare-\\r line as progress (it knows the delimiter), JobLog lets the next line replace it (it owns the display). Live percentages stay; hiding git's output was left out, since a failure's last lines explain it."
+        },
+        {
+          "@type": "Decision",
+          "text": "A shared outputLine helper in job-log.tsx turns an output event into a LogLine for both clone panels; the runner panels hand plain strings and are untouched."
+        },
+        {
+          "@type": "Decision",
+          "text": "job-log.tsx got its Purpose/Intention header."
+        },
+        {
+          "@type": "Decision",
+          "text": "a real `git clone` of metatrom-ag/Counter through runStreaming reported 148 lines; the collapsed log shows 7, one per phase.",
+          "by": "Trial"
+        },
+        {
+          "@type": "Decision",
+          "text": "Tests in test/lib/exec.test.ts and web/src/components/job-log.test.tsx failed before the change and pass after it."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "Philipp's yes to the commit and to opening its PR, Closes #126."
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "A \\r\\n split across two chunks would mark the line before it as progress; git ends its lines with \\n, so no case has called for a guard."
+        },
+        {
+          "@type": "Deferral",
+          "text": "Not tried in a browser this time."
+        }
+      ]
+    }
+  ]
+}

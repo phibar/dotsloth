@@ -1,5 +1,6 @@
 import type {ClaudeLinkEvent, ClaudeStatus, HistoryPlan, MemoryPlan} from '../../src/core/claude.js'
 import type {CloneEvent, ClonePlan, CloneResult, CloneTarget} from '../../src/core/clone.js'
+import type {OrgCloneEvent, OrgCloneFilter, OrgClonePlan, OrgCloneResult} from '../../src/core/clone-org.js'
 import type {DaemonStatus, InstallDaemonResult} from '../../src/core/daemon.js'
 import type {DoctorEvent, DoctorReport, RepoAtRisk} from '../../src/core/doctor.js'
 import type {EnvEntry, EnvTransfer, EnvTransferOptions, EnvTransferResult} from '../../src/core/env.js'
@@ -45,6 +46,9 @@ export type {
   MailRestorePlan,
   MailStatus,
   MemoryPlan,
+  OrgCloneEvent,
+  OrgClonePlan,
+  OrgCloneResult,
   OrgInfo,
   OrgInput,
   RemoveRunnerResult,
@@ -120,6 +124,8 @@ export const api = {
     status: () => call<ClaudeStatus>('GET', '/api/claude'),
   },
   clone: {
+    orgPlan: (owner: string, filter: OrgCloneFilter) =>
+      call<OrgClonePlan>('POST', '/api/clone/org-plan', {owner, ...filter}),
     plan: (url: string) => call<ClonePlan>('POST', '/api/clone/plan', {url}),
   },
   config: {
@@ -138,6 +144,8 @@ export const api = {
   },
   jobs: {
     clone: (url: string, target?: CloneTarget) => call<JobSnapshot>('POST', '/api/jobs/clone', {target, url}),
+    cloneOrg: (owner: string, repos: string[], filter: OrgCloneFilter, target?: CloneTarget) =>
+      call<JobSnapshot>('POST', '/api/jobs/clone-org', {owner, repos, target, ...filter}),
     claudeHistory: (direction: SyncDirection, retentionDays: number) =>
       call<JobSnapshot>('POST', '/api/jobs/claude-history', {direction, retentionDays}),
     claudeMemory: (direction: SyncDirection) => call<JobSnapshot>('POST', '/api/jobs/claude-memory', {direction}),

@@ -1,10 +1,12 @@
 import {type FormEvent, useEffect, useState} from 'react'
 
 import {api, type CloneEvent, type ClonePlan, type CloneResult, type CloneTarget, type OrgInfo} from '../api.js'
+import {CloneTargetChoice} from '../components/clone-target.js'
 import {JobLog} from '../components/job-log.js'
 import {Button, Card, ConfirmDialog, Dot, ErrorNote, useLoad} from '../components/ui.js'
 import {useToast} from '../toast.js'
 import {useJob} from '../use-job.js'
+import {OrgClonePanel} from './org-clone-panel.js'
 
 type Editing = {mode: 'add'} | {mode: 'edit'; org: OrgInfo}
 
@@ -70,6 +72,7 @@ export function OrganizationsPage() {
       </Card>
 
       <ClonePanel onCloned={orgs.reload} />
+      <OrgClonePanel onCloned={orgs.reload} />
 
       {editing && (
         <OrgForm
@@ -194,10 +197,7 @@ function ClonePanel({onCloned}: {onCloned: () => void}) {
   const toast = useToast()
   const [url, setUrl] = useState('')
   const [plan, setPlan] = useState<ClonePlan | null>(null)
-  const [choice, setChoice] = useState<'existing' | 'new' | 'none'>('new')
-  const [existingOrg, setExistingOrg] = useState('')
-  const [gitEmail, setGitEmail] = useState('')
-  const [gitUsername, setGitUsername] = useState('')
+  const [target, setTarget] = useState<CloneTarget | null>(null)
   const [jobId, setJobId] = useState<null | string>(null)
   const job = useJob<CloneEvent, CloneResult>(jobId)
 
@@ -215,8 +215,6 @@ function ClonePanel({onCloned}: {onCloned: () => void}) {
     try {
       const result = await api.clone.plan(url)
       setPlan(result)
-      setExistingOrg(result.organizations[0]?.name ?? '')
-      setChoice('new')
       setJobId(null)
     } catch (error) {
       setPlan(null)
@@ -224,22 +222,15 @@ function ClonePanel({onCloned}: {onCloned: () => void}) {
     }
   }
 
-  const target = (): CloneTarget | undefined => {
-    if (!plan || plan.org) return undefined
-    if (choice === 'existing') return {kind: 'org', name: existingOrg}
-    if (choice === 'none') return {kind: 'none'}
-    return {gitEmail, gitUsername, kind: 'new-org'}
-  }
-
   const start = async () => {
     try {
-      setJobId((await api.jobs.clone(plan?.url ?? url, target())).id)
+      setJobId((await api.jobs.clone(plan?.url ?? url, plan?.org ? undefined : (target ?? undefined))).id)
     } catch (error) {
       toast.error(error)
     }
   }
 
-  const folder = plan?.org?.folderName ?? (choice === 'existing' ? existingOrg : plan?.orgName)
+  const folder = plan?.org?.folderName ?? (target?.kind === 'org' ? target.name : plan?.orgName)
   const lines = job.events.filter((e) => e.type === 'output').map((e) => (e as {line: string}).line)
 
   return (
@@ -267,67 +258,17 @@ function ClonePanel({onCloned}: {onCloned: () => void}) {
               {plan.org.gitEmail}&gt;
             </p>
           ) : (
-            <fieldset className="choices">
-              <legend>
-                <Dot tone="warn" /> <strong>{plan.orgName}</strong> is not a configured organization
-              </legend>
-              <label className="inline">
-                <input checked={choice === 'new'} name="choice" onChange={() => setChoice('new')} type="radio" /> Create
-                it
-              </label>
-              {plan.organizations.length > 0 && (
-                <label className="inline">
-                  <input
-                    checked={choice === 'existing'}
-                    name="choice"
-                    onChange={() => setChoice('existing')}
-                    type="radio"
-                  />{' '}
-                  Use an existing one
-                </label>
-              )}
-              <label className="inline">
-                <input checked={choice === 'none'} name="choice" onChange={() => setChoice('none')} type="radio" />{' '}
-                Clone without an identity
-              </label>
-
-              {choice === 'new' && (
-                <div className="field-row">
-                  <input
-                    aria-label="Git email"
-                    onChange={(e) => setGitEmail(e.target.value)}
-                    placeholder="Git email"
-                    type="email"
-                    value={gitEmail}
-                  />
-                  <input
-                    aria-label="Git username"
-                    onChange={(e) => setGitUsername(e.target.value)}
-                    placeholder="Git username"
-                    value={gitUsername}
-                  />
-                </div>
-              )}
-              {choice === 'existing' && (
-                <select aria-label="Organization" onChange={(e) => setExistingOrg(e.target.value)} value={existingOrg}>
-                  {plan.organizations.map((o) => (
-                    <option key={o.name} value={o.name}>
-                      {o.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </fieldset>
+            <CloneTargetChoice
+              key={plan.orgName}
+              onChange={setTarget}
+              orgName={plan.orgName}
+              organizations={plan.organizations}
+            />
           )}
           <p className="muted">
             Into <code>{`${plan.githubRoot}/${folder}/${plan.repo}`}</code>
           </p>
-          <Button
-            busy={job.status === 'running'}
-            disabled={choice === 'new' && !plan.org && (!gitEmail || !gitUsername)}
-            onClick={start}
-            variant="primary"
-          >
+          <Button busy={job.status === 'running'} disabled={!plan.org && !target} onClick={start} variant="primary">
             Clone
           </Button>
         </div>

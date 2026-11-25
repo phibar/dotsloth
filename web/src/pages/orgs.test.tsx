@@ -104,4 +104,53 @@ describe('organizations page', () => {
       url: 'u',
     })
   })
+
+  it('lists an organisation by topic and clones the repositories left ticked', async () => {
+    const calls = mockApi({
+      'GET /api/orgs': [200, [ACME]],
+      'POST /api/clone/org-plan': [
+        200,
+        {
+          org: null,
+          orgName: 'stranger',
+          organizations: [ACME],
+          owner: 'stranger',
+          repos: [
+            {local: false, name: 'design', repoPath: '/gh/stranger/design', topics: ['0field']},
+            {local: true, name: 'kernel', repoPath: '/gh/stranger/kernel', topics: ['0field']},
+            {local: false, name: 'site', repoPath: '/gh/stranger/site', topics: ['0field', 'web']},
+          ],
+        },
+      ],
+      'POST /api/jobs/clone-org': [202, {id: 'job-2', status: 'running'}],
+    })
+    renderWithToasts(<OrganizationsPage />)
+
+    fireEvent.change(await screen.findByLabelText('Organization on GitHub'), {target: {value: 'stranger'}})
+    fireEvent.change(screen.getByLabelText('Topics'), {target: {value: '0field, web'}})
+    fireEvent.click(screen.getByText('List'))
+
+    const kernel = (await screen.findByLabelText('kernel')) as HTMLInputElement
+    expect(kernel.disabled).toBe(true)
+    expect(screen.getByText('already cloned')).toBeTruthy()
+    fireEvent.click(screen.getByLabelText('site'))
+    fireEvent.click(screen.getByText('Clone without an identity'))
+    fireEvent.click(screen.getByText('Clone 1'))
+
+    await waitFor(() => expect(calls.some((c) => c.route === 'POST /api/jobs/clone-org')).toBe(true))
+    expect(calls.find((c) => c.route === 'POST /api/clone/org-plan')?.body).toEqual({
+      includeArchived: false,
+      includeForks: false,
+      owner: 'stranger',
+      topics: ['0field', 'web'],
+    })
+    expect(calls.find((c) => c.route === 'POST /api/jobs/clone-org')?.body).toEqual({
+      includeArchived: false,
+      includeForks: false,
+      owner: 'stranger',
+      repos: ['design'],
+      target: {kind: 'none'},
+      topics: ['0field', 'web'],
+    })
+  })
 })

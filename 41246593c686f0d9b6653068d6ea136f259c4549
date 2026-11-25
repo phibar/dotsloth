@@ -1,0 +1,44 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:41246593c686f0d9b6653068d6ea136f259c4549",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@41246593c686f0d9b6653068d6ea136f259c4549"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#129, found by the terminal trial Philipp asked for after #119 closed: the picker started with nothing ticked and never said \"already cloned\".",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "`initial` names the new repositories; Enquirer's ArrayPrompt.reset sets every choice's enabled to false and enables only what `initial` names (node_modules/enquirer/lib/types/array.js, v2.4.1)."
+        },
+        {
+          "@type": "Decision",
+          "text": "A local repository's hint is \"already cloned\"; Enquirer uses a disabled string as hint only where the choice has none."
+        },
+        {
+          "@type": "Decision",
+          "text": "The picker's options moved into an exported repoPicker so a test can run the real Enquirer MultiSelect on PassThrough streams (isTTY, a no-op setRawMode, 120x40) and submit on 'run'. Both tests failed on the old options."
+        },
+        {
+          "@type": "Decision",
+          "text": "Trial in a pseudo-terminal (`script` with `stty rows 40 cols 120` — at 0 rows Enquirer renders \"No matching choices\", an artifact of the trial): 20 rows \"already cloned\", the new ones ticked; `a` cleared all, ↓ and space ticked Continuum, Enter cloned it into ~/github/metatrom-ag/Continuum with philipp.bartels@metatrom.com, exit 0."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "Philipp's yes to the commit and its PR, Closes #129."
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "Ctrl+C in any Enquirer prompt on Node 24 throws ERR_USE_AFTER_CLOSE → oasis://github:phibar/dotsloth/issues/130"
+        }
+      ]
+    }
+  ]
+}

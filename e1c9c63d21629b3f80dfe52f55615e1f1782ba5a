@@ -1,0 +1,50 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:e1c9c63d21629b3f80dfe52f55615e1f1782ba5a",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@e1c9c63d21629b3f80dfe52f55615e1f1782ba5a"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#120 core and CLI: core/clone-org.ts (planOrgClone, cloneOrg) and `clone <org>` with an Enquirer multiselect, after Philipp asked for a pick list (\"nice libraries in oclif\").",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Enquirer multiselect over @inquirer/prompts checkbox: Enquirer is already the tree's prompt library"
+        },
+        {
+          "@type": "Decision",
+          "text": "An argument parseGitUrl cannot read is an org; a non-login owner is INVALID_INPUT, which also keeps \"--x\" from reaching gh as an option"
+        },
+        {
+          "@type": "Decision",
+          "text": "gh output validated with Zod at the boundary: repo names [A-Za-z0-9._-], sshUrl must parse as SSH/HTTPS (no ext::)"
+        },
+        {
+          "@type": "Decision",
+          "text": "cloneOrg takes names and re-lists through gh, so the web API never hands git a client-supplied URL"
+        },
+        {
+          "@type": "Decision",
+          "text": "`clone metatrom-ag -t 0field --dry-run` → 26 repos, 20 local, 6 to clone",
+          "by": "Trial"
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "The interactive multiselect itself is untried here (needs a TTY); Philipp can try `./bin/run.js clone metatrom-ag -t 0field`"
+        },
+        {
+          "@type": "Deferral",
+          "text": "#121: web UI",
+          "issue": {
+            "@id": "oasis://github:phibar/dotsloth/issues/121"
+          }
+        }
+      ]
+    }
+  ]
+}

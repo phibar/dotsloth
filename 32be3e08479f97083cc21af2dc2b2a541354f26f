@@ -1,0 +1,46 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:32be3e08479f97083cc21af2dc2b2a541354f26f",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@32be3e08479f97083cc21af2dc2b2a541354f26f"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Issue #119 (bulk clone of an org's repos, filtered by topic) shaped with Philipp and opened with sub-issues #120 (core + CLI) and #121 (web UI); this is the first commit of #120.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Refactor first, so cloneOrg reuses resolveTarget, repoPathIn and gitClone rather than copying them, and syncs once per batch instead of once per repo"
+        },
+        {
+          "@type": "Decision",
+          "text": "re-runs skip local repos; archived and forks left out by default; several topics match any of them (filtered on our side — gh --topic repeated means all); `clone` takes an org name besides a URL; list then confirm (Enquirer multiselect, --yes, --dry-run); unknown org asked once for the batch; topics sync afterwards; SSH URLs; a failed repo doesn't stop the batch; UI on the Organizations page",
+          "by": "Interview"
+        },
+        {
+          "@type": "Decision",
+          "text": "#120 kept whole although its body (1490 chars) flags XL; Philipp's \"do it\" read as the lean",
+          "governs": [
+            {
+              "@id": "oasis://github:phibar/dotsloth/issues/120"
+            }
+          ]
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "Implement #120, then #121"
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "npm test's Biome step fails on the untracked .vscode/settings.json; left alone, it is Philipp's"
+        }
+      ]
+    }
+  ]
+}

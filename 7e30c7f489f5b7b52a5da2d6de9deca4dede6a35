@@ -1,0 +1,55 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:7e30c7f489f5b7b52a5da2d6de9deca4dede6a35",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@7e30c7f489f5b7b52a5da2d6de9deca4dede6a35"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#121, the web half of cloning an organisation: a card on the Organizations page beside ClonePanel, two routes and a job.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "A card of its own under \"Clone a repository\" rather than a URL/organisation toggle in one panel."
+        },
+        {
+          "@type": "Decision",
+          "text": "The clone-org job body takes repository names only; core re-lists through gh, so the browser never hands git a URL. A body with sshUrl is a 400 (strict Zod), pinned in routes.test.ts."
+        },
+        {
+          "@type": "Decision",
+          "text": "Local repositories are listed checked and disabled, \"already cloned\"; the rest start ticked, as in the CLI's multiselect."
+        },
+        {
+          "@type": "Decision",
+          "text": "Topics typed as one field, split on commas and spaces; any of them matches, as core does."
+        },
+        {
+          "@type": "Decision",
+          "text": "CloneTargetChoice's header names both panels now."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "Philipp's yes to the commit and to opening two stacked PRs: feat/120-clone-org closing #120, feat/121-clone-org-ui on top closing #121; merged bottom-up only on his yes."
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "The page is untried in a real browser; the tests mock the API. `./bin/run.js ui` shows it."
+        },
+        {
+          "@type": "Deferral",
+          "text": "Closing comments on #120 and #121 (separate card instead of toggle; #120 kept whole) before the PRs merge.",
+          "issue": {
+            "@id": "oasis://github:phibar/dotsloth/issues/120"
+          }
+        }
+      ]
+    }
+  ]
+}

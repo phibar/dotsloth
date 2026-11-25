@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.11.0
+
+### Minor Changes
+
+- [#123](https://github.com/phibar/dotsloth/pull/123) [`7e30c7f`](https://github.com/phibar/dotsloth/commit/7e30c7f489f5b7b52a5da2d6de9deca4dede6a35) Thanks [@phibar](https://github.com/phibar)! - The web UI's Organizations page can clone an organisation's repositories: enter the organisation and, optionally, topics, tick the repositories to clone from the list (those already cloned are shown greyed out), and follow the run in the job log.
+
 ## 0.10.0
 
 ### Minor Changes

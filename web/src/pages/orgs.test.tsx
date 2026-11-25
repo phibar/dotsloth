@@ -1,7 +1,7 @@
-import {cleanup, fireEvent, screen, waitFor} from '@testing-library/react'
+import {act, cleanup, fireEvent, screen, waitFor} from '@testing-library/react'
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 
-import {installFakeEventSource, mockApi, renderWithToasts} from '../test-utils.js'
+import {FakeEventSource, installFakeEventSource, mockApi, renderWithToasts} from '../test-utils.js'
 import {OrganizationsPage} from './orgs.js'
 
 const ACME = {
@@ -152,5 +152,48 @@ describe('organizations page', () => {
       target: {kind: 'none'},
       topics: ['0field', 'web'],
     })
+  })
+
+  it('lists the organisation again once a clone succeeds, so the cloned repositories are greyed out', async () => {
+    const repo = (name: string, local: boolean) => ({local, name, repoPath: `/gh/acme/${name}`, topics: []})
+    let plans = 0
+    const calls = mockApi({
+      'GET /api/orgs': [200, [ACME]],
+      'POST /api/clone/org-plan': () => {
+        plans += 1
+        const cloned = plans > 1
+        return [
+          200,
+          {
+            org: ACME,
+            orgName: 'acme',
+            organizations: [ACME],
+            owner: 'acme',
+            repos: [repo('design', cloned), repo('site', false)],
+          },
+        ]
+      },
+      'POST /api/jobs/clone-org': [202, {id: 'job-3', status: 'running'}],
+    })
+    renderWithToasts(<OrganizationsPage />)
+
+    fireEvent.change(await screen.findByLabelText('Organization on GitHub'), {target: {value: 'acme'}})
+    fireEvent.click(screen.getByText('List'))
+    fireEvent.click(await screen.findByLabelText('site'))
+    fireEvent.click(screen.getByText('Clone 1'))
+    await waitFor(() => expect(FakeEventSource.instances).toHaveLength(1))
+
+    act(() => FakeEventSource.instances[0].emit('event', {index: 1, name: 'design', total: 1, type: 'repo'}))
+    act(() =>
+      FakeEventSource.instances[0].emit('end', {
+        result: {cloned: ['design'], failed: [], local: []},
+        status: 'succeeded',
+      }),
+    )
+
+    await waitFor(() => expect((screen.getByLabelText('design') as HTMLInputElement).disabled).toBe(true))
+    expect(calls.filter((c) => c.route === 'POST /api/clone/org-plan')).toHaveLength(2)
+    expect(screen.getByText('Clone 1')).toBeTruthy()
+    expect(screen.getByText('[1/1] design')).toBeTruthy()
   })
 })

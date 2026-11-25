@@ -47,6 +47,7 @@ export type {
   MailStatus,
   MemoryPlan,
   OrgCloneEvent,
+  OrgCloneFilter,
   OrgClonePlan,
   OrgCloneResult,
   OrgInfo,

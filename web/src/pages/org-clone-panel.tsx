@@ -2,7 +2,7 @@ import {type FormEvent, useEffect, useState} from 'react'
 
 import {api, type CloneTarget, type OrgCloneEvent, type OrgClonePlan, type OrgCloneResult} from '../api.js'
 import {CloneTargetChoice} from '../components/clone-target.js'
-import {JobLog} from '../components/job-log.js'
+import {JobLog, type LogLine, outputLine} from '../components/job-log.js'
 import {Button, Card, Dot} from '../components/ui.js'
 import {useToast} from '../toast.js'
 import {useJob} from '../use-job.js'
@@ -158,17 +158,17 @@ export function OrgClonePanel({onCloned}: {onCloned: () => void}) {
         </div>
       )}
 
-      <JobLog lines={job.events.map(logLine).filter((line): line is string => line !== null)} />
+      <JobLog lines={job.events.map(logLine).filter((line) => line !== null)} />
     </Card>
   )
 }
 
-function logLine(event: OrgCloneEvent): null | string {
+function logLine(event: OrgCloneEvent): LogLine | null {
   switch (event.type) {
     case 'repo':
       return `[${event.index}/${event.total}] ${event.name}`
     case 'output':
-      return event.line
+      return outputLine(event)
     case 'repo-local':
       return `  already at ${event.repoPath}`
     case 'repo-failed':

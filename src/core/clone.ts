@@ -64,7 +64,8 @@ export function planClone(url: string, {org: override}: {org?: string} = {}): Cl
 }
 
 export type CloneEvent =
-  | {line: string; stream: 'stderr' | 'stdout'; type: 'output'}
+  /** `progress`: git rewrites this line with the next one. */
+  | {line: string; progress: boolean; stream: 'stderr' | 'stdout'; type: 'output'}
   | {repoPath: string; type: 'cloning'; url: string}
   | {name: string; type: 'org-created'}
 
@@ -170,9 +171,9 @@ export async function gitClone(
     const lines: string[] = []
     const code = await runStreaming('git', ['clone', '--progress', '--', url, repoPath], {
       env: {GIT_TERMINAL_PROMPT: '0'},
-      onLine(line, stream) {
+      onLine(line, stream, progress) {
         lines.push(line)
-        onEvent({line, stream, type: 'output'})
+        onEvent({line, progress, stream, type: 'output'})
       },
     })
     if (code !== 0) throw new CoreError('COMMAND_FAILED', 'Git clone failed', lines.slice(-3))

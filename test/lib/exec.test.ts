@@ -68,6 +68,20 @@ describe('exec wrapper', () => {
     expect(lines.filter((l) => l.startsWith('stdout:'))).to.deep.equal(['stdout:a', 'stdout:b'])
     expect(lines.filter((l) => l.startsWith('stderr:'))).to.deep.equal(['stderr:10%', 'stderr:50%', 'stderr:100%'])
   })
+
+  it('runStreaming marks a line ended by a bare \\r as progress the next line rewrites', async () => {
+    const lines: Array<[string, boolean]> = []
+    await runStreaming('sh', ['-c', String.raw`printf 'a\r\nb\n10%%\r100%%, done.\nend'`], {
+      onLine: (line, _stream, progress) => lines.push([line, progress]),
+    })
+    expect(lines).to.deep.equal([
+      ['a', false],
+      ['b', false],
+      ['10%', true],
+      ['100%, done.', false],
+      ['end', false],
+    ])
+  })
 })
 
 describe('keychain process calls', () => {

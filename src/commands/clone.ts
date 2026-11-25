@@ -133,17 +133,7 @@ export default class Clone extends BaseCommand {
   }
 
   private async chooseRepos(plan: OrgClonePlan): Promise<string[]> {
-    const {repos} = await Enquirer.prompt<{repos: string[]}>({
-      choices: plan.repos.map((r) => ({
-        disabled: r.local ? 'already cloned' : false,
-        enabled: !r.local,
-        hint: r.topics.join(', '),
-        name: r.name,
-      })),
-      message: 'Clone which repositories? (space toggles, a toggles all, enter starts)',
-      name: 'repos',
-      type: 'multiselect',
-    })
+    const {repos} = await Enquirer.prompt<{repos: string[]}>({...repoPicker(plan), name: 'repos', type: 'multiselect'})
     return repos
   }
 
@@ -199,5 +189,19 @@ export default class Clone extends BaseCommand {
     }
 
     return {kind: 'none'}
+  }
+}
+
+/** The multiselect `clone <org>` asks with: the repositories still missing ticked, those already cloned disabled. */
+export function repoPicker(plan: Pick<OrgClonePlan, 'repos'>) {
+  return {
+    // Enquirer shows a disabled choice's reason only where the choice has no hint, and ticks only what `initial` names.
+    choices: plan.repos.map((r) => ({
+      disabled: r.local,
+      hint: r.local ? 'already cloned' : r.topics.join(', '),
+      name: r.name,
+    })),
+    initial: plan.repos.filter((r) => !r.local).map((r) => r.name),
+    message: 'Clone which repositories? (space toggles, a toggles all, enter starts)',
   }
 }

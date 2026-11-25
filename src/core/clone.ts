@@ -10,6 +10,14 @@ import type {OnEvent} from './events.js'
 import {ignoreEvents} from './events.js'
 import {addOrg, getOrg, safeOrgFolder} from './orgs.js'
 
+/**
+ * Purpose: put a repository in its organisation's folder, so the org's git
+ * identity applies from the first commit.
+ *
+ * Intention: uses parseGitUrl for the address, core/orgs for the org it
+ * lands in and runSync so ~/.gitconfig includes that org before git runs;
+ * speaks to the clone command and the web API.
+ */
 export interface ClonePlan {
   /** Where org folders live; the clone lands in <githubRoot>/<org folder>/<repo>. */
   githubRoot: string
@@ -78,8 +86,9 @@ export interface CloneResult {
   sync: SyncResult
 }
 
-async function resolveTarget(
-  plan: ClonePlan,
+/** The org and folder a clone lands in, creating the org when the target asks for it. */
+export async function resolveTarget(
+  plan: Pick<ClonePlan, 'org' | 'orgName'>,
   target: CloneTarget | undefined,
   onEvent: OnEvent<CloneEvent>,
 ): Promise<{createdOrg: boolean; folder: string; org: null | Organization}> {
@@ -120,21 +129,37 @@ export async function clone(
   const config = requireConfig()
   const resolved = await resolveTarget(plan, target, onEvent)
 
-  const orgDir = safeOrgFolder(config.paths.githubRoot, resolved.folder)
-  const repoPath = path.resolve(orgDir, plan.repo)
-  // The repo part of a URL may contain slashes ("group/sub/repo") but must
-  // never climb out of the org folder.
-  if (!repoPath.startsWith(orgDir + path.sep)) {
-    throw new CoreError('UNSAFE_PATH', `Refusing to clone outside ${orgDir}: ${plan.repo}`)
-  }
-
+  const repoPath = repoPathIn(safeOrgFolder(config.paths.githubRoot, resolved.folder), plan.repo)
   if (fs.existsSync(repoPath)) throw new CoreError('CONFLICT', `${repoPath} already exists`)
 
   fs.mkdirSync(path.dirname(repoPath), {recursive: true})
   const sync = await runSync()
+  await gitClone(plan.url, repoPath, interactive, onEvent)
 
-  onEvent({repoPath, type: 'cloning', url: plan.url})
-  const args = ['clone', '--', plan.url, repoPath]
+  return {createdOrg: resolved.createdOrg, org: resolved.org, repoPath, sync}
+}
+
+/** Where `repo` lands inside `orgDir`. */
+export function repoPathIn(orgDir: string, repo: string): string {
+  const repoPath = path.resolve(orgDir, repo)
+  // The repo part of a URL may contain slashes ("group/sub/repo") but must
+  // never climb out of the org folder.
+  if (!repoPath.startsWith(orgDir + path.sep)) {
+    throw new CoreError('UNSAFE_PATH', `Refusing to clone outside ${orgDir}: ${repo}`)
+  }
+
+  return repoPath
+}
+
+/** Run `git clone`; interactive on a terminal, otherwise streamed as events and never prompting. */
+export async function gitClone(
+  url: string,
+  repoPath: string,
+  interactive: boolean,
+  onEvent: OnEvent<CloneEvent>,
+): Promise<void> {
+  onEvent({repoPath, type: 'cloning', url})
+  const args = ['clone', '--', url, repoPath]
   if (interactive) {
     try {
       run('git', args, {interactive: true})
@@ -143,7 +168,7 @@ export async function clone(
     }
   } else {
     const lines: string[] = []
-    const code = await runStreaming('git', ['clone', '--progress', '--', plan.url, repoPath], {
+    const code = await runStreaming('git', ['clone', '--progress', '--', url, repoPath], {
       env: {GIT_TERMINAL_PROMPT: '0'},
       onLine(line, stream) {
         lines.push(line)
@@ -152,6 +177,4 @@ export async function clone(
     })
     if (code !== 0) throw new CoreError('COMMAND_FAILED', 'Git clone failed', lines.slice(-3))
   }
-
-  return {createdOrg: resolved.createdOrg, org: resolved.org, repoPath, sync}
 }

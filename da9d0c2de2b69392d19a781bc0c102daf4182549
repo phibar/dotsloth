@@ -1,0 +1,24 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:da9d0c2de2b69392d19a781bc0c102daf4182549",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@da9d0c2de2b69392d19a781bc0c102daf4182549"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#120: adding the clone-org suite pushed doctor-clone.test.ts past Biome's 300 lines.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Move git/makeRepo/codeOf to test/__testdata__/repos.ts rather than copy them into a new suite file; the `acme` fixture (one line) stays per suite"
+        },
+        {
+          "@type": "Decision",
+          "text": "Checked with the feature files stashed, so this commit is green on its own"
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.11.1
+
+### Patch Changes
+
+- [#127](https://github.com/phibar/dotsloth/pull/127) [`ad9fac8`](https://github.com/phibar/dotsloth/commit/ad9fac8e0f420c59bc5539854a4c5f5f2bd79d57) Thanks [@phibar](https://github.com/phibar)! - The Organizations page lists an organisation again once its clone finishes, so the repositories just cloned show as already cloned.
+
 ## 0.11.0
 
 ### Minor Changes

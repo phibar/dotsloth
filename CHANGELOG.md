@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.11.3
+
+### Patch Changes
+
+- [#131](https://github.com/phibar/dotsloth/pull/131) [`4124659`](https://github.com/phibar/dotsloth/commit/41246593c686f0d9b6653068d6ea136f259c4549) Thanks [@phibar](https://github.com/phibar)! - `clone <org>`'s picker starts with every repository still missing ticked, and shows "already cloned" beside the others.
+
 ## 0.11.2
 
 ### Patch Changes

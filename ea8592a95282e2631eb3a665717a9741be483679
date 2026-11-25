@@ -1,0 +1,28 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:ea8592a95282e2631eb3a665717a9741be483679",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@ea8592a95282e2631eb3a665717a9741be483679"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#121 web UI, first step: Philipp chose React for this tree over rules/ontocratic-frontend/components.md (web components), and said yes to scoping that rule to ExtendedKernel WebView trees (claude-code-plugins, branch fix/components-scope).",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "React, in the tree's style; components.md is amended to name the trees it governs rather than marked as a deviation here"
+        },
+        {
+          "@type": "Decision",
+          "text": "The org clone gets a card of its own under \"Clone a repository\" instead of a URL/organisation toggle in one panel; orgs.tsx was at 339 lines"
+        },
+        {
+          "@type": "Decision",
+          "text": "CloneTargetChoice holds its own radio/identity state and reports CloneTarget | null; keyed by orgName so a new plan resets it"
+        }
+      ]
+    }
+  ]
+}

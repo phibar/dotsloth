@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.11.2
+
+### Patch Changes
+
+- [#128](https://github.com/phibar/dotsloth/pull/128) [`51f279f`](https://github.com/phibar/dotsloth/commit/51f279f9b948ec6028c42e07291d79c2f609058e) Thanks [@phibar](https://github.com/phibar)! - A clone's job log in the web UI shows git's progress in place, one line per phase, instead of one line per percentage.
+
 ## 0.11.1
 
 ### Patch Changes

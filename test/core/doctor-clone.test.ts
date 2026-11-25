@@ -9,36 +9,11 @@ import {clone, planClone} from '../../src/core/clone.js'
 import {replaceConfig} from '../../src/core/config.js'
 import type {DoctorEvent} from '../../src/core/doctor.js'
 import {runDoctor} from '../../src/core/doctor.js'
-import type {CoreError} from '../../src/core/errors.js'
 import {getOrg} from '../../src/core/orgs.js'
 import {getDefaultConfig} from '../../src/lib/config.js'
 import {PATHS} from '../../src/lib/paths.js'
+import {codeOf, makeRepo} from '../__testdata__/repos.js'
 import {EMPTY_SYSTEM, fakeBinaries, resetHome} from '../helpers.js'
-
-const git = (cwd: string, ...args: string[]) =>
-  execFileSync('git', ['-c', 'user.name=test', '-c', 'user.email=test@example.com', '-C', cwd, ...args], {
-    encoding: 'utf8',
-    stdio: ['pipe', 'pipe', 'pipe'],
-  })
-
-/** A repository with one commit at `dir`. */
-function makeRepo(dir: string): void {
-  fs.mkdirSync(dir, {recursive: true})
-  git(dir, 'init', '-q')
-  fs.writeFileSync(path.join(dir, 'README.md'), '# test\n', 'utf8')
-  git(dir, 'add', '-A')
-  git(dir, 'commit', '-q', '-m', 'initial')
-}
-
-async function codeOf(promise: Promise<unknown>): Promise<string | undefined> {
-  try {
-    await promise
-  } catch (error) {
-    return (error as CoreError).code
-  }
-
-  return undefined
-}
 
 const acme = {folderName: 'acme', gitEmail: 'dev@acme.test', gitUsername: 'dev', name: 'acme'}
 

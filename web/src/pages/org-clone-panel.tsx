@@ -1,6 +1,13 @@
-import {type FormEvent, useEffect, useState} from 'react'
+import {type FormEvent, useCallback, useEffect, useRef, useState} from 'react'
 
-import {api, type CloneTarget, type OrgCloneEvent, type OrgClonePlan, type OrgCloneResult} from '../api.js'
+import {
+  api,
+  type CloneTarget,
+  type OrgCloneEvent,
+  type OrgCloneFilter,
+  type OrgClonePlan,
+  type OrgCloneResult,
+} from '../api.js'
 import {CloneTargetChoice} from '../components/clone-target.js'
 import {JobLog} from '../components/job-log.js'
 import {Button, Card, Dot} from '../components/ui.js'
@@ -26,8 +33,15 @@ export function OrgClonePanel({onCloned}: {onCloned: () => void}) {
   const [target, setTarget] = useState<CloneTarget | null>(null)
   const [jobId, setJobId] = useState<null | string>(null)
   const job = useJob<OrgCloneEvent, OrgCloneResult>(jobId)
+  // What the running job was asked for, so the list can be read again once it ends.
+  const lastRun = useRef<null | {filter: OrgCloneFilter; owner: string}>(null)
 
-  const filter = {
+  const showPlan = useCallback((result: OrgClonePlan) => {
+    setPlan(result)
+    setPicked(new Set(result.repos.filter((r) => !r.local).map((r) => r.name)))
+  }, [])
+
+  const filter: OrgCloneFilter = {
     includeArchived,
     includeForks,
     topics: topicText
@@ -42,17 +56,19 @@ export function OrgClonePanel({onCloned}: {onCloned: () => void}) {
       toast.success(`Cloned ${cloned.length}, already there ${local.length}`)
       if (failed.length > 0) toast.error(new Error(`Failed: ${failed.map((f) => f.name).join(', ')}`))
       onCloned()
+      const run = lastRun.current
+      lastRun.current = null
+      if (run) api.clone.orgPlan(run.owner, run.filter).then(showPlan, toast.error)
     }
 
     if (job.status === 'failed') toast.error(new Error(job.error?.message ?? 'Clone failed'))
-  }, [job.status, job.result, job.error, onCloned, toast])
+  }, [job.status, job.result, job.error, onCloned, showPlan, toast])
 
   const list = async (event: FormEvent) => {
     event.preventDefault()
     try {
       const result = await api.clone.orgPlan(owner.trim(), filter)
-      setPlan(result)
-      setPicked(new Set(result.repos.filter((r) => !r.local).map((r) => r.name)))
+      showPlan(result)
       setJobId(null)
     } catch (error) {
       setPlan(null)
@@ -72,6 +88,7 @@ export function OrgClonePanel({onCloned}: {onCloned: () => void}) {
     if (!plan) return
     try {
       const repos = plan.repos.filter((r) => picked.has(r.name)).map((r) => r.name)
+      lastRun.current = {filter, owner: plan.owner}
       setJobId((await api.jobs.cloneOrg(plan.owner, repos, filter, plan.org ? undefined : (target ?? undefined))).id)
     } catch (error) {
       toast.error(error)

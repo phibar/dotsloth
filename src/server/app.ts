@@ -21,6 +21,14 @@ import {statusRoutes} from './routes/status.js'
 import {updateRoutes} from './routes/update.js'
 import {checkHost, checkOrigin, cookieName, requireSession, securityHeaders, tokensMatch} from './security.js'
 
+/**
+ * Purpose: the web UI gets every operation the CLI has, behind one set of
+ * guards.
+ *
+ * Intention: mounts every route under the security middleware and serves
+ * the built web app; uses server/jobs and server/errors; started by
+ * server/index.
+ */
 export interface AppOptions {
   /** The port the server listens on - known only once it is listening. */
   port: () => number

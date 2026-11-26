@@ -6,6 +6,14 @@ import type {DevSlothConfig, Organization} from '../types/index.js'
 import {getOrgGitconfigPath, PATHS} from './paths.js'
 
 /**
+ * Purpose: the gitconfigs that give each organisation's folder its
+ * identity and signing key.
+ *
+ * Intention: uses lib/paths and the types; used by core/orgs, core/init,
+ * core/clone and lib/sync.
+ */
+
+/**
  * Generate the main ~/.gitconfig content
  */
 export function generateMainGitconfig(config: DevSlothConfig, userName: string): string {

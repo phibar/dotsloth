@@ -3,6 +3,12 @@ import * as path from 'node:path'
 import {CLAUDE_DIR, CLAUDE_STORE} from './claude.js'
 import type {ClaudeProject} from './claude-projects.js'
 
+/**
+ * Purpose: Claude Code conversations started on one machine can be
+ * continued on another.
+ *
+ * Intention: uses lib/claude and lib/claude-projects; used by core/claude.
+ */
 export const HISTORY_FILE = path.join(CLAUDE_DIR, 'history.jsonl')
 export const HISTORY_STORE = path.join(CLAUDE_STORE, 'history')
 export const SESSIONS_STORE = path.join(HISTORY_STORE, 'sessions')

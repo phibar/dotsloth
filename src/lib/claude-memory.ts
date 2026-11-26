@@ -3,6 +3,12 @@ import * as path from 'node:path'
 import {CLAUDE_STORE} from './claude.js'
 import type {ClaudeProject} from './claude-projects.js'
 
+/**
+ * Purpose: what Claude Code remembers about a project is the same on every
+ * machine.
+ *
+ * Intention: uses lib/claude and lib/claude-projects; used by core/claude.
+ */
 export const MEMORY_STORE = path.join(CLAUDE_STORE, 'memory')
 
 export interface MemoryFile {

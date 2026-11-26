@@ -1,5 +1,13 @@
 import {run, tryRun} from './exec.js'
 
+/**
+ * Purpose: secrets and the SSH key's passphrase are kept in the macOS
+ * Keychain.
+ *
+ * Intention: uses security and ssh-add through lib/exec; used by
+ * core/secrets, core/init, core/status and the `secret load|export`
+ * commands.
+ */
 const KEYCHAIN_ACCOUNT = 'dotsloth'
 
 /**

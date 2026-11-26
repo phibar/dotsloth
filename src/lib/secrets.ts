@@ -1,4 +1,11 @@
 /**
+ * Purpose: secrets written into a shell profile are found, so they can
+ * move to the Keychain.
+ *
+ * Intention: used by core/init and the `secret load|export` commands.
+ */
+
+/**
  * Patterns for detecting secrets in shell profiles
  */
 const SECRET_PATTERNS = [

@@ -4,6 +4,12 @@ import {run} from './exec.js'
 import {PATHS} from './paths.js'
 
 /**
+ * Purpose: tell whether iCloud Drive still holds files not yet uploaded.
+ *
+ * Intention: uses brctl through lib/exec; used by core/doctor.
+ */
+
+/**
  * Files iCloud has not finished uploading yet.
  *
  * A file sitting in the iCloud folder is not yet a backup. Until the upload

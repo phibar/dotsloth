@@ -6,6 +6,13 @@ import {tryRun} from './exec.js'
 import {parseGitUrl} from './git.js'
 import {findRepos} from './repo-audit.js'
 
+/**
+ * Purpose: find a project's Claude Code folder on each machine, even where
+ * its path differs.
+ *
+ * Intention: uses lib/git and lib/repo-audit to match by git remote, and
+ * lib/exec; used by the Claude history and memory sync.
+ */
 export const PROJECTS_DIR = path.join(CLAUDE_DIR, 'projects')
 
 /**

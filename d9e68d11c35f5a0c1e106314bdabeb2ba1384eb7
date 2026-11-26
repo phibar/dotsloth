@@ -1,0 +1,40 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:d9e68d11c35f5a0c1e106314bdabeb2ba1384eb7",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@d9e68d11c35f5a0c1e106314bdabeb2ba1384eb7"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Step 3 of #136 after lib (#144, merged 0a8dfd4): the 16 of 18 files in src/server without a header; routes/runners and routes/update had one.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Purposes from the files' own comments and CLAUDE.md's security notes; each route's Intention names only the core module it calls, since server/app mounts them all."
+        },
+        {
+          "@type": "Decision",
+          "text": "Same placement as core and lib. Empty changeset, no release."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "\"yes\" (merge #144 and the server drafts), \"go ahead\" (commit and PR).",
+          "by": "Philipp"
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "#140 cli and commands, #141 web, #142 tests.",
+          "issue": {
+            "@id": "oasis://github:phibar/dotsloth/issues/140"
+          }
+        }
+      ]
+    }
+  ]
+}

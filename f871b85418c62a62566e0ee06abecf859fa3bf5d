@@ -1,0 +1,44 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:f871b85418c62a62566e0ee06abecf859fa3bf5d",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@f871b85418c62a62566e0ee06abecf859fa3bf5d"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Step 2 of #136 after core (#143, merged cfdc494): the 17 of 22 files in src/lib without a header.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Each Purpose drawn from the file's own top comments and the README, each Intention from its imports and from grep of who imports it."
+        },
+        {
+          "@type": "Decision",
+          "text": "Same placement as core: below the imports; existing comments in exec, env, git, config, icloud and secrets stay unchanged below the header."
+        },
+        {
+          "@type": "Decision",
+          "text": "Empty changeset, no release."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "\"yes\" (merge #143 and the 17 drafts as shown), \"go for it\" (commit and PR).",
+          "by": "Philipp"
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "#139 server, #140 cli and commands, #141 web, #142 tests.",
+          "issue": {
+            "@id": "oasis://github:phibar/dotsloth/issues/139"
+          }
+        }
+      ]
+    }
+  ]
+}

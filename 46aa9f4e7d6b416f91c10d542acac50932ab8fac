@@ -1,0 +1,57 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:46aa9f4e7d6b416f91c10d542acac50932ab8fac",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@46aa9f4e7d6b416f91c10d542acac50932ab8fac"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Step 4 of #136 after server (#145, merged d1f9bb0): the 33 files without a header in src/cli, src/commands, src/index.ts and src/types. With them every file in src has one.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Purposes from each command's oclif description and the README; Intentions name what the command extends and the core module it calls."
+        },
+        {
+          "@type": "Decision",
+          "text": "\"extends BaseCommand\" rather than the \"realizes BaseCommand\" of the older headers: BaseCommand is a class, not an interface. The older headers stay as they are (#136 Left out).",
+          "governs": [
+            {
+              "@id": "oasis://github:phibar/dotsloth/issues/136"
+            }
+          ]
+        },
+        {
+          "@type": "Decision",
+          "text": "sync, secret export, secret load and secret list extend oclif's Command; their headers say so, which also tells a reader they get neither \"Cancelled\" nor the update notice."
+        },
+        {
+          "@type": "Decision",
+          "text": "Empty changeset, no release."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "\"ywes right\" (merge #145 and the 33 drafts), \"yes\" (commit and PR).",
+          "by": "Philipp"
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "#141 web (21 files), #142 tests.",
+          "issue": {
+            "@id": "oasis://github:phibar/dotsloth/issues/141"
+          }
+        },
+        {
+          "@type": "Deferral",
+          "text": "Whether sync and the three secret commands should extend BaseCommand was not raised; noticed here only."
+        }
+      ]
+    }
+  ]
+}

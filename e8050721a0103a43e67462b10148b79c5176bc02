@@ -1,0 +1,53 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:e8050721a0103a43e67462b10148b79c5176bc02",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@e8050721a0103a43e67462b10148b79c5176bc02"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#116: Safari 27's safaridriver refuses to launch under a LaunchAgent with SessionCreate, which the runner's svc.sh template sets. Measured on macAir 2026-11-18.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "1a: plutil -remove SessionCreate through exec, on the plist named in the runner's .service; the tests get a plutil stand-in. Rejected: editing the XML text in Node, which holds only while svc.sh writes XML."
+        },
+        {
+          "@type": "Decision",
+          "text": "2a: only addRunner applies it, between svc.sh install and start: the labels are known locally only at the add. Rejected: also on runner start, which would need GitHub's labels first. An existing desktop runner is re-added."
+        },
+        {
+          "@type": "Decision",
+          "text": "3a: the label matches desktop ignoring case, as GitHub matches labels."
+        },
+        {
+          "@type": "Decision",
+          "text": "A step \"Runs in the desktop's own session\" is reported; the runner add --labels help names desktop. Patch changeset."
+        },
+        {
+          "@type": "Decision",
+          "text": "plutil runs with run rather than tryRun: the template sets the key, and a template without it is a case not yet met."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "\"leans\" (1a, 2a, 3a); \"yes\" to the commit and PR.",
+          "by": "Philipp"
+        }
+      ],
+      "discussed": [
+        "The new test fails with the core change reverted (plist still holds SessionCreate).",
+        "project-status start: #116 sits on no project."
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "Done when's second half — safaridriver /status ready: true on a job — is checked on a Mac with Safari 27 after the release, by re-adding the desktop runner."
+        }
+      ]
+    }
+  ]
+}

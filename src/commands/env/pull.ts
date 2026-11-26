@@ -4,6 +4,12 @@ import {BaseCommand} from '../../cli/base-command.js'
 import {printEnvTransfer} from '../../cli/env.js'
 import {envStoreIsEmpty, pullEnv} from '../../core/env.js'
 
+/**
+ * Purpose: after a reinstall, put the env files back into the
+ * repositories.
+ *
+ * Intention: extends BaseCommand; uses core/env and cli/env.
+ */
 export default class EnvPull extends BaseCommand {
   static override description = 'Restore env files from the dotsloth store into your repos'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --force']

@@ -4,6 +4,14 @@ import type {StepEvent} from '../core/events.js'
 import type {SyncResult} from '../lib/sync.js'
 import type {SymlinkStatus} from '../types/index.js'
 
+/**
+ * Purpose: sync results, link results and step events read the same in
+ * every command.
+ *
+ * Intention: uses core/events and lib/sync; used by `sync`, `init`,
+ * `topics`, `claude link` and `runner add|remove`.
+ */
+
 /** Render a sync result as the familiar tick/cross list. */
 export function printSyncResult(log: (message?: string) => void, result: SyncResult): void {
   for (const step of result.steps) {

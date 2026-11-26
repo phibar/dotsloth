@@ -4,6 +4,11 @@ import {BaseCommand} from '../../cli/base-command.js'
 import {listOrgs} from '../../core/orgs.js'
 import {readConfig} from '../../lib/config.js'
 
+/**
+ * Purpose: see the configured organisations and their identities.
+ *
+ * Intention: extends BaseCommand; uses core/orgs and lib/config.
+ */
 export default class OrgList extends BaseCommand {
   static override description = 'List configured organizations'
   static override examples = ['<%= config.bin %> <%= command.id %>']

@@ -5,6 +5,13 @@ import type {SyncResult} from '../lib/sync.js'
 import {runSync} from '../lib/sync.js'
 
 /**
+ * Purpose: after a command changes config, the person sees what the
+ * automatic sync changed.
+ *
+ * Intention: uses lib/sync; used by `clone` and `org add|remove|update`.
+ */
+
+/**
  * Report the sync a config-changing command ran.
  *
  * Config changes are only half the job: ~/.gitconfig and the org includeIf

@@ -5,6 +5,13 @@ import {BaseCommand} from '../cli/base-command.js'
 import {printStepEvent} from '../cli/format.js'
 import {getInitPlan, runInit} from '../core/init.js'
 
+/**
+ * Purpose: set up dotsloth on a machine, asking only what core leaves to a
+ * decision.
+ *
+ * Intention: extends BaseCommand; uses core/init and cli/format; asks with
+ * @inquirer/prompts.
+ */
 export default class Init extends BaseCommand {
   static override description = 'Initialize dotsloth on this machine'
   static override examples = ['<%= config.bin %> <%= command.id %>']

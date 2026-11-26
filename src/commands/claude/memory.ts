@@ -3,6 +3,11 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {applyMemorySync, type MemoryFilePlan, planMemorySync} from '../../core/claude.js'
 
+/**
+ * Purpose: a project's Claude Code memory is the same on every machine.
+ *
+ * Intention: extends BaseCommand; uses core/claude.
+ */
 export default class ClaudeMemory extends BaseCommand {
   static override args = {
     direction: Args.string({

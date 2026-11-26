@@ -6,6 +6,12 @@ import {BaseCommand} from '../../cli/base-command.js'
 import {getConfig} from '../../core/config.js'
 import {getOrg, updateOrg} from '../../core/orgs.js'
 
+/**
+ * Purpose: change an organisation's git identity.
+ *
+ * Intention: extends BaseCommand; uses core/orgs, core/config and
+ * cli/autosync; asks with @inquirer/prompts.
+ */
 export default class OrgUpdate extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Organization name to update'}),

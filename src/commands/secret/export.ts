@@ -4,6 +4,13 @@ import chalk from 'chalk'
 import {getAllSecrets} from '../../lib/keychain.js'
 import {generateExportStatements} from '../../lib/secrets.js'
 
+/**
+ * Purpose: print every secret at once, for migration or debugging; the one
+ * bulk read, kept out of core.
+ *
+ * Intention: extends oclif's Command; uses lib/keychain and lib/secrets
+ * directly.
+ */
 export default class SecretExport extends Command {
   static override description = 'Export all secrets (for debugging/migration)'
   static override examples = ['<%= config.bin %> <%= command.id %>']

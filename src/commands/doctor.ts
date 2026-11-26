@@ -3,6 +3,12 @@ import chalk from 'chalk'
 import {BaseCommand} from '../cli/base-command.js'
 import {type DoctorReport, type RepoAtRisk, runDoctor} from '../core/doctor.js'
 
+/**
+ * Purpose: before wiping the machine, learn whether anything would be
+ * lost.
+ *
+ * Intention: extends BaseCommand; uses core/doctor.
+ */
 export default class Doctor extends BaseCommand {
   static override description = 'Check whether anything would be lost if this machine were wiped'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --offline']

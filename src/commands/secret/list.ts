@@ -3,6 +3,11 @@ import chalk from 'chalk'
 
 import {listSecretNames} from '../../core/secrets.js'
 
+/**
+ * Purpose: see which secrets are stored, by name.
+ *
+ * Intention: extends oclif's Command; uses core/secrets.
+ */
 export default class SecretList extends Command {
   static override description = 'List all secret names stored in Keychain'
   static override examples = ['<%= config.bin %> <%= command.id %>']

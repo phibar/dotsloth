@@ -4,6 +4,11 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {normalizeSecretName, removeSecret, secretExists} from '../../core/secrets.js'
 
+/**
+ * Purpose: delete a secret, once confirmed.
+ *
+ * Intention: extends BaseCommand; uses core/secrets.
+ */
 export default class SecretRemove extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Secret name to remove', required: true}),

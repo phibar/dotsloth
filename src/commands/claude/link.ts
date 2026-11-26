@@ -5,6 +5,12 @@ import {printLinkResult} from '../../cli/format.js'
 import {linkClaude} from '../../core/claude.js'
 import {getConfig} from '../../core/config.js'
 
+/**
+ * Purpose: Claude Code's settings are shared through the dotsloth store.
+ *
+ * Intention: extends BaseCommand; uses core/claude, core/config and
+ * cli/format.
+ */
 export default class ClaudeLink extends BaseCommand {
   static override description = 'Share Claude Code settings between machines via the dotsloth store'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']

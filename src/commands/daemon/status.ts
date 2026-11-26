@@ -2,6 +2,11 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {getDaemonStatus} from '../../core/daemon.js'
 
+/**
+ * Purpose: see whether the periodic sync runs and when it last ran.
+ *
+ * Intention: extends BaseCommand; uses core/daemon.
+ */
 export default class DaemonStatus extends BaseCommand {
   static override description = 'Show whether periodic sync is installed and when it last ran'
   static override examples = ['<%= config.bin %> <%= command.id %>']

@@ -2,6 +2,13 @@ import chalk from 'chalk'
 
 import type {EnvTransfer} from '../core/env.js'
 
+/**
+ * Purpose: an env push or pull shows which files moved and which were
+ * left, so nothing is overwritten unseen.
+ *
+ * Intention: uses core/env; used by `env push|pull`.
+ */
+
 /** One line per env file a push or pull touched or skipped. */
 export function printEnvTransfer(
   log: (message?: string) => void,

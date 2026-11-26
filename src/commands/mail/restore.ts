@@ -3,6 +3,12 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {applyMailRestore, type MailRestorePlan, planMailRestore} from '../../core/mail.js'
 
+/**
+ * Purpose: on a new machine, recreate Mail's rules and signatures and list
+ * the accounts to sign into again.
+ *
+ * Intention: extends BaseCommand; uses core/mail.
+ */
 export default class MailRestore extends BaseCommand {
   static override description = 'Recreate Mail signatures and rules, and list the accounts to re-add'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']

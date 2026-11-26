@@ -1,5 +1,11 @@
 import {z} from 'zod'
 
+/**
+ * Purpose: config.json has one shape, checked the same way in the CLI, the
+ * server and the web app.
+ *
+ * Intention: Zod schemas; used by lib, core, the server and the web app.
+ */
 export const OrganizationSchema = z.object({
   folderName: z.string(),
   gitEmail: z.string().email(),

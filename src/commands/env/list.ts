@@ -3,6 +3,12 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {scanEnv} from '../../core/env.js'
 
+/**
+ * Purpose: see which env files the repositories hold and whether each is
+ * backed up.
+ *
+ * Intention: extends BaseCommand; uses core/env.
+ */
 const STATE_LABEL = {
   differs: chalk.yellow('differs'),
   identical: chalk.green('in sync'),

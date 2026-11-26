@@ -3,6 +3,12 @@ import chalk from 'chalk'
 import {BaseCommand} from '../cli/base-command.js'
 import {getStatus, type Status as StatusData} from '../core/status.js'
 
+/**
+ * Purpose: see at a glance whether this machine is in the state dotsloth
+ * keeps.
+ *
+ * Intention: extends BaseCommand; uses core/status.
+ */
 export default class Status extends BaseCommand {
   static override description = 'Show current dotsloth configuration status'
   static override examples = ['<%= config.bin %> <%= command.id %>']

@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.11.6
+
+### Patch Changes
+
+- [#150](https://github.com/phibar/dotsloth/pull/150) [`e805072`](https://github.com/phibar/dotsloth/commit/e8050721a0103a43e67462b10148b79c5176bc02) Thanks [@phibar](https://github.com/phibar)! - A runner added with the label `desktop` runs in the logged-in desktop's session, so Safari 27's `safaridriver` launches on it. Re-add an existing desktop runner to take this on.
+
 ## 0.11.5
 
 ### Patch Changes

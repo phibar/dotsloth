@@ -1,0 +1,57 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:faab61dc04633510f6e88f5cff58b91ef7b45d72",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@faab61dc04633510f6e88f5cff58b91ef7b45d72"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "After #133, six commands were noticed without headers; a count found 124 files (79 src, 21 web, 24 tests). Philipp chose the whole tree layer by layer: #136 with sub-issues #137-#142, core first.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Option (b) of three: whole tree per layer, over the six commands alone (a) or all commands (c)."
+        },
+        {
+          "@type": "Decision",
+          "text": "Each Purpose drawn from the README's \"What it does\" and the file's callers (grep of core/<x>.js imports); the record (commits, notes) said only what files do."
+        },
+        {
+          "@type": "Decision",
+          "text": "Header right below the imports, above re-exports too. Existing comments there (env, errors, events, mail, secrets) stay unchanged below the header; in errors and events that comment documents the first type, so the editor's hover shows it rather than the header."
+        },
+        {
+          "@type": "Decision",
+          "text": "Empty changeset: comments only, no release."
+        },
+        {
+          "@type": "Decision",
+          "text": "The 43 existing headers, such as runner/*, are left as they are (#136 Left out).",
+          "governs": [
+            {
+              "@id": "oasis://github:phibar/dotsloth/issues/136"
+            }
+          ]
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "\"yeah go for it\" (option b), \"yes go for it\" (open #136-#142, the 13 core headers as drafted), \"go ahead\" (commit and PR).",
+          "by": "Philipp"
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "#138 lib, #139 server, #140 cli and commands, #141 web, #142 tests, in that order, each drafted for Philipp's yes.",
+          "issue": {
+            "@id": "oasis://github:phibar/dotsloth/issues/138"
+          }
+        }
+      ]
+    }
+  ]
+}

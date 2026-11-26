@@ -5,6 +5,15 @@ import {pullEnv, pushEnv, scanEnv} from '../../src/core/env.js'
 import {PATHS} from '../../src/lib/paths.js'
 import {resetHome} from '../helpers.js'
 
+/**
+ * Purpose: env files survive a reinstall: a push copies them to the
+ * store, a pull restores them into cloned repositories, a differing
+ * copy is overwritten only when forced, and a scan returns no file
+ * contents.
+ *
+ * Intention: repositories and the store are folders in the throwaway
+ * HOME.
+ */
 describe('core/env', () => {
   const repo = () => path.join(PATHS.githubRoot, 'acme', 'web')
   const local = (name = '.env') => path.join(repo(), name)

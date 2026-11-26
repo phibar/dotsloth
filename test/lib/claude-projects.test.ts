@@ -3,6 +3,14 @@ import {expect} from 'chai'
 import {slugify} from '../../src/lib/claude-projects.js'
 
 /**
+ * Purpose: a project's path maps to the folder name Claude Code gives
+ * it, the same on every machine.
+ *
+ * Intention: a table of paths and their folder names, one per character
+ * class.
+ */
+
+/**
  * The mapping is lossy, so getting it right in the forward direction is the
  * only thing standing between memory sync and silently mis-filing it. Each
  * case below pins one character class that collapses to a dash.

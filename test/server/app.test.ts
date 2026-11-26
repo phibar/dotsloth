@@ -11,6 +11,17 @@ import {cookieName} from '../../src/server/security.js'
 import {EMPTY_SYSTEM, fakeBinaries, resetHome} from '../helpers.js'
 import {COOKIE, ORIGIN, PORT, readSse, signedIn, TOKEN, testApp} from './client.js'
 
+/**
+ * Purpose: only the tab `dotsloth ui` opened reaches the server: a
+ * foreign Host, a missing cookie and a change from another origin are
+ * refused; the built app is served, jobs stream live and resume, and
+ * the server listens on 127.0.0.1.
+ *
+ * Intention: runs createApp in-process through test/server/client, one
+ * app per test; startServer on a port of its own for the last;
+ * EMPTY_SYSTEM stands in for the system tools.
+ */
+
 // One app per test: jobs live in its runner, so requests within a test must share it.
 let app = testApp()
 const request = (path: string, init: RequestInit & {headers?: Record<string, string>} = {}) => signedIn(app, path, init)

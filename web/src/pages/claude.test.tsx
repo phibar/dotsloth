@@ -4,6 +4,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {installFakeEventSource, mockApi, renderWithToasts} from '../test-utils.js'
 import {ClaudePage} from './claude.js'
 
+/**
+ * Purpose: the Claude page shows the shared settings and pushes memory
+ * only after its preview.
+ *
+ * Intention: renders the page against mockApi's answers and drives the
+ * job's SSE stream with FakeEventSource.
+ */
+
 beforeEach(() => installFakeEventSource())
 afterEach(() => {
   cleanup()

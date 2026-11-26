@@ -4,6 +4,13 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {FakeEventSource, installFakeEventSource, mockApi, renderWithToasts} from '../test-utils.js'
 import {EnvPage} from './env.js'
 
+/**
+ * Purpose: the env page previews a push and then overwrites only the
+ * conflicts ticked.
+ *
+ * Intention: renders the page against mockApi's answers and drives the
+ * job's SSE stream with FakeEventSource.
+ */
 describe('env page', () => {
   beforeEach(() => installFakeEventSource())
   afterEach(() => {

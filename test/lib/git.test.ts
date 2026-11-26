@@ -2,6 +2,12 @@ import {expect} from 'chai'
 
 import {parseGitUrl} from '../../src/lib/git.js'
 
+/**
+ * Purpose: a repository URL is read only when it is a whole SSH or
+ * HTTPS address.
+ *
+ * Intention: parses strings; nothing runs git.
+ */
 describe('parseGitUrl', () => {
   it('parses SSH and HTTPS URLs', () => {
     expect(parseGitUrl('git@github.com:phibar/dotsloth.git')).to.deep.equal({

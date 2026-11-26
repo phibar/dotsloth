@@ -4,6 +4,14 @@ import * as path from 'node:path'
 
 import {PATHS} from '../src/lib/paths.js'
 
+/**
+ * Purpose: a test reaches a throwaway HOME and stand-ins for the system
+ * tools, never the real Keychain, ssh-agent or launchd.
+ *
+ * Intention: used by the core, lib and server tests; the HOME is the
+ * one test/setup.ts sets.
+ */
+
 /** Empty the throwaway HOME from test/setup.ts, optionally with iCloud Drive present. */
 export function resetHome({icloud = true} = {}): void {
   const home = os.homedir()

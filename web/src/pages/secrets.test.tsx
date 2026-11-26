@@ -4,6 +4,13 @@ import {afterEach, describe, expect, it, vi} from 'vitest'
 import {mockApi, renderWithToasts} from '../test-utils.js'
 import {REVEAL_SECONDS, SecretsPage} from './secrets.js'
 
+/**
+ * Purpose: the secrets page shows names with masked values, reveals one
+ * and hides it again, copies without showing, and stores a new name
+ * upper-cased, replacing an existing one only explicitly.
+ *
+ * Intention: renders the page against mockApi's answers.
+ */
 describe('secrets page', () => {
   afterEach(() => {
     cleanup()

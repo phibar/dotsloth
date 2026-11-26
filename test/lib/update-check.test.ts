@@ -1,12 +1,14 @@
-/*
- * Purpose: Pin the promises of src/lib/update-check.ts.
- * Intention: uses a temp state file via the fake HOME from test/setup.ts.
- */
-
 import {expect} from 'chai'
 import {readState, saveUpdateCheckState} from '../../src/lib/state.js'
 import {checkForUpdate} from '../../src/lib/update-check.js'
 
+/**
+ * Purpose: a newer release is reported only when it is newer than this
+ * one, from a cache under a day old unless a fresh answer is asked for.
+ *
+ * Intention: the cache is the state file in the throwaway HOME; fetch
+ * is replaced where npm is asked.
+ */
 describe('update-check', () => {
   describe('checkForUpdate', () => {
     it('returns null when the cached version matches current', async () => {

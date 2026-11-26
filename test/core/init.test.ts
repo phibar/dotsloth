@@ -8,6 +8,17 @@ import {getIcloudDotfilePath, PATHS} from '../../src/lib/paths.js'
 import {codeOf as asyncCodeOf, codeOfCall as codeOf} from '../__testdata__/repos.js'
 import {EMPTY_SYSTEM, fakeBinaries, resetHome} from '../helpers.js'
 
+/**
+ * Purpose: a new machine reaches the state dotsloth keeps, every step
+ * reported, an existing config kept and local dotfiles backed up; it
+ * stops without iCloud Drive or a user name, and replaces a broken
+ * config only with --force.
+ *
+ * Intention: EMPTY_SYSTEM's stand-ins answer for security, ssh-add,
+ * osascript and launchctl; the throwaway HOME is reset with or without
+ * iCloud Drive.
+ */
+
 function writeRawConfig(content: string): void {
   fs.mkdirSync(path.dirname(PATHS.icloudConfig), {recursive: true})
   fs.writeFileSync(PATHS.icloudConfig, content, 'utf8')

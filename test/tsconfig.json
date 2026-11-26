@@ -1,3 +1,9 @@
+/**
+ * Purpose: the tests are type-checked against the source they test.
+ *
+ * Intention: extends the root tsconfig and emits nothing.
+ */
+
 {
   "extends": "../tsconfig",
   "compilerOptions": {

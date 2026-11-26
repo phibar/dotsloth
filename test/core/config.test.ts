@@ -4,6 +4,13 @@ import {CoreError} from '../../src/core/errors.js'
 import {getDefaultConfig, readConfig} from '../../src/lib/config.js'
 import {resetHome} from '../helpers.js'
 
+/**
+ * Purpose: a change to config.json through core is validated whole,
+ * names every field it refuses, and leaves the file as it was.
+ *
+ * Intention: writes the config into the throwaway HOME's iCloud store
+ * and reads it back through lib/config.
+ */
 describe('core/config', () => {
   beforeEach(() => resetHome())
 

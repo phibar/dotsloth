@@ -4,6 +4,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {installFakeEventSource, mockApi, renderWithToasts} from '../test-utils.js'
 import {MailPage} from './mail.js'
 
+/**
+ * Purpose: the Mail page touches Mail only when asked, and a restore
+ * creates only what is missing after its preview.
+ *
+ * Intention: renders the page against mockApi's answers and drives the
+ * job's SSE stream with FakeEventSource.
+ */
+
 beforeEach(() => installFakeEventSource())
 afterEach(() => {
   cleanup()

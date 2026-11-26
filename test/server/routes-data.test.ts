@@ -7,6 +7,15 @@ import {PATHS} from '../../src/lib/paths.js'
 import {EMPTY_SYSTEM, FAKE_SECURITY, fakeBinaries, resetHome} from '../helpers.js'
 import {mutate, readSse, signedIn, testApp} from './client.js'
 
+/**
+ * Purpose: the web API reaches secrets, env files, the doctor, Mail and
+ * Claude Code as the CLI does, revealing one secret value on POST only
+ * and never an env file's contents.
+ *
+ * Intention: runs createApp in-process through test/server/client; a
+ * shell stand-in for security keeps the Keychain in a file.
+ */
+
 // One app per test: jobs live in its runner, so requests within a test must share it.
 let app = testApp()
 const request = (path: string, init: RequestInit & {headers?: Record<string, string>} = {}) => signedIn(app, path, init)

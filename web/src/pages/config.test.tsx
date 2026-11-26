@@ -5,6 +5,15 @@ import {changedHunks, lineDiff} from '../diff.js'
 import {renderWithToasts} from '../test-utils.js'
 import {ConfigPage, validateConfigText} from './config.js'
 
+/**
+ * Purpose: config.json is edited validated by the server's schema, its
+ * changes shown as a diff, saved with the version it was loaded at, and
+ * a conflict reported.
+ *
+ * Intention: renders the editor against a fetch stub that answers with
+ * an ETag, as the server does, and records If-Match.
+ */
+
 const CONFIG = {
   organizations: [{folderName: 'acme', gitEmail: 'dev@acme.test', gitUsername: 'dev', name: 'acme'}],
   paths: {githubRoot: '/Users/me/github'},

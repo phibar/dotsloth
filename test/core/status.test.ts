@@ -7,6 +7,15 @@ import {getDefaultConfig} from '../../src/lib/config.js'
 import {PATHS} from '../../src/lib/paths.js'
 import {EMPTY_SYSTEM, fakeBinaries, resetHome} from '../helpers.js'
 
+/**
+ * Purpose: status shows whether this machine is in the state dotsloth
+ * keeps, reports a missing or broken config instead of failing, and
+ * writes nothing.
+ *
+ * Intention: EMPTY_SYSTEM stands in for the system tools; the config is
+ * written into the throwaway HOME.
+ */
+
 function writeRawConfig(content: string): void {
   fs.mkdirSync(path.dirname(PATHS.icloudConfig), {recursive: true})
   fs.writeFileSync(PATHS.icloudConfig, content, 'utf8')

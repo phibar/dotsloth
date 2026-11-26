@@ -1,3 +1,10 @@
+/*
+ * Purpose: every view of the web UI shares one look, light and dark.
+ *
+ * Intention: holds the tokens on :root that the components' classes
+ * take.
+ */
+
 :root {
   --bg: #f7f7f5;
   --surface: #ffffff;

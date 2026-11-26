@@ -7,6 +7,13 @@ import {expect} from 'chai'
 import {auditRepo, isAtRisk} from '../../src/lib/repo-audit.js'
 
 /**
+ * Purpose: work that exists only on this machine is counted: modified,
+ * untracked and stashed, while an env file the store backs up is not.
+ *
+ * Intention: real git repositories in temp folders.
+ */
+
+/**
  * doctor is the wipe gate, so the property that matters is that it can
  * actually reach zero once everything is backed up.
  */

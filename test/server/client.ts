@@ -3,6 +3,14 @@ import type {Hono} from 'hono'
 import {createApp} from '../../src/server/app.js'
 import {cookieName} from '../../src/server/security.js'
 
+/**
+ * Purpose: a server test sends requests as the signed-in browser tab
+ * does.
+ *
+ * Intention: builds createApp with a fixed port and token; used by the
+ * server tests.
+ */
+
 export const PORT = 4711
 export const TOKEN = 'test-token-0123456789'
 export const HOST = `127.0.0.1:${PORT}`

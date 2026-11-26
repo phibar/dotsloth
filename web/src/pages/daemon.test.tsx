@@ -5,6 +5,13 @@ import {mockApi, renderWithToasts} from '../test-utils.js'
 import {DaemonPage} from './daemon.js'
 import {formatInterval} from './dashboard.js'
 
+/**
+ * Purpose: the periodic sync is installed with the chosen interval and
+ * removed only after asking.
+ *
+ * Intention: renders the page against mockApi's answers.
+ */
+
 const DAEMON = {
   installed: true,
   intervalSeconds: 86_400,

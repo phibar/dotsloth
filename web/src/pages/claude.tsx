@@ -5,6 +5,12 @@ import {Button, Card, Dot, ErrorNote, type Tone, useLoad} from '../components/ui
 import {useToast} from '../toast.js'
 import {useJob} from '../use-job.js'
 
+/**
+ * Purpose: share Claude Code's settings, memory and history between
+ * machines.
+ *
+ * Intention: uses api, ui and toast; reached through app.
+ */
 const FILE_STATE: Record<ClaudeStatus['files'][number]['state'], {label: string; tone: Tone}> = {
   absent: {label: 'not present', tone: 'muted'},
   'local-only': {label: 'local only - not shared yet', tone: 'warn'},

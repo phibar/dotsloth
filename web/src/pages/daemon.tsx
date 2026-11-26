@@ -5,6 +5,11 @@ import {Button, Card, ConfirmDialog, Dot, ErrorNote, useLoad} from '../component
 import {useToast} from '../toast.js'
 import {formatInterval} from './dashboard.js'
 
+/**
+ * Purpose: turn the periodic sync on or off and set how often it runs.
+ *
+ * Intention: uses api, ui and toast; reached through app.
+ */
 const PRESETS = [3600, 6 * 3600, 12 * 3600, 86_400]
 
 function describeState(d: {installed: boolean; loaded: boolean}): string {

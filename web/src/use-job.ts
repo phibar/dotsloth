@@ -2,6 +2,13 @@ import {useEffect, useState} from 'react'
 
 import type {JobSnapshot} from './api.js'
 
+/**
+ * Purpose: a page follows a running job and picks up where it left off
+ * after a reconnect.
+ *
+ * Intention: uses EventSource over the server's job stream; used by the
+ * pages that start jobs.
+ */
 export interface JobState<E, R> {
   error?: JobSnapshot['error']
   events: E[]

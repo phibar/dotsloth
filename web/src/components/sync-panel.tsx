@@ -5,6 +5,13 @@ import {useToast} from '../toast.js'
 import {useJob} from '../use-job.js'
 import {Button, Card, Dot} from './ui.js'
 
+/**
+ * Purpose: run a sync from the UI and see each step as it happens.
+ *
+ * Intention: uses api and use-job; shown on the dashboard and the config
+ * page.
+ */
+
 /** "Sync now": runs a sync job and lists each step as it reports back. */
 export function SyncPanel({onDone}: {onDone?: () => void}) {
   const toast = useToast()

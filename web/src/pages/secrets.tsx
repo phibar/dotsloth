@@ -4,6 +4,12 @@ import {api} from '../api.js'
 import {Button, Card, ConfirmDialog, ErrorNote, useLoad} from '../components/ui.js'
 import {useToast} from '../toast.js'
 
+/**
+ * Purpose: manage the Keychain secrets, revealing one value for a few
+ * seconds.
+ *
+ * Intention: uses api, ui and toast; reached through app.
+ */
 export const REVEAL_SECONDS = 30
 
 export function SecretsPage() {

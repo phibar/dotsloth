@@ -1,5 +1,11 @@
 import {useEffect, useState} from 'react'
 
+/**
+ * Purpose: the UI follows the system's light or dark mode, or the person's
+ * choice, remembered per browser.
+ *
+ * Intention: used by app.
+ */
 export type Theme = 'dark' | 'light' | 'system'
 
 const KEY = 'dotsloth-theme'

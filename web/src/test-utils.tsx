@@ -4,6 +4,13 @@ import {vi} from 'vitest'
 
 import {ToastProvider} from './toast.js'
 
+/**
+ * Purpose: page tests run against a stand-in for the server, never the
+ * real one.
+ *
+ * Intention: answers fetch by method and path and fakes EventSource; used
+ * by the web tests.
+ */
 type Handler = (body: unknown) => [number, unknown]
 
 /**

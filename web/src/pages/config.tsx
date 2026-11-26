@@ -7,6 +7,12 @@ import {Button, Card, Dot, ErrorNote, useLoad} from '../components/ui.js'
 import {changedHunks, lineDiff} from '../diff.js'
 import {useToast} from '../toast.js'
 
+/**
+ * Purpose: edit config.json directly, validated as the server validates
+ * it, with the changes shown before saving.
+ *
+ * Intention: uses api, ui and toast; reached through app.
+ */
 const pretty = (config: DevSlothConfig) => JSON.stringify(config, null, 2)
 
 /** Parse and validate JSON with the same schema the server uses. */

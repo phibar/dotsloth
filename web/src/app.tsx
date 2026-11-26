@@ -15,6 +15,12 @@ import {SecretsPage} from './pages/secrets.js'
 import {SECTIONS, type Section, useRoute} from './routes.js'
 import {type Theme, useTheme} from './theme.js'
 
+/**
+ * Purpose: one shell for every section of the web UI: navigation, theme
+ * and the config's state at a glance.
+ *
+ * Intention: uses routes for the sections, theme and api; mounted by main.
+ */
 const THEMES: Theme[] = ['system', 'light', 'dark']
 
 export function App() {

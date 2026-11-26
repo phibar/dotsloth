@@ -5,6 +5,11 @@ import {Button, Card, Dot, type Tone} from '../components/ui.js'
 import {useToast} from '../toast.js'
 import {useJob} from '../use-job.js'
 
+/**
+ * Purpose: back up and restore Mail's rules and signatures.
+ *
+ * Intention: uses api, ui and toast; reached through app.
+ */
 const AUTOMATION_NOTE =
   'This talks to Mail via AppleScript. The first time, macOS asks whether dotsloth may control Mail - allow it.'
 

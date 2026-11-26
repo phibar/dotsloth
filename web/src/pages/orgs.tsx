@@ -8,6 +8,11 @@ import {useToast} from '../toast.js'
 import {useJob} from '../use-job.js'
 import {OrgClonePanel} from './org-clone-panel.js'
 
+/**
+ * Purpose: add, change, remove and clone into organisations.
+ *
+ * Intention: uses api, ui and toast; reached through app.
+ */
 type Editing = {mode: 'add'} | {mode: 'edit'; org: OrgInfo}
 
 export function OrganizationsPage() {

@@ -1,3 +1,8 @@
+/**
+ * Purpose: show what a config edit changes before it is saved.
+ *
+ * Intention: a line diff; used by pages/config.
+ */
 export interface DiffLine {
   text: string
   type: 'add' | 'remove' | 'same'

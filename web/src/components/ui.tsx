@@ -1,5 +1,10 @@
 import {type ButtonHTMLAttributes, type ReactNode, useCallback, useEffect, useState} from 'react'
 
+/**
+ * Purpose: the building blocks every page shares look and behave alike.
+ *
+ * Intention: buttons, dots, cards and dialogs; used by every page.
+ */
 export function Button({
   busy = false,
   children,

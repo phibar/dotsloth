@@ -1,0 +1,61 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:2eb57af170140cd7c99829d85e566069cbc06e74",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@2eb57af170140cd7c99829d85e566069cbc06e74"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Last step of #136: headers for the tests, after #148 left one suite per file.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Placement option c (Philipp): header right below the imports; fixtures already above a describe stay there, so in 19 files the header is not the describe's doc-comment. Options a (refactor fixtures into the suites and the copies into __testdata__) and b (header directly above describe) were weighed and set aside. This bends file-header.md's \"every fixture only it uses inside it\" by Philipp's choice."
+        },
+        {
+          "@type": "Decision",
+          "text": "Each Purpose drawn from the tested module's own header narrowed to what the test titles check; each Intention names the host and stand-ins (throwaway HOME, EMPTY_SYSTEM, shell stand-ins, mockApi, FakeEventSource)."
+        },
+        {
+          "@type": "Decision",
+          "text": "The seven real headers already present (core/runners, core/clone-org, server/runners, cli/base-command, commands/clone, pages/runners, components/job-log) stay; update-check and topics (\"Pin the promises of ...\") replaced and moved below the imports."
+        },
+        {
+          "@type": "Decision",
+          "text": "Older file-level comments (symlink, mail, claude-history, claude-projects, repo-audit, setup) stay below the header."
+        },
+        {
+          "@type": "Decision",
+          "text": "helpers.ts, setup.ts, server/client.ts, test/tsconfig.json (JSONC comment) and web/src/styles.css (missed by #141) carry headers too. Empty changeset.",
+          "governs": [
+            {
+              "@id": "oasis://github:phibar/dotsloth/issues/141"
+            }
+          ]
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "\"c\" for placement; \"yes\" to the drafts; \"yes\" to commit and open the PR.",
+          "by": "Philipp"
+        }
+      ],
+      "discussed": [
+        "`tsc --noEmit -p test` fails with TS6306 (referenced root project lacks composite) on main as well; it is not part of the tree's check."
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "Copies left in place: HOSTILE (exec, keychain), testApp/request (three server tests), respond (api, app), writeRawConfig (init, status), STATUS fixtures. Not raised as an issue."
+        },
+        {
+          "@type": "Deferral",
+          "text": "test/tsconfig.json's TS6306 noticed only."
+        }
+      ]
+    }
+  ]
+}

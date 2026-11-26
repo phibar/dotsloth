@@ -8,6 +8,16 @@ import {getDefaultConfig, readConfig, saveConfig} from '../../src/lib/config.js'
 import {getOrgGitconfigPath, PATHS} from '../../src/lib/paths.js'
 import {EMPTY_SYSTEM, fakeBinaries, resetHome} from '../helpers.js'
 
+/**
+ * Purpose: each organisation's git identity applies to every repository
+ * in its folder: adding, updating and removing an org writes its
+ * config, gitconfig and folder and syncs; repositories are deleted only
+ * when asked, and the GitHub root never.
+ *
+ * Intention: EMPTY_SYSTEM stands in for the system tools; the config
+ * and the org folders live in the throwaway HOME.
+ */
+
 async function expectCoreError(promise: Promise<unknown> | (() => unknown), code: string): Promise<CoreError> {
   try {
     await (typeof promise === 'function' ? promise() : promise)

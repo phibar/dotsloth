@@ -7,6 +7,14 @@ import {PLIST_PATH} from '../../src/lib/daemon.js'
 import {codeOfCall as codeOf} from '../__testdata__/repos.js'
 import {fakeBinaries, resetHome} from '../helpers.js'
 
+/**
+ * Purpose: the periodic sync is installed, reported and removed as one
+ * LaunchAgent, and an interval below a minute is refused before launchd
+ * is touched.
+ *
+ * Intention: a shell stand-in for launchctl answers in the throwaway
+ * HOME, so no real agent is loaded.
+ */
 describe('core/daemon', () => {
   let restorePath: () => void
   let launchctlLog: string

@@ -2,6 +2,13 @@ import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 
+/**
+ * Purpose: every test run writes into a throwaway HOME, never the real
+ * config, gitconfigs or iCloud store.
+ *
+ * Intention: required first by .mocharc.json.
+ */
+
 // Every test runs against a throwaway HOME. PATHS is computed from it when
 // src/lib/paths.ts is first imported, so this has to run before any test file
 // loads - .mocharc.json requires it first. Without it, tests that write the

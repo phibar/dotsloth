@@ -13,6 +13,15 @@ import {PATHS} from '../../src/lib/paths.js'
 import {codeOf, makeRepo} from '../__testdata__/repos.js'
 import {EMPTY_SYSTEM, fakeBinaries, resetHome} from '../helpers.js'
 
+/**
+ * Purpose: a repository lands in its organisation's folder, so the
+ * org's git identity applies from the first commit; an unknown org
+ * waits for a decision, and a target outside the org folder is refused.
+ *
+ * Intention: clones local bare repositories built by __testdata__/repos
+ * into the throwaway HOME; EMPTY_SYSTEM stands in for the system tools.
+ */
+
 const acme = {folderName: 'acme', gitEmail: 'dev@acme.test', gitUsername: 'dev', name: 'acme'}
 
 describe('core/clone', () => {

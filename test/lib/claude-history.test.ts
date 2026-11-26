@@ -5,6 +5,16 @@ import {expect} from 'chai'
 import {mergeHistory, sessionFiles} from '../../src/lib/claude-history.js'
 import type {ClaudeProject} from '../../src/lib/claude-projects.js'
 
+/**
+ * Purpose: a conversation started on one machine can be continued on
+ * another: a session is found on either side, a live one is marked
+ * active, and the history logs merge without losing or doubling an
+ * entry.
+ *
+ * Intention: the local and the store's project folders are temp
+ * folders; a freshly written session file counts as live.
+ */
+
 const write = (dir: string, name: string, body = '{"type":"x"}\n') => {
   fs.mkdirSync(dir, {recursive: true})
   fs.writeFileSync(path.join(dir, name), body, 'utf8')

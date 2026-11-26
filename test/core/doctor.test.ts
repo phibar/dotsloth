@@ -8,6 +8,14 @@ import {PATHS} from '../../src/lib/paths.js'
 import {makeRepo} from '../__testdata__/repos.js'
 import {resetHome} from '../helpers.js'
 
+/**
+ * Purpose: the doctor names every repository and env file a wipe would
+ * lose, and reports nothing where nothing is at risk.
+ *
+ * Intention: repositories with work only on this machine and unsaved
+ * env files are laid out by __testdata__/repos under the throwaway
+ * HOME's GitHub root.
+ */
 describe('core/doctor', () => {
   beforeEach(() => resetHome())
 

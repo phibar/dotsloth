@@ -5,6 +5,14 @@ import {expect} from 'chai'
 
 import {addSecret, deleteSecret, getSecret, isValidSecretName} from '../../src/lib/keychain.js'
 
+/**
+ * Purpose: a secret value reaches security as one literal argument, and
+ * a name that is no shell identifier is refused before security runs.
+ *
+ * Intention: a stand-in for security in a temp folder records the
+ * arguments it receives.
+ */
+
 /** Input that would run a command if it ever reached a shell. */
 const HOSTILE = ['"; touch PWNED; "', '$(touch PWNED)', '`touch PWNED`', "'; touch PWNED; '"]
 

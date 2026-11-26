@@ -1,14 +1,18 @@
-/*
- * Purpose: Pin the promises of src/lib/topics.ts.
- * Intention: uses a temp githubRoot to avoid touching the real ~/github/topics.
- */
-
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import {expect} from 'chai'
 
 import {buildTopicMap, pruneTopicSymlinks, syncTopicSymlinks} from '../../src/lib/topics.js'
+
+/**
+ * Purpose: ~/github/topics/<topic>/<repo> links each repository under
+ * each of its GitHub topics, without doubling on a re-run, and prunes a
+ * link whose repository left the topic.
+ *
+ * Intention: a temp folder stands in for ~/github; a dry run is checked
+ * to write nothing.
+ */
 
 function makeRepo(root: string, org: string, name: string): string {
   const repoPath = path.join(root, org, name)

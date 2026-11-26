@@ -4,6 +4,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {FakeEventSource, installFakeEventSource, mockApi, renderWithToasts} from '../test-utils.js'
 import {DoctorPage} from './doctor.js'
 
+/**
+ * Purpose: the doctor page shows progress, each repository at risk as
+ * it arrives, and the verdict.
+ *
+ * Intention: renders the page against mockApi's answers and drives the
+ * job's SSE stream with FakeEventSource.
+ */
+
 beforeEach(() => installFakeEventSource())
 afterEach(() => {
   cleanup()

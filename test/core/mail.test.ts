@@ -7,6 +7,16 @@ import {mailInstalled, writeExport} from '../../src/lib/mail.js'
 import {codeOfAwaitedCall as codeOf} from '../__testdata__/repos.js'
 import {fakeBinaries, resetHome} from '../helpers.js'
 
+/**
+ * Purpose: Mail's rules and signatures are exported to the store and
+ * recreated where missing, a plan leaving Mail unchanged; without Mail,
+ * an export is refused and everything plans as missing.
+ *
+ * Intention: a shell stand-in for osascript answers as Mail would; each
+ * inner suite runs only on the machine it describes, so one of them is
+ * pending on every run.
+ */
+
 const STORED = {
   accounts: [
     {emails: ['me@work.test'], name: 'Work', port: null, server: null, type: 'imap', user: 'me'},

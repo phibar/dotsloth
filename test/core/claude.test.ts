@@ -20,6 +20,17 @@ import {PATHS} from '../../src/lib/paths.js'
 import {codeOfAwaitedCall as codeOf} from '../__testdata__/repos.js'
 import {resetHome} from '../helpers.js'
 
+/**
+ * Purpose: Claude Code's settings, memory and history reach the store
+ * and come back on another machine: settings linked and recorded in the
+ * config, memory copied and its index merged, finished sessions copied
+ * while a live one stays.
+ *
+ * Intention: runs core/claude against the throwaway HOME of
+ * test/setup.ts, with a ~/.claude and the iCloud store written into it
+ * before each test.
+ */
+
 const write = (file: string, content: string) => {
   fs.mkdirSync(path.dirname(file), {recursive: true})
   fs.writeFileSync(file, content, 'utf8')

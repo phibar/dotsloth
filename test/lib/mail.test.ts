@@ -5,6 +5,15 @@ import type {MailRule, MailSignature} from '../../src/lib/mail.js'
 import {asLiteral, howToAdd, ruleScript, signatureScript} from '../../src/lib/mail.js'
 
 /**
+ * Purpose: Mail's rules and signatures become AppleScript that
+ * recreates them, every string kept inside its literal; an account's
+ * hint names where its type is added.
+ *
+ * Intention: reads the script text the module builds; nothing runs
+ * osascript.
+ */
+
+/**
  * Restore generates AppleScript with signature bodies and rule expressions
  * embedded in it, so escaping is both a correctness problem and the only thing
  * between a rule expression and arbitrary code execution.

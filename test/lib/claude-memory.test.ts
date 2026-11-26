@@ -2,6 +2,12 @@ import {expect} from 'chai'
 
 import {mergeIndex} from '../../src/lib/claude-memory.js'
 
+/**
+ * Purpose: the memory index of two machines merges into one, losing no
+ * line and doubling none.
+ *
+ * Intention: merges strings; no file is read.
+ */
 describe('mergeIndex', () => {
   it('unions bullet lines from both machines', () => {
     const local = '# Memory\n\n- [A](a.md) — hook a\n- [B](b.md) — hook b\n'

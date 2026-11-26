@@ -4,6 +4,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {FakeEventSource, installFakeEventSource, mockApi, renderWithToasts} from '../test-utils.js'
 import {Dashboard} from './dashboard.js'
 
+/**
+ * Purpose: the dashboard sums up this machine and runs a sync, listing
+ * its steps.
+ *
+ * Intention: renders the page against mockApi's answers and drives the
+ * job's SSE stream with FakeEventSource.
+ */
+
 const config = {
   organizations: [{folderName: 'acme', gitEmail: 'dev@acme.test', gitUsername: 'dev', name: 'acme'}],
   paths: {githubRoot: '/gh'},

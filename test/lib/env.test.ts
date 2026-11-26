@@ -5,6 +5,13 @@ import {expect} from 'chai'
 
 import {isEnvFile, isTemplate, scanRepo} from '../../src/lib/env.js'
 
+/**
+ * Purpose: every env file git leaves out is found, in a monorepo too,
+ * while templates, build output and dependencies stay out.
+ *
+ * Intention: matches file names, and scans a repository tree in a temp
+ * folder.
+ */
 describe('lib/env', () => {
   describe('env matching', () => {
     it('matches plain and suffixed env files', () => {

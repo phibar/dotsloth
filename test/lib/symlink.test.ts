@@ -5,6 +5,14 @@ import {expect} from 'chai'
 import {checkSymlink, createSymlink, removeSymlink} from '../../src/lib/symlink.js'
 
 /**
+ * Purpose: the dotfiles in iCloud stand at the paths tools look for
+ * them, and a file already there is backed up rather than destroyed
+ * unless asked; the backup's path is reported rather than printed.
+ *
+ * Intention: links files in a temp folder.
+ */
+
+/**
  * symlink.ts is the module where a bug silently destroys dotfiles, so these
  * tests focus on the destructive paths rather than the happy one.
  */

@@ -2,6 +2,13 @@ import {expect} from 'chai'
 
 import {DAEMON_LABEL, generatePlist, isVersionedNodePath} from '../../src/lib/daemon.js'
 
+/**
+ * Purpose: the LaunchAgent runs dotsloth sync at its interval and at
+ * load, through absolute paths that survive a Node upgrade.
+ *
+ * Intention: reads the plist text the module builds; nothing is
+ * installed.
+ */
 describe('lib/daemon', () => {
   describe('daemon plist', () => {
     const plist = generatePlist({binPath: '/opt/dotsloth/bin/run.js', intervalSeconds: 3600, nodePath: '/usr/bin/node'})

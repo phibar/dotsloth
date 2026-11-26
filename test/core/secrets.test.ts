@@ -6,6 +6,14 @@ import {listSecretNames, removeSecret, revealSecret, secretExists, setSecret} fr
 import {codeOfCall as codeOf} from '../__testdata__/repos.js'
 import {FAKE_SECURITY, fakeBinaries, resetHome} from '../helpers.js'
 
+/**
+ * Purpose: a secret is stored, listed, revealed and removed in the
+ * Keychain under its upper-case name, a hostile value kept intact and
+ * an existing one replaced only when asked.
+ *
+ * Intention: a shell stand-in for security keeps the Keychain in a file
+ * of a temp folder ($FAKE_KEYCHAIN).
+ */
 describe('core/secrets', () => {
   let restorePath: () => void
 

@@ -7,6 +7,15 @@ import {ConfigError, getDefaultConfig, loadConfig, readConfig, saveConfig} from 
 import {PATHS} from '../../src/lib/paths.js'
 import type {DevSlothConfig} from '../../src/types/index.js'
 
+/**
+ * Purpose: config.json is read as it stands and saved whole or not at
+ * all: reading never writes, a broken file is an error rather than no
+ * config, and an invalid config is refused.
+ *
+ * Intention: reads and writes the config in the throwaway HOME's iCloud
+ * store.
+ */
+
 const withOrg = (): DevSlothConfig => ({
   ...getDefaultConfig(),
   organizations: [{folderName: 'acme', gitEmail: 'dev@acme.test', gitUsername: 'dev', name: 'acme'}],

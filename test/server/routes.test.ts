@@ -10,6 +10,16 @@ import {PATHS} from '../../src/lib/paths.js'
 import {EMPTY_SYSTEM, fakeBinaries, resetHome} from '../helpers.js'
 import {mutate, ORIGIN, readSse, signedIn, testApp} from './client.js'
 
+/**
+ * Purpose: the web API gives status, config, sync, the daemon,
+ * organisations and clones as the CLI does, maps core errors to HTTP
+ * status, and refuses unknown fields and a config changed since it was
+ * read.
+ *
+ * Intention: runs createApp in-process through test/server/client under
+ * the throwaway HOME; EMPTY_SYSTEM stands in for the system tools.
+ */
+
 // One app per test: jobs live in its runner, so requests within a test must share it.
 let app = testApp()
 const request = (path: string, init: RequestInit & {headers?: Record<string, string>} = {}) => signedIn(app, path, init)

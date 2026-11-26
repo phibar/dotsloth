@@ -4,6 +4,16 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {FakeEventSource, installFakeEventSource, mockApi, renderWithToasts} from '../test-utils.js'
 import {OrganizationsPage} from './orgs.js'
 
+/**
+ * Purpose: the organisations page adds and removes organisations,
+ * deleting repositories only after the name is typed, and clones a
+ * repository or an organisation by topic, greying out what is already
+ * cloned.
+ *
+ * Intention: renders the page against mockApi's answers and drives the
+ * clone jobs' SSE streams with FakeEventSource.
+ */
+
 const ACME = {
   exists: true,
   folderName: 'acme',

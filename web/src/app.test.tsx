@@ -5,6 +5,14 @@ import {App} from './app.js'
 import {mockApi} from './test-utils.js'
 import {ToastProvider} from './toast.js'
 
+/**
+ * Purpose: the shell shows every section, follows the hash route, and
+ * tells a signed-out browser to open the printed link.
+ *
+ * Intention: renders the app in jsdom against mockApi's answers by
+ * "METHOD /path".
+ */
+
 function respond(status: number, body: unknown) {
   return vi.fn().mockResolvedValue(new Response(JSON.stringify(body), {status}))
 }

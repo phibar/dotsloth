@@ -2,6 +2,14 @@ import {afterEach, describe, expect, it, vi} from 'vitest'
 
 import {ApiError, api} from './api.js'
 
+/**
+ * Purpose: the API client sends JSON and turns an error answer into an
+ * ApiError carrying the server's code and details.
+ *
+ * Intention: replaces fetch with a stub that answers once and records
+ * the request.
+ */
+
 function respond(status: number, body: unknown) {
   return vi.fn().mockResolvedValue(new Response(JSON.stringify(body), {status}))
 }

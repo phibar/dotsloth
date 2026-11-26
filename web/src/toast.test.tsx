@@ -4,6 +4,11 @@ import {afterEach, describe, expect, it} from 'vitest'
 import {ApiError} from './api.js'
 import {ToastProvider, useToast} from './toast.js'
 
+/**
+ * Purpose: an API error reaches the person as a toast with its details.
+ *
+ * Intention: renders the toast provider in jsdom.
+ */
 describe('toasts', () => {
   afterEach(() => cleanup())
 

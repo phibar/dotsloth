@@ -5,6 +5,15 @@ import {expect} from 'chai'
 
 import {ExecError, run, runAsync, runStreaming, tryRun} from '../../src/lib/exec.js'
 
+/**
+ * Purpose: every argument reaches the process literally, never through
+ * a shell, and a failure carries its exit code and stderr; streamed
+ * output arrives line by line, git's \r progress included.
+ *
+ * Intention: runs real processes in a temp folder, where a hostile
+ * argument read by a shell would leave a file behind.
+ */
+
 /** Input that would run a command if it ever reached a shell. */
 const HOSTILE = ['"; touch PWNED; "', '$(touch PWNED)', '`touch PWNED`', "'; touch PWNED; '"]
 

@@ -4,6 +4,14 @@ import * as path from 'node:path'
 import {PATHS} from './paths.js'
 
 /**
+ * Purpose: find the env files git leaves out and keep a copy of each in
+ * iCloud.
+ *
+ * Intention: uses lib/paths for the store; used by core/env and lib/repo-
+ * audit.
+ */
+
+/**
  * Filename patterns that count as a machine-local env file.
  *
  * Deliberately not hardcoded to `.env*`: process-sync keeps a

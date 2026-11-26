@@ -3,6 +3,13 @@ import * as path from 'node:path'
 import {run} from './exec.js'
 import {PATHS} from './paths.js'
 
+/**
+ * Purpose: Mail's rules, signatures and account list leave the machine as
+ * a file and come back as Mail's own.
+ *
+ * Intention: uses osascript through lib/exec and lib/paths for the store;
+ * used by core/mail.
+ */
 export const MAIL_STORE = PATHS.icloudMail
 export const SIGNATURES_DIR = path.join(MAIL_STORE, 'signatures')
 export const ACCOUNTS_FILE = path.join(MAIL_STORE, 'accounts.json')

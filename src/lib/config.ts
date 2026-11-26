@@ -7,6 +7,13 @@ import {DevSlothConfigSchema} from '../types/index.js'
 import {getOrgGitconfigPath, PATHS} from './paths.js'
 
 /**
+ * Purpose: config.json is the one source of truth, read as it stands and
+ * saved whole or not at all.
+ *
+ * Intention: uses the Zod schemas in types and lib/paths; used by core.
+ */
+
+/**
  * Generate and write org gitconfig file (keeps gitconfig in sync with config.json)
  */
 function syncOrgGitconfig(org: Organization): void {

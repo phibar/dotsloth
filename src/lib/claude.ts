@@ -4,6 +4,13 @@ import * as path from 'node:path'
 
 import {PATHS} from './paths.js'
 
+/**
+ * Purpose: name which parts of ~/.claude travel between machines and which
+ * stay on one.
+ *
+ * Intention: uses lib/paths for the iCloud store; used by core/claude and
+ * the history, memory and projects helpers beside it.
+ */
 export const CLAUDE_DIR = path.join(os.homedir(), '.claude')
 
 /** Where Claude Code state is mirrored inside the dotsloth iCloud folder. */

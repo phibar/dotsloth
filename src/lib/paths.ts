@@ -1,6 +1,11 @@
 import * as os from 'node:os'
 import * as path from 'node:path'
 
+/**
+ * Purpose: every place dotsloth reads or writes on disk is named once.
+ *
+ * Intention: used by every helper and core module that touches a file.
+ */
 const home = os.homedir()
 
 export const PATHS = {

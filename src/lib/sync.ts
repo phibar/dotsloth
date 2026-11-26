@@ -8,6 +8,13 @@ import {generateMainGitconfig, readPublicKey, writeAllowedSigners, writeOrgGitco
 import {getIcloudDotfilePath} from './paths.js'
 import {createSymlink} from './symlink.js'
 
+/**
+ * Purpose: bring gitconfigs, allowed signers and symlinks in line with
+ * config.json in one run.
+ *
+ * Intention: uses lib/config, lib/git, lib/symlink and lib/paths; used by
+ * core/sync, core/orgs, core/clone and the CLI's auto-sync output.
+ */
 export interface SyncOptions {
   /** Report what would change without touching the filesystem */
   dryRun?: boolean

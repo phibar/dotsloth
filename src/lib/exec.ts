@@ -1,6 +1,14 @@
 import {execFile, execFileSync, spawn} from 'node:child_process'
 
 /**
+ * Purpose: every process dotsloth starts gets its arguments as an array,
+ * never through a shell.
+ *
+ * Intention: wraps Node's child_process; used by every helper that runs a
+ * program.
+ */
+
+/**
  * Every external process goes through here, always as a command plus an argv
  * array and never as a shell string. With a shell string, a secret value,
  * repository URL or path containing `"`, `$(...)` or a backtick runs

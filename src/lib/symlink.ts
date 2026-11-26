@@ -3,6 +3,13 @@ import * as path from 'node:path'
 
 import type {SymlinkStatus} from '../types/index.js'
 
+/**
+ * Purpose: the dotfiles in iCloud stand at the paths where tools look for
+ * them.
+ *
+ * Intention: uses the types; used by core/init, core/status, core/claude
+ * and lib/sync.
+ */
 export interface SymlinkConfig {
   backup?: boolean
   source: string

@@ -4,6 +4,13 @@ import * as path from 'node:path'
 import {isEnvFile} from './env.js'
 import {runAsync} from './exec.js'
 
+/**
+ * Purpose: find work that exists only on this machine: unpushed or
+ * orphaned branches.
+ *
+ * Intention: uses git through lib/exec and lib/env; used by core/doctor
+ * and the `worktree` commands.
+ */
 export type BranchRisk = 'local-only' | 'merged' | 'unknown'
 
 export interface BranchFinding {

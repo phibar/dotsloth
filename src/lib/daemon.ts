@@ -3,6 +3,13 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import {run} from './exec.js'
 
+/**
+ * Purpose: dotsloth sync runs on its own at an interval, surviving Node
+ * upgrades.
+ *
+ * Intention: writes the launchd plist and drives launchctl through
+ * lib/exec; used by core/daemon.
+ */
 export const DAEMON_LABEL = 'com.phibar.dotsloth.sync'
 
 /** Once a day, per #7. */

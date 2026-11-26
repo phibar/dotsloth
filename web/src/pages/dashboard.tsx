@@ -4,6 +4,12 @@ import {api} from '../api.js'
 import {SyncPanel} from '../components/sync-panel.js'
 import {Card, Dot, ErrorNote, type Tone, useLoad} from '../components/ui.js'
 
+/**
+ * Purpose: see at a glance whether this machine is in the state dotsloth
+ * keeps.
+ *
+ * Intention: uses api, ui and toast; reached through app.
+ */
 function Stat({detail, label, tone, value}: {detail?: string; label: string; tone: Tone; value: string}) {
   return (
     <div className="stat">

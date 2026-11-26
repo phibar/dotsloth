@@ -20,6 +20,14 @@ import type {ApiError as ApiErrorBody} from '../../src/server/errors.js'
 import type {JobSnapshot} from '../../src/server/jobs.js'
 import type {DevSlothConfig} from '../../src/types/index.js'
 
+/**
+ * Purpose: the web UI calls the server with the same types the server
+ * answers with, so the two can't drift apart unnoticed.
+ *
+ * Intention: imports the result types from core and the server as types
+ * only; used by every page.
+ */
+
 // Result types come straight from the server code (type-only imports), so the
 // UI and the API cannot drift apart unnoticed.
 export type {

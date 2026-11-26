@@ -5,6 +5,11 @@ import {Button, Card, Dot, ErrorNote, type Tone, useLoad} from '../components/ui
 import {useToast} from '../toast.js'
 import {useJob} from '../use-job.js'
 
+/**
+ * Purpose: see which env files are backed up and push or pull them.
+ *
+ * Intention: uses api, ui and toast; reached through app.
+ */
 const STATE: Record<EnvEntry['state'], {label: string; tone: Tone}> = {
   differs: {label: 'differs', tone: 'warn'},
   identical: {label: 'in sync', tone: 'ok'},

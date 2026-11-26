@@ -2,6 +2,12 @@ import {createContext, type ReactNode, useCallback, useContext, useMemo, useStat
 
 import {ApiError} from './api.js'
 
+/**
+ * Purpose: the outcome of an action reaches the person wherever they are
+ * in the UI.
+ *
+ * Intention: a context every page and panel uses.
+ */
 export interface Toast {
   details: string[]
   id: number

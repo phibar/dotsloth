@@ -5,6 +5,12 @@ import {Button, Card, Dot} from '../components/ui.js'
 import {useToast} from '../toast.js'
 import {useJob} from '../use-job.js'
 
+/**
+ * Purpose: learn whether anything would be lost if this machine were
+ * wiped.
+ *
+ * Intention: uses api, ui and toast; reached through app.
+ */
 export function DoctorPage() {
   const toast = useToast()
   const [offline, setOffline] = useState(false)

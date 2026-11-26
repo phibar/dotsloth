@@ -1,5 +1,11 @@
 import {useEffect, useState} from 'react'
 
+/**
+ * Purpose: each section has an address that survives a reload.
+ *
+ * Intention: hash routing without a router library; used by app and
+ * placeholder.
+ */
 export interface Section {
   id: string
   /** The issue that builds this page out. */

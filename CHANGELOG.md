@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.11.5
+
+### Patch Changes
+
+- [#134](https://github.com/phibar/dotsloth/pull/134) [`f4987c8`](https://github.com/phibar/dotsloth/commit/f4987c8cd789f574571d7aa0df7e8d39cb366467) Thanks [@phibar](https://github.com/phibar)! - Prompts run on `@inquirer/prompts` instead of the unmaintained Enquirer. Ctrl+C in any prompt ends the command with "Cancelled".
+
 ## 0.11.4
 
 ### Patch Changes

@@ -22,7 +22,8 @@ export default class RunnerAdd extends BaseCommand {
   ]
   static override flags = {
     labels: Flags.string({
-      description: 'Extra labels, comma-separated, besides self-hosted, macOS and the architecture',
+      description:
+        "Extra labels, comma-separated, besides self-hosted, macOS and the architecture; 'desktop' runs the runner in the logged-in desktop's session, as Safari's safaridriver needs",
     }),
     name: Flags.string({description: "Runner name (default: this Mac's host name)"}),
   }

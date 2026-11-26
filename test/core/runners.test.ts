@@ -62,6 +62,21 @@ describe('core/runners', () => {
     ])
   })
 
+  it("runs a runner labelled desktop, in any case, in the desktop's own session, and keeps the session of every other", async () => {
+    const plist = (name: string) =>
+      fs.readFileSync(path.join(os.homedir(), `Library/LaunchAgents/actions.runner.acme.${name}.plist`), 'utf8')
+    const steps: string[] = []
+    await addRunner({labels: ['e2e', 'Desktop'], name: 'safari', org: 'acme'}, (event) => {
+      if (event.type === 'step') steps.push(event.label)
+    })
+    await addRunner({labels: ['e2e'], name: 'box', org: 'acme'})
+
+    expect(plist('safari')).to.not.include('SessionCreate')
+    expect(plist('box')).to.include('<key>SessionCreate</key>')
+    expect(steps).to.include("Runs in the desktop's own session")
+    expect(steps.indexOf("Runs in the desktop's own session")).to.be.below(steps.indexOf('Started as a LaunchAgent'))
+  })
+
   it('leaves the organization repo count as it was', async () => {
     const before = getOrg('acme').repoCount
     await addRunner({name: 'box', org: 'acme'})

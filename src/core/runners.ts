@@ -23,7 +23,15 @@ import {
 } from '../lib/runner/github.js'
 import {installPackage, latestRelease} from '../lib/runner/package.js'
 import {isRegistered, register, unregister} from '../lib/runner/registration.js'
-import {isInstalled, isLoaded, logPath, serviceName, svc, tailServiceLog} from '../lib/runner/service.js'
+import {
+  isInstalled,
+  isLoaded,
+  joinDesktopSession,
+  logPath,
+  serviceName,
+  svc,
+  tailServiceLog,
+} from '../lib/runner/service.js'
 import {CoreError, requireConfig} from './errors.js'
 import type {OnEvent, StepEvent} from './events.js'
 import {ignoreEvents} from './events.js'
@@ -168,6 +176,12 @@ export async function addRunner(
     }
 
     svc(dir, 'install')
+    // GitHub matches labels ignoring case.
+    if (labels.some((label) => label.toLowerCase() === 'desktop')) {
+      joinDesktopSession(dir)
+      onEvent({label: "Runs in the desktop's own session", status: 'ok', type: 'step'})
+    }
+
     svc(dir, 'start')
     onEvent({label: 'Started as a LaunchAgent', status: 'ok', type: 'step'})
     return describe(org, dir, null)

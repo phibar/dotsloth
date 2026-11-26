@@ -1,7 +1,8 @@
 /*
  * Purpose: Stand-ins for everything a runner operation reaches outside the
- * process — `gh`, `tar`, `launchctl` and the runner's own scripts — so the
- * tests of core/runners and of the runner routes run against the same fakes.
+ * process — `gh`, `tar`, `launchctl`, `plutil` and the runner's own
+ * scripts — so the tests of core/runners and of the runner routes run
+ * against the same fakes.
  * Intention: uses fakeBinaries and resetHome from test/helpers and saveConfig
  * from lib/config; the scripts beside it are what the fake `tar` unpacks.
  * Every call lands in $FAKE_LOG, which `calls()` reads; the FAKE_* switches a
@@ -46,6 +47,10 @@ echo "tar $*" >> "$FAKE_LOG"
 cp "$FAKE_RUNNER_FIXTURE/config.sh" "$4/config.sh"
 chmod +x "$4/config.sh"`
 const FAKE_LAUNCHCTL = String.raw`[ "$1" = list ] && [ -f "$FAKE_LAUNCHD/$2" ]`
+// Removes the key's line and the value line after it, as plutil -remove does for the plist svc.sh writes.
+const FAKE_PLUTIL = String.raw`
+echo "plutil $*" >> "$FAKE_LOG"
+awk -v key="<key>$2</key>" '$0 == key { skip = 2 } skip > 0 { skip--; next } { print }' "$3" > "$3.tmp" && mv "$3.tmp" "$3"`
 
 const env = ['FAKE_CONFIG_FAIL', 'FAKE_GH_DOWN', 'FAKE_GH_REFUSE', 'FAKE_GH_TYPE'] as const
 
@@ -82,7 +87,13 @@ export function installRunnerFakes(): () => void {
     organizations: [{folderName: 'acme', gitEmail: 'dev@acme.test', gitUsername: 'dev', name: 'acme'}],
   })
   fs.mkdirSync(path.join(orgDir(), 'web'), {recursive: true})
-  const restorePath = fakeBinaries({...EMPTY_SYSTEM, gh: FAKE_GH, launchctl: FAKE_LAUNCHCTL, tar: FAKE_TAR})
+  const restorePath = fakeBinaries({
+    ...EMPTY_SYSTEM,
+    gh: FAKE_GH,
+    launchctl: FAKE_LAUNCHCTL,
+    plutil: FAKE_PLUTIL,
+    tar: FAKE_TAR,
+  })
 
   return () => {
     restorePath()

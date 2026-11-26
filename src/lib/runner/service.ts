@@ -2,7 +2,7 @@
  * Purpose: Keep a registered runner running on this Mac as a launchd service,
  * and tell whether it is.
  * Intention: uses run and tryRun from exec to drive the runner's own `svc.sh`
- * (a LaunchAgent) and `launchctl`. The service name is read from the `svc.sh`
+ * (a LaunchAgent), `launchctl` and `plutil`. The service name is read from the `svc.sh`
  * that `config.sh` generated, because the runner shortens long names itself.
  * Speaks to core/runners.
  */
@@ -38,6 +38,16 @@ export function isLoaded(name: string): boolean {
 
 export function svc(dir: string, command: 'install' | 'start' | 'stop' | 'uninstall'): void {
   run('./svc.sh', [command], {cwd: dir})
+}
+
+/**
+ * Let the LaunchAgent `svc.sh install` wrote run in the logged-in desktop's
+ * security session: its template sets SessionCreate, in whose session of its
+ * own Safari 27's safaridriver refuses to launch.
+ */
+export function joinDesktopSession(dir: string): void {
+  const plist = fs.readFileSync(path.join(dir, '.service'), 'utf8').trim()
+  run('plutil', ['-remove', 'SessionCreate', plist])
 }
 
 /** Where the plist of svc.sh points the runner's output. */

@@ -5,6 +5,13 @@ import {checkSymlinks} from '../lib/symlink.js'
 import type {DevSlothConfig, Organization, SymlinkStatus} from '../types/index.js'
 import {resolveOrgForPath} from './orgs.js'
 
+/**
+ * Purpose: show at a glance whether this machine is in the state dotsloth
+ * keeps.
+ *
+ * Intention: uses lib/config, lib/keychain, lib/symlink and core/orgs for
+ * the org of a directory; called by the `status` command and the web API.
+ */
 export interface Status {
   config: {
     /** One line per problem when config.json exists but is invalid. */

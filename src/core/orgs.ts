@@ -8,6 +8,14 @@ import type {DevSlothConfig, Organization} from '../types/index.js'
 import {OrganizationSchema} from '../types/index.js'
 import {CoreError, requireConfig} from './errors.js'
 
+/**
+ * Purpose: each GitHub organisation's git identity applies to every
+ * repository in its folder.
+ *
+ * Intention: uses lib/config, lib/git for the org's gitconfig and runSync
+ * so ~/.gitconfig includes it; called by the `org` commands, core/clone
+ * and the web API.
+ */
 export interface OrgInfo extends Organization {
   /** Whether the org folder exists yet. */
   exists: boolean

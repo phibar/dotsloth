@@ -16,6 +16,12 @@ import {
 } from '../lib/daemon.js'
 import {CoreError} from './errors.js'
 
+/**
+ * Purpose: everything stays current without running sync by hand.
+ *
+ * Intention: uses lib/daemon for the launchd agent; called by the `daemon`
+ * commands and the web API.
+ */
 export const MIN_INTERVAL_SECONDS = 60
 
 export interface DaemonStatus {

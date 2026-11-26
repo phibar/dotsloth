@@ -18,6 +18,15 @@ import {CoreError} from './errors.js'
 import type {OnEvent, StepEvent} from './events.js'
 import {ignoreEvents} from './events.js'
 
+/**
+ * Purpose: a new machine reaches the state dotsloth keeps: config in
+ * iCloud, dotfiles linked, secrets in the Keychain, the SSH key in the
+ * agent.
+ *
+ * Intention: uses lib/config, lib/git, lib/keychain, lib/secrets and
+ * lib/symlink; called by the `init` command.
+ */
+
 const MINIMAL_ZPROFILE = `# dotsloth managed zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 

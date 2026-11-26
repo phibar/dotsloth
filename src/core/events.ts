@@ -1,6 +1,14 @@
 import type {SymlinkStatus} from '../types/index.js'
 
 /**
+ * Purpose: a long operation reports its progress in one shape, whether a
+ * terminal prints it or the web UI streams it.
+ *
+ * Intention: the core operations emit it; cli/format and the web UI's job
+ * log read it.
+ */
+
+/**
  * Progress of a multi-step operation, reported as it happens so the CLI can
  * print each line and the web UI can stream it.
  */

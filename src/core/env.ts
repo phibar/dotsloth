@@ -6,6 +6,13 @@ import {PATHS} from '../lib/paths.js'
 import {getGithubRoot} from './config.js'
 
 /**
+ * Purpose: env files, which git never saves, survive a reinstall.
+ *
+ * Intention: uses lib/env to scan repositories and copy to and from the
+ * iCloud store; called by the `env` commands, core/doctor and the web API.
+ */
+
+/**
  * Env files hold credentials, so nothing here ever returns their contents:
  * only where they are and whether the repo and store copies agree.
  */

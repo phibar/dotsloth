@@ -8,6 +8,14 @@ import {
 import {CoreError} from './errors.js'
 
 /**
+ * Purpose: secrets live encrypted in the Keychain, never in a synced
+ * plaintext file.
+ *
+ * Intention: uses lib/keychain; called by the `secret` commands and the
+ * web API, which reveals one secret at a time.
+ */
+
+/**
  * Secrets live in the macOS Keychain. Core hands out names freely but values
  * only one at a time, on explicit request ({@link revealSecret}). Exporting
  * every value at once (`secret export` / `secret load`) is deliberately not

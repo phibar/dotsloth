@@ -2,6 +2,14 @@ import {ConfigError, readConfig} from '../lib/config.js'
 import type {DevSlothConfig} from '../types/index.js'
 
 /**
+ * Purpose: a failure means the same in the terminal and in the web UI: a
+ * stable code with a message.
+ *
+ * Intention: BaseCommand prints it, and server/errors maps its code to an
+ * HTTP status.
+ */
+
+/**
  * Stable reasons a core operation can fail. The CLI prints the message; the
  * web API maps the code to an HTTP status, so codes must not be renamed.
  */

@@ -8,6 +8,15 @@ import {scanEnv} from './env.js'
 import type {OnEvent} from './events.js'
 import {ignoreEvents} from './events.js'
 
+/**
+ * Purpose: "safe to wipe" is said only while nothing would be lost by a
+ * reinstall.
+ *
+ * Intention: uses lib/repo-audit for unpushed work, lib/icloud for pending
+ * uploads and core/env for unsaved env files; called by the `doctor`
+ * command and the web API.
+ */
+
 /** A repository with something that exists only on this machine. */
 export interface RepoAtRisk {
   /** Branches worth reporting: unpushed or orphaned, and not already merged. */

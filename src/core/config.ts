@@ -6,6 +6,14 @@ import {PATHS} from '../lib/paths.js'
 import type {DevSlothConfig} from '../types/index.js'
 import {CoreError, requireConfig} from './errors.js'
 
+/**
+ * Purpose: the CLI and the web UI read and change config.json in one
+ * place, so neither overwrites a newer change from the other.
+ *
+ * Intention: uses lib/config for reads and atomic saves and core/errors;
+ * called by the commands and the web API's config route.
+ */
+
 export {requireConfig as getConfig} from './errors.js'
 
 /** The configured GitHub root; the default one before init. */

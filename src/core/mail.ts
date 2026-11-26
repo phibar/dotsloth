@@ -17,6 +17,13 @@ import type {OnEvent} from './events.js'
 import {ignoreEvents} from './events.js'
 
 /**
+ * Purpose: Mail rules and signatures survive a reinstall and are recreated
+ * on the new machine.
+ *
+ * Intention: uses lib/mail; called by the `mail` commands and the web API.
+ */
+
+/**
  * Mail's own data lives under ~/Library/Mail and ~/Library/Accounts, both
  * TCC-protected. Everything here goes through Mail's scripting interface
  * (osascript), which is slow and needs Automation permission: macOS asks

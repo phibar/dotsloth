@@ -22,6 +22,14 @@ import {CoreError, requireConfig} from './errors.js'
 import type {OnEvent} from './events.js'
 import {ignoreEvents} from './events.js'
 
+/**
+ * Purpose: Claude Code works the same on every machine; its settings,
+ * project memory and conversation history are shared through iCloud.
+ *
+ * Intention: uses lib/claude and its history, memory and projects helpers;
+ * called by the `claude` commands and the web API.
+ */
+
 export {ACTIVE_SESSION_MINUTES, DEFAULT_RETENTION_DAYS} from '../lib/claude-history.js'
 
 function requireClaude(): void {

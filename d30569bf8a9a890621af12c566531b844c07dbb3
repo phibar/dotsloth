@@ -1,0 +1,36 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:d30569bf8a9a890621af12c566531b844c07dbb3",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@d30569bf8a9a890621af12c566531b844c07dbb3"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "After merging Dependabot #117 and #118, the full check on main passed but Biome 2.6.8 printed that biome.json names the 2.6.7 schema.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "`biome migrate --write` changed only the $schema URL; full check green, notice gone."
+        },
+        {
+          "@type": "Decision",
+          "text": "Empty changeset: tooling only, no release. No issue: a one-line follow-up to #118.",
+          "governs": [
+            {
+              "@id": "oasis://github:phibar/dotsloth/issues/118"
+            }
+          ]
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "\"continue\" to the offered separate PR.",
+          "by": "Philipp"
+        }
+      ]
+    }
+  ]
+}

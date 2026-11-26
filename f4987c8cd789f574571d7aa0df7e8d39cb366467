@@ -1,0 +1,75 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:f4987c8cd789f574571d7aa0df7e8d39cb366467",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@f4987c8cd789f574571d7aa0df7e8d39cb366467"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#130 was fixed with a guard (#132); option B, moving off Enquirer, was left as the clean fix. Philipp asked for an issue and the work at once (\"make an issue and go ahead\"): #133.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "@inquirer/prompts 7.10.1, not 8.x: 8.x needs Node 20.17, the package promises >=18."
+        },
+        {
+          "@type": "Decision",
+          "text": "BaseCommand.catch ends an error named ExitPromptError as \"Cancelled\", process.exitCode 130; matched by name so the transitive @inquirer/core stays out of the imports. The unhandledRejection guard from #132 is removed.",
+          "governs": [
+            {
+              "@id": "oasis://github:phibar/dotsloth/issues/132"
+            }
+          ]
+        },
+        {
+          "@type": "Decision",
+          "text": "Clone picker: topics go into the choice's name (the checkbox shows a description only under the highlighted row); a cloned repository shows only \"already cloned\", as Enquirer did."
+        },
+        {
+          "@type": "Decision",
+          "text": "pageSize max(7, rows - 6): Philipp took the lean (fit to terminal) over a fixed 20 or the default 7. Trial at 40 rows lists all 26 repositories of metatrom-ag/0field."
+        },
+        {
+          "@type": "Decision",
+          "text": "Before opening #133: @inquirer checkbox tried in a pseudo-terminal under Node 24.20 — Ctrl+C rejects with ExitPromptError, disabled reason and checked work.",
+          "governs": [
+            {
+              "@id": "oasis://github:phibar/dotsloth/issues/133"
+            }
+          ]
+        },
+        {
+          "@type": "Decision",
+          "text": "The cancel test runs a BaseCommand subclass through oclif's _run in a bare package root (Config.load of the repo root loaded the stale dist build); it fails with the catch branch disabled."
+        },
+        {
+          "@type": "Decision",
+          "text": "Picker test presses Enter once via setImmediate after the first frame; pressing on every chunk spun forever."
+        },
+        {
+          "@type": "Decision",
+          "text": "Ctrl+C in the org picker and in the unknown-org select both print \"Cancelled\", exit 130.",
+          "by": "Trials"
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "\"leans\" (fit to terminal), \"yes do that\" (commit and PR).",
+          "by": "Philipp"
+        }
+      ],
+      "discussed": [
+        "Philipp reported a keychain error; this change touches no keychain code. The message and the command that showed it are still to come from him."
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "init.ts, org/add, org/remove, org/update, secret/add, secret/remove carry no Purpose/Intention header; to be found with Philipp, not in this PR."
+        }
+      ]
+    }
+  ]
+}

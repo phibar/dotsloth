@@ -1,5 +1,11 @@
 # @phibar/dotsloth
 
+## 0.11.4
+
+### Patch Changes
+
+- [#132](https://github.com/phibar/dotsloth/pull/132) [`0ba1574`](https://github.com/phibar/dotsloth/commit/0ba1574de1b7d9480235cc2ae25f8b0156a51b23) Thanks [@phibar](https://github.com/phibar)! - Ctrl+C in a prompt ends the command with "Cancelled" instead of a stack trace on Node 24 and later.
+
 ## 0.11.3
 
 ### Patch Changes

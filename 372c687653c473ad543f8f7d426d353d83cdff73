@@ -1,0 +1,48 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:372c687653c473ad543f8f7d426d353d83cdff73",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@372c687653c473ad543f8f7d426d353d83cdff73"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Step 5 of #136 after cli and commands (#146, merged bf09fe9): the 22 non-test files in web/src without a header.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Purposes from the files' own comments and each page's headings; pages share one Intention: uses api, ui and toast, reached through app."
+        },
+        {
+          "@type": "Decision",
+          "text": "vite-env.d.ts: header below the /// reference, which TypeScript honours only at the top."
+        },
+        {
+          "@type": "Decision",
+          "text": "React tree, so the ontocratic-frontend block rule does not apply (Philipp's decision of 2026-11-25 for this tree); headers sit below the imports as in src."
+        },
+        {
+          "@type": "Decision",
+          "text": "Full check and production build green. Empty changeset, no release."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "\"yes\" (merge #146 and the web drafts), \"ja bitte\" (commit and PR).",
+          "by": "Philipp"
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "#142 the 24 test files, as the suite's doc-comment.",
+          "issue": {
+            "@id": "oasis://github:phibar/dotsloth/issues/142"
+          }
+        }
+      ]
+    }
+  ]
+}

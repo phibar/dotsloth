@@ -151,16 +151,15 @@ export default class MyCommand extends Command {
 
 ### Interactive Prompts
 
-Use `enquirer` for user input:
+Use `@inquirer/prompts` for user input. Ctrl+C rejects a prompt with `ExitPromptError`, which
+`BaseCommand` ends as "Cancelled" (exit 130):
 
 ```typescript
-import Enquirer from 'enquirer'
+import {input} from '@inquirer/prompts' // or confirm, select, checkbox, password
 
-const {value} = await Enquirer.prompt<{value: string}>({
-  type: 'input', // or 'select', 'confirm', 'password'
-  name: 'value',
+const value = await input({
   message: 'Prompt text:',
-  validate: (input) => (input.length > 0 ? true : 'Required'),
+  validate: (value) => (value.length > 0 ? true : 'Required'),
 })
 ```
 

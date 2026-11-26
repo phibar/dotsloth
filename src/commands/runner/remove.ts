@@ -1,12 +1,12 @@
 /*
  * Purpose: CLI command that takes a self-hosted runner off this Mac and off its organization.
  * Intention: realizes BaseCommand; uses removeRunner from core/runners, printStepEvent from
- * cli/format and runnerArgs from cli/runner; asks with enquirer before it removes anything.
+ * cli/format and runnerArgs from cli/runner; asks with @inquirer/prompts before it removes anything.
  */
 
+import {confirm} from '@inquirer/prompts'
 import {Flags} from '@oclif/core'
 import chalk from 'chalk'
-import Enquirer from 'enquirer'
 
 import {BaseCommand} from '../../cli/base-command.js'
 import {printStepEvent} from '../../cli/format.js'
@@ -30,13 +30,11 @@ export default class RunnerRemove extends BaseCommand {
     const log = this.log.bind(this)
 
     if (!flags.force) {
-      const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
-        initial: false,
+      const confirmed = await confirm({
+        default: false,
         message: `Remove runner ${args.name ? `'${args.name}' ` : ''}of '${args.org}' from this Mac and from GitHub?`,
-        name: 'confirm',
-        type: 'confirm',
       })
-      if (!confirm) {
+      if (!confirmed) {
         this.log(chalk.yellow('Cancelled'))
         return
       }

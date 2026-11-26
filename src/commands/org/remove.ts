@@ -1,6 +1,6 @@
+import {confirm} from '@inquirer/prompts'
 import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
-import Enquirer from 'enquirer'
 import {printAutoSync} from '../../cli/autosync.js'
 import {BaseCommand} from '../../cli/base-command.js'
 import {getOrg, removeOrg} from '../../core/orgs.js'
@@ -46,13 +46,8 @@ export default class OrgRemove extends BaseCommand {
   }
 
   private async confirm(message: string): Promise<boolean> {
-    const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
-      initial: false,
-      message,
-      name: 'confirm',
-      type: 'confirm',
-    })
-    return confirm
+    const confirmed = await confirm({default: false, message})
+    return confirmed
   }
 
   private removeMessage(name: string, repoCount: number, path: string): string {

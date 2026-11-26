@@ -1,31 +1,63 @@
+import {mkdtempSync, writeFileSync} from 'node:fs'
+import {tmpdir} from 'node:os'
+import {join} from 'node:path'
+import {Config} from '@oclif/core'
 import {expect} from 'chai'
 
-import {exitOnClosedPrompt} from '../../src/cli/base-command.js'
+import {BaseCommand} from '../../src/cli/base-command.js'
 
 /**
  * Purpose: Ctrl+C in a prompt ends the command as cancelled, while every
- * other unhandled rejection still fails it as before.
+ * other error still fails it as before.
  *
- * Intention: hands the handler the error Node 24 raises from Enquirer's
- * cancel, and another one, with an exit that records its code.
+ * Intention: runs a command extending BaseCommand through oclif's own run
+ * loop, in a bare package root, its run throwing the error @inquirer/prompts rejects with on Ctrl+C,
+ * or another; exitCode is restored after each test.
  */
 describe('cancelling a prompt', () => {
-  const closed = Object.assign(new Error('readline was closed'), {code: 'ERR_USE_AFTER_CLOSE'})
+  class Throwing extends BaseCommand {
+    static thrown: Error
+    lines: string[] = []
 
-  it('exits with 130 and says "Cancelled" when Enquirer pauses its closed readline', () => {
-    const exits: number[] = []
-    const lines: string[] = []
-    exitOnClosedPrompt(closed, {exit: (code) => exits.push(code), log: (line) => lines.push(line)})
-    expect(exits).to.deep.equal([130])
-    expect(lines.join('')).to.contain('Cancelled')
+    override log(line = ''): void {
+      this.lines.push(line)
+    }
+
+    async run(): Promise<void> {
+      throw Throwing.thrown
+    }
+  }
+
+  let config: Config
+  before(async () => {
+    // A bare package root: the command under test needs a config, and none of the tree's commands.
+    const root = mkdtempSync(join(tmpdir(), 'base-command-'))
+    writeFileSync(join(root, 'package.json'), JSON.stringify({name: 'base-command-test', version: '0.0.0'}))
+    config = await Config.load(root)
+  })
+  afterEach(() => {
+    process.exitCode = undefined
   })
 
-  it('throws any other rejection on, so it still fails the command', () => {
+  const cancelled = Object.assign(new Error('User force closed the prompt with SIGINT'), {name: 'ExitPromptError'})
+
+  it('says "Cancelled" and sets exit code 130 when a prompt is closed with Ctrl+C', async () => {
+    Throwing.thrown = cancelled
+    const command = new Throwing([], config)
+    await command._run()
+    expect(process.exitCode).to.equal(130)
+    expect(command.lines.join('')).to.contain('Cancelled')
+  })
+
+  it('fails the command with any other error', async () => {
     const other = new Error('boom')
-    const exits: number[] = []
-    expect(() => exitOnClosedPrompt(other, {exit: (code) => exits.push(code), log: () => exits.push(-1)})).to.throw(
-      other,
-    )
-    expect(exits).to.deep.equal([])
+    Throwing.thrown = other
+    const command = new Throwing([], config)
+    let caught: unknown
+    await command._run().catch((error) => {
+      caught = error
+    })
+    expect(caught).to.equal(other)
+    expect(command.lines.join('')).not.to.contain('Cancelled')
   })
 })

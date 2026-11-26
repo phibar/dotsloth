@@ -1,0 +1,53 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:babf60c5c982e5e78d252415fd363758617cacee",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@babf60c5c982e5e78d252415fd363758617cacee"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "#142 asks every test file for a header as the doc-comment of its one top-level suite. 14 files held several top-level suites; Philipp chose option a: a refactor PR first, the headers after it.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Files that mixed modules are split per module: core/doctor-clone, init-status, mail-claude, secrets-env-daemon; pages/dashboard-daemon, doctor-mail-claude, secrets-env; lib/exec (keychain, git), lib/config (symlink), lib/claude-merge (history, memory), web/app (api, toast). Where a file for the module existed, the suite was appended to it."
+        },
+        {
+          "@type": "Decision",
+          "text": "One-module files with several suites (lib/mail, daemon, env, symlink, claude-history) wrap them in one describe named after the module."
+        },
+        {
+          "@type": "Decision",
+          "text": "codeOf and its async variant now live once in test/__testdata__/repos.ts as codeOfCall and codeOfAwaitedCall, imported under the names each test already called, so no test line changed."
+        },
+        {
+          "@type": "Decision",
+          "text": "Only declarations Biome reported unused after the split were removed. Empty changeset, no release."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "\"go with leans\" — commit and open this PR; merge #147.",
+          "by": "Philipp"
+        }
+      ],
+      "discussed": [
+        "First split attempt broke a multi-line template literal and Biome --unsafe renamed unused vars to _x; reset and redone with whole preludes, unused removed one by one.",
+        "I had first said seven files were one module each; exec, config, claude-merge and app mixed modules, corrected openly.",
+        "Test titles compared against main with [[:space:]]-aware diff: the same 242."
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "#142 headers PR: one header per test file as the doc-comment of its describe, then close #142 and #136. → oasis://github:phibar/dotsloth/issues/142",
+          "issue": {
+            "@id": "oasis://github:phibar/dotsloth/issues/142"
+          }
+        }
+      ]
+    }
+  ]
+}

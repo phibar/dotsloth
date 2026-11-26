@@ -1,0 +1,55 @@
+{
+  "@context": "oasis://metatrom-ag/Continuity/corpus.jsonld",
+  "@id": "oasis://phibar/dotsloth@refs/notes/continuity:0ba1574de1b7d9480235cc2ae25f8b0156a51b23",
+  "@type": "Note",
+  "commit": {
+    "@id": "oasis://phibar/dotsloth@0ba1574de1b7d9480235cc2ae25f8b0156a51b23"
+  },
+  "takes": [
+    {
+      "@type": "Take",
+      "scene": "Trying the CLI's repository picker in a pseudo-terminal (#129) showed Ctrl+C ending `dotsloth clone` with an ERR_USE_AFTER_CLOSE stack trace on Node 24; #130 took it.",
+      "decided": [
+        {
+          "@type": "Decision",
+          "text": "Option C of three: BaseCommand registers an unhandledRejection handler in init() that turns only ERR_USE_AFTER_CLOSE into \"Cancelled\" and exit 130; any other rejection is thrown on unchanged."
+        },
+        {
+          "@type": "Decision",
+          "text": "A (patch-package over Enquirer's keypress.js) was weighed and left: it patches a vendored file every install."
+        },
+        {
+          "@type": "Decision",
+          "text": "B (move to @inquirer/prompts) was weighed and left for later: it is the clean fix, but rewrites every prompt."
+        },
+        {
+          "@type": "Decision",
+          "text": "Header of base-command.ts written; it names that the commands calling core or Enquirer extend it (sync, secret export and secret load extend Command)."
+        },
+        {
+          "@type": "Decision",
+          "text": "Tests in test/cli/base-command.test.ts call exitOnClosedPrompt directly: exit 130 with \"Cancelled\", and another rejection rethrown without exit."
+        },
+        {
+          "@type": "Decision",
+          "text": "Trial in a pseudo-terminal: Ctrl+C in `clone <url>` and in `clone metatrom-ag -t 0field` prints \"Cancelled\", exit 130."
+        }
+      ],
+      "wordsGiven": [
+        {
+          "@type": "Word",
+          "text": "Philipp chose option C (\"yes\") and said \"go ahead\" to commit and open the PR."
+        }
+      ],
+      "later": [
+        {
+          "@type": "Deferral",
+          "text": "Move to @inquirer/prompts (option B) once Enquirer's cancel path is worth replacing; enquirer/enquirer#483 stays open.",
+          "issue": {
+            "@id": "oasis://github:enquirer/enquirer/issues/483"
+          }
+        }
+      ]
+    }
+  ]
+}

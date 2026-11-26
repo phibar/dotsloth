@@ -2,6 +2,14 @@ import type {ContentfulStatusCode} from 'hono/utils/http-status'
 
 import {CoreError, type CoreErrorCode} from '../core/errors.js'
 
+/**
+ * Purpose: an API error tells the browser what failed without leaking
+ * paths or values.
+ *
+ * Intention: maps core/errors' codes to HTTP statuses; used by server/app,
+ * server/jobs and the routes.
+ */
+
 /** The JSON body of every API error. */
 export interface ApiError {
   code: 'INTERNAL' | CoreErrorCode

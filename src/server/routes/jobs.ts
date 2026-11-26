@@ -14,6 +14,12 @@ import {readBody} from '../body.js'
 import {type JobRunner, UpdateQueue} from '../jobs.js'
 import {OrgFilter} from './clone.js'
 
+/**
+ * Purpose: the web UI starts every long operation as a job it can follow.
+ *
+ * Intention: starts sync, clone, doctor, env, Claude and mail jobs on
+ * server/jobs, calling core for each.
+ */
 const SyncBody = z.object({dryRun: z.boolean().optional(), force: z.boolean().optional()}).strict()
 
 const CloneTarget = z.discriminatedUnion('kind', [

@@ -4,6 +4,11 @@ import {z} from 'zod'
 import {getDaemonStatus, installDaemon, MIN_INTERVAL_SECONDS, uninstallDaemon} from '../../core/daemon.js'
 import {readBody} from '../body.js'
 
+/**
+ * Purpose: the web UI installs, shows and removes the periodic sync.
+ *
+ * Intention: calls core/daemon.
+ */
 const InstallBody = z.object({intervalSeconds: z.number().int().min(MIN_INTERVAL_SECONDS)}).strict()
 
 export const daemonRoutes = new Hono()

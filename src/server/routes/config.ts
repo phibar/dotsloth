@@ -3,6 +3,14 @@ import {Hono} from 'hono'
 import {getConfigWithVersion, replaceConfig} from '../../core/config.js'
 
 /**
+ * Purpose: the web UI edits config.json without overwriting a newer
+ * change.
+ *
+ * Intention: calls core/config, sends the version as ETag and refuses a
+ * stale If-Match with 409.
+ */
+
+/**
  * The config with optimistic concurrency: GET sends its version as ETag,
  * and a PUT carrying If-Match is refused (409) when the file changed since.
  */

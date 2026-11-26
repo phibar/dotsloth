@@ -5,6 +5,11 @@ import {getClaudeStatus, linkClaude, planHistorySync, planMemorySync} from '../.
 import {CoreError} from '../../core/errors.js'
 import {readBody} from '../body.js'
 
+/**
+ * Purpose: the web UI shows and plans the Claude Code sync.
+ *
+ * Intention: calls core/claude.
+ */
 const Direction = z.enum(['status', 'push', 'pull'])
 
 function direction(value: string | undefined): 'pull' | 'push' | 'status' {

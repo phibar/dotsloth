@@ -5,6 +5,11 @@ import {CoreError} from '../../core/errors.js'
 import {addOrg, listOrgs, removeOrg, updateOrg} from '../../core/orgs.js'
 import {readBody} from '../body.js'
 
+/**
+ * Purpose: the web UI adds, changes and removes organisations.
+ *
+ * Intention: calls core/orgs.
+ */
 const AddBody = z
   .object({
     folderName: z.string().optional(),

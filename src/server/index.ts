@@ -8,6 +8,12 @@ import {serve} from '@hono/node-server'
 
 import {createApp} from './app.js'
 
+/**
+ * Purpose: `dotsloth ui` serves the web UI on this machine only.
+ *
+ * Intention: starts the app on 127.0.0.1 at a free port; called by the
+ * `ui` command.
+ */
 export interface RunningServer {
   close: () => Promise<void>
   port: number

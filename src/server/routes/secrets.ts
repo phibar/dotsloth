@@ -4,6 +4,12 @@ import {z} from 'zod'
 import {listSecretNames, removeSecret, revealSecret, setSecret} from '../../core/secrets.js'
 import {readBody} from '../body.js'
 
+/**
+ * Purpose: the web UI manages secrets while handing out at most one value
+ * at a time.
+ *
+ * Intention: calls core/secrets.
+ */
 const SetBody = z.object({name: z.string(), overwrite: z.boolean().optional(), value: z.string()}).strict()
 
 /**

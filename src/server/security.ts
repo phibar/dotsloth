@@ -5,6 +5,14 @@ import type {MiddlewareHandler} from 'hono'
 import {getCookie} from 'hono/cookie'
 
 /**
+ * Purpose: only the browser tab that `dotsloth ui` opened can reach the
+ * Keychain, the config and the repositories through the server.
+ *
+ * Intention: checks the Host header, the session cookie and, for anything
+ * that changes state, the Origin on every request; used by server/app.
+ */
+
+/**
  * The server holds the keys to the Keychain, the config and every repository,
  * so it has to make sure each request comes from the browser tab that
  * `dotsloth ui` opened:

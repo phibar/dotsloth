@@ -3,6 +3,13 @@ import {CoreError} from '../core/errors.js'
 import type {ApiError} from './errors.js'
 import {toApiError} from './errors.js'
 
+/**
+ * Purpose: a long operation runs in the background and a browser can
+ * follow it, even after it reconnects.
+ *
+ * Intention: runs one job at a time and streams its events over SSE; used
+ * by server/app and the jobs and runners routes.
+ */
 export type JobStatus = 'failed' | 'running' | 'succeeded'
 
 export interface JobSnapshot {

@@ -1,6 +1,6 @@
+import {checkbox, input, select} from '@inquirer/prompts'
 import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
-import Enquirer from 'enquirer'
 import {printAutoSync} from '../cli/autosync.js'
 import {BaseCommand} from '../cli/base-command.js'
 import {type ClonePlan, type CloneTarget, clone, planClone} from '../core/clone.js'
@@ -12,7 +12,7 @@ import {parseGitUrl} from '../lib/git.js'
  * repositories, in the org folder whose git identity they belong to.
  *
  * Intention: realizes BaseCommand; uses core/clone for a URL and
- * core/clone-org for an organisation, and asks with Enquirer what core
+ * core/clone-org for an organisation, and asks with @inquirer/prompts what core
  * leaves to a decision.
  */
 export default class Clone extends BaseCommand {
@@ -133,8 +133,7 @@ export default class Clone extends BaseCommand {
   }
 
   private async chooseRepos(plan: OrgClonePlan): Promise<string[]> {
-    const {repos} = await Enquirer.prompt<{repos: string[]}>({...repoPicker(plan), name: 'repos', type: 'multiselect'})
-    return repos
+    return checkbox(repoPicker(plan))
   }
 
   private repoLine(repo: OrgRepo): string {
@@ -147,29 +146,23 @@ export default class Clone extends BaseCommand {
   private async chooseTarget(plan: Pick<ClonePlan, 'organizations' | 'orgName'>): Promise<CloneTarget> {
     this.log(chalk.yellow(`Organization '${plan.orgName}' not configured`))
 
-    const {action} = await Enquirer.prompt<{action: string}>({
+    const action = await select({
       choices: [
-        {message: `Create '${plan.orgName}' organization`, name: 'create'},
-        {message: 'Select existing organization', name: 'select'},
-        {message: 'Clone without organization config', name: 'skip'},
+        {name: `Create '${plan.orgName}' organization`, value: 'create'},
+        {name: 'Select existing organization', value: 'select'},
+        {name: 'Clone without organization config', value: 'skip'},
       ],
       message: 'What would you like to do?',
-      name: 'action',
-      type: 'select',
     })
 
     if (action === 'create') {
-      const {email} = await Enquirer.prompt<{email: string}>({
+      const email = await input({
         message: 'Git email for this organization:',
-        name: 'email',
-        type: 'input',
-        validate: (input) => (input.includes('@') ? true : 'Invalid email'),
+        validate: (value) => (value.includes('@') ? true : 'Invalid email'),
       })
-      const {username} = await Enquirer.prompt<{username: string}>({
+      const username = await input({
         message: 'Git username for this organization:',
-        name: 'username',
-        type: 'input',
-        validate: (input) => (input.length > 0 ? true : 'Username required'),
+        validate: (value) => (value.length > 0 ? true : 'Username required'),
       })
       return {gitEmail: email, gitUsername: username, kind: 'new-org'}
     }
@@ -179,11 +172,9 @@ export default class Clone extends BaseCommand {
         this.error('No organizations configured. Run "dotsloth org add" first.')
       }
 
-      const {selectedOrg} = await Enquirer.prompt<{selectedOrg: string}>({
-        choices: plan.organizations.map((o) => ({message: `${o.name} (${o.gitEmail})`, name: o.name})),
+      const selectedOrg = await select({
+        choices: plan.organizations.map((o) => ({name: `${o.name} (${o.gitEmail})`, value: o.name})),
         message: 'Select organization:',
-        name: 'selectedOrg',
-        type: 'select',
       })
       return {kind: 'org', name: selectedOrg}
     }
@@ -192,16 +183,19 @@ export default class Clone extends BaseCommand {
   }
 }
 
-/** The multiselect `clone <org>` asks with: the repositories still missing ticked, those already cloned disabled. */
-export function repoPicker(plan: Pick<OrgClonePlan, 'repos'>) {
+/** The checkbox `clone <org>` asks with: the repositories still missing ticked, those already cloned disabled. */
+export function repoPicker(plan: Pick<OrgClonePlan, 'repos'>, rows = process.stdout.rows) {
   return {
-    // Enquirer shows a disabled choice's reason only where the choice has no hint, and ticks only what `initial` names.
+    // The checkbox shows a choice's description only under the highlighted row, so the topics go into its name;
+    // a disabled one shows its reason after the name, in their place.
     choices: plan.repos.map((r) => ({
-      disabled: r.local,
-      hint: r.local ? 'already cloned' : r.topics.join(', '),
-      name: r.name,
+      checked: !r.local,
+      disabled: r.local ? 'already cloned' : false,
+      name: r.local || r.topics.length === 0 ? r.name : `${r.name}  ${chalk.dim(r.topics.join(', '))}`,
+      value: r.name,
     })),
-    initial: plan.repos.filter((r) => !r.local).map((r) => r.name),
-    message: 'Clone which repositories? (space toggles, a toggles all, enter starts)',
+    message: 'Clone which repositories?',
+    // As many rows as the terminal holds beside the lines around the list, and at least the checkbox's own 7.
+    pageSize: Math.max(7, (rows ?? 0) - 6),
   }
 }

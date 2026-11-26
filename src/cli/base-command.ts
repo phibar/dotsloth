@@ -8,17 +8,17 @@ import {checkForUpdate} from '../core/update.js'
  * message, a cancelled prompt as "Cancelled" — and tell of a newer release.
  *
  * Intention: extends oclif's Command; uses core/errors and core/update.
- * The commands that call into core or ask with Enquirer extend it.
+ * The commands that call into core or ask with @inquirer/prompts extend it.
  */
 export abstract class BaseCommand extends Command {
-  public override async init(): Promise<void> {
-    await super.init()
-    process.on('unhandledRejection', (reason) =>
-      exitOnClosedPrompt(reason, {exit: (code) => process.exit(code), log: (line) => this.log(line)}),
-    )
-  }
-
   protected override async catch(error: Error & {exitCode?: number}): Promise<unknown> {
+    // @inquirer/prompts rejects with ExitPromptError on Ctrl+C; 130 is the shell's code for an interrupt.
+    if (error.name === 'ExitPromptError') {
+      this.log(chalk.dim('Cancelled'))
+      process.exitCode = 130
+      return
+    }
+
     if (error instanceof CoreError) {
       this.error([error.message, ...error.details.map((detail) => `  - ${detail}`)].join('\n'), {exit: 1})
     }
@@ -39,19 +39,4 @@ export abstract class BaseCommand extends Command {
 
     return result
   }
-}
-
-/**
- * On Ctrl+C, Enquirer 2.4.1 pauses its readline after closing it, which
- * Node 24 refuses with ERR_USE_AFTER_CLOSE (enquirer/enquirer#483). The
- * error escapes the prompt's promise, so it arrives here as an unhandled
- * rejection; any other reason is thrown on and fails the command as before.
- */
-export function exitOnClosedPrompt(
-  reason: unknown,
-  {exit, log}: {exit: (code: number) => void; log: (line: string) => void},
-): void {
-  if ((reason as {code?: unknown} | null)?.code !== 'ERR_USE_AFTER_CLOSE') throw reason
-  log(chalk.dim('Cancelled'))
-  exit(130)
 }

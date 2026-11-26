@@ -1,6 +1,6 @@
 import {PassThrough} from 'node:stream'
+import {checkbox} from '@inquirer/prompts'
 import {expect} from 'chai'
-import Enquirer from 'enquirer'
 
 import {repoPicker} from '../../src/commands/clone.js'
 import type {OrgRepo} from '../../src/core/clone-org.js'
@@ -9,9 +9,9 @@ import type {OrgRepo} from '../../src/core/clone-org.js'
  * Purpose: `clone <org>`'s picker starts with every repository still missing
  * ticked, and says which are already cloned.
  *
- * Intention: runs the real Enquirer multiselect on streams of its own, out of
- * sight, and submits it the moment it runs, as Enter pressed at once; the
- * rendered output is read for the hints.
+ * Intention: runs the real @inquirer/prompts checkbox on streams of its own,
+ * out of sight, and presses Enter once it has drawn; the rendered output is
+ * read for the labels.
  */
 describe('clone <org> picker', () => {
   const repo = (name: string, local: boolean, topics: string[] = ['0field']): OrgRepo => ({
@@ -25,37 +25,38 @@ describe('clone <org> picker', () => {
   })
   const plan = {repos: [repo('kernel', true), repo('canvas', false), repo('demo', false, ['web'])]}
 
-  async function submitAtOnce(): Promise<{output: string; picked: string[]}> {
-    const stdin = new PassThrough() as PassThrough & {isTTY: boolean; setRawMode: () => void}
-    stdin.isTTY = true
-    stdin.setRawMode = () => {
-      // Enquirer switches a terminal to raw mode; these streams carry no mode.
-    }
-    const stdout = new PassThrough() as PassThrough & {columns: number; rows: number}
-    stdout.columns = 120
-    stdout.rows = 40
-    let output = ''
-    stdout.on('data', (chunk) => {
-      output += String(chunk)
+  async function enterAtOnce(): Promise<{output: string; picked: string[]}> {
+    const input = new PassThrough()
+    const output = new PassThrough()
+    let text = ''
+    let pressed = false
+    output.on('data', (chunk) => {
+      text += String(chunk)
+      if (pressed || !text.includes('Clone which repositories?')) return
+      pressed = true
+      // Enter once, after the prompt has finished drawing this frame.
+      setImmediate(() => input.write('\r'))
     })
-
-    // biome-ignore lint/suspicious/noExplicitAny: Enquirer's types leave out its prompt classes
-    const prompt = new (Enquirer as any).MultiSelect({...repoPicker(plan), name: 'repos', stdin, stdout})
-    prompt.once('run', () => prompt.submit())
-    const picked = (await prompt.run()) as string[]
-    return {output, picked}
+    const picked = await checkbox(repoPicker(plan, 40), {input, output})
+    return {output: text, picked}
   }
 
   it('submits every repository still missing, and none already cloned, when Enter comes at once', async () => {
-    const {picked} = await submitAtOnce()
+    const {picked} = await enterAtOnce()
     expect(picked).to.deep.equal(['canvas', 'demo'])
   })
 
   it('shows "already cloned" beside a local repository and the topics beside the others', async () => {
-    const {output} = await submitAtOnce()
-    // biome-ignore lint/suspicious/noControlCharactersInRegex: strips the colours Enquirer draws
+    const {output} = await enterAtOnce()
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: strips the colours the prompt draws
     const text = output.replaceAll(/\u001B\[[\d;?]*[A-Za-z]/g, '')
     expect(text).to.match(/kernel\s+already cloned/)
     expect(text).to.match(/demo\s+web/)
+  })
+
+  it('lists as many repositories as the terminal has rows for, and at least seven', () => {
+    expect(repoPicker(plan, 40).pageSize).to.equal(34)
+    expect(repoPicker(plan, 10).pageSize).to.equal(7)
+    expect(repoPicker(plan, undefined).pageSize).to.equal(7)
   })
 })

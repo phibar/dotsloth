@@ -1,6 +1,6 @@
+import {confirm, input} from '@inquirer/prompts'
 import {Flags} from '@oclif/core'
 import chalk from 'chalk'
-import Enquirer from 'enquirer'
 import {BaseCommand} from '../cli/base-command.js'
 import {printStepEvent} from '../cli/format.js'
 import {getInitPlan, runInit} from '../core/init.js'
@@ -23,27 +23,16 @@ export default class Init extends BaseCommand {
     const plan = getInitPlan({force: flags.force})
 
     const userName = plan.needsUserName
-      ? (
-          await Enquirer.prompt<{name: string}>({
-            message: 'Your name (for git commits):',
-            name: 'name',
-            type: 'input',
-            validate: (input) => (input.length > 0 ? true : 'Name is required'),
-          })
-        ).name
+      ? await input({
+          message: 'Your name (for git commits):',
+          validate: (value) => (value.length > 0 ? true : 'Name is required'),
+        })
       : undefined
 
     let extractSecrets = false
     if (!flags['skip-secrets'] && plan.secretsInZprofile > 0) {
       this.log(chalk.yellow(`Found ${plan.secretsInZprofile} secret(s) in your .zprofile`))
-      extractSecrets = (
-        await Enquirer.prompt<{extractSecrets: boolean}>({
-          initial: true,
-          message: 'Extract secrets to iCloud Keychain?',
-          name: 'extractSecrets',
-          type: 'confirm',
-        })
-      ).extractSecrets
+      extractSecrets = await confirm({default: true, message: 'Extract secrets to iCloud Keychain?'})
       this.log('')
     }
 

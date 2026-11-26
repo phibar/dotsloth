@@ -1,6 +1,6 @@
+import {input, select} from '@inquirer/prompts'
 import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
-import Enquirer from 'enquirer'
 import {printAutoSync} from '../../cli/autosync.js'
 import {BaseCommand} from '../../cli/base-command.js'
 import {getConfig} from '../../core/config.js'
@@ -31,14 +31,10 @@ export default class OrgUpdate extends BaseCommand {
 
     const orgName =
       args.name ??
-      (
-        await Enquirer.prompt<{selectedOrg: string}>({
-          choices: config.organizations.map((o) => ({message: `${o.name} (${o.gitEmail})`, name: o.name})),
-          message: 'Select organization to update:',
-          name: 'selectedOrg',
-          type: 'select',
-        })
-      ).selectedOrg
+      (await select({
+        choices: config.organizations.map((o) => ({name: `${o.name} (${o.gitEmail})`, value: o.name})),
+        message: 'Select organization to update:',
+      }))
 
     const org = getOrg(orgName, config)
 
@@ -50,31 +46,23 @@ export default class OrgUpdate extends BaseCommand {
 
     const gitEmail =
       flags.email ??
-      (
-        await Enquirer.prompt<{email: string}>({
-          initial: org.gitEmail,
-          message: 'Git email:',
-          name: 'email',
-          type: 'input',
-          validate(input) {
-            if (input.length === 0) return 'Email is required'
-            if (!input.includes('@')) return 'Invalid email format'
-            return true
-          },
-        })
-      ).email
+      (await input({
+        default: org.gitEmail,
+        message: 'Git email:',
+        validate(value) {
+          if (value.length === 0) return 'Email is required'
+          if (!value.includes('@')) return 'Invalid email format'
+          return true
+        },
+      }))
 
     const gitUsername =
       flags.username ??
-      (
-        await Enquirer.prompt<{username: string}>({
-          initial: org.gitUsername,
-          message: 'Git username:',
-          name: 'username',
-          type: 'input',
-          validate: (input) => (input.length > 0 ? true : 'Username is required'),
-        })
-      ).username
+      (await input({
+        default: org.gitUsername,
+        message: 'Git username:',
+        validate: (value) => (value.length > 0 ? true : 'Username is required'),
+      }))
 
     const result = await updateOrg(org.name, {gitEmail, gitUsername})
     if (!result.changed) {

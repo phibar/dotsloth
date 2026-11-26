@@ -1,6 +1,6 @@
+import {confirm, input} from '@inquirer/prompts'
 import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
-import Enquirer from 'enquirer'
 import {printAutoSync} from '../../cli/autosync.js'
 import {BaseCommand} from '../../cli/base-command.js'
 import {addOrg, findOrg} from '../../core/orgs.js'
@@ -24,25 +24,16 @@ export default class OrgAdd extends BaseCommand {
 
     const name =
       args.name ??
-      (
-        await Enquirer.prompt<{name: string}>({
-          message: 'Organization name (as it appears on GitHub):',
-          name: 'name',
-          type: 'input',
-          validate: (input) => (input.length > 0 ? true : 'Name is required'),
-        })
-      ).name
+      (await input({
+        message: 'Organization name (as it appears on GitHub):',
+        validate: (value) => (value.length > 0 ? true : 'Name is required'),
+      }))
 
     const existing = findOrg(name)
     if (existing) {
-      const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
-        initial: false,
-        message: `Organization '${name}' already exists. Update it?`,
-        name: 'confirm',
-        type: 'confirm',
-      })
+      const confirmed = await confirm({default: false, message: `Organization '${name}' already exists. Update it?`})
 
-      if (!confirm) {
+      if (!confirmed) {
         this.log(chalk.yellow('Cancelled'))
         return
       }
@@ -50,31 +41,23 @@ export default class OrgAdd extends BaseCommand {
 
     const email =
       flags.email ??
-      (
-        await Enquirer.prompt<{email: string}>({
-          initial: existing?.gitEmail,
-          message: 'Git email for this organization:',
-          name: 'email',
-          type: 'input',
-          validate(input) {
-            if (input.length === 0) return 'Email is required'
-            if (!input.includes('@')) return 'Invalid email format'
-            return true
-          },
-        })
-      ).email
+      (await input({
+        default: existing?.gitEmail,
+        message: 'Git email for this organization:',
+        validate(value) {
+          if (value.length === 0) return 'Email is required'
+          if (!value.includes('@')) return 'Invalid email format'
+          return true
+        },
+      }))
 
     const username =
       flags.username ??
-      (
-        await Enquirer.prompt<{username: string}>({
-          initial: existing?.gitUsername,
-          message: 'Git username for this organization:',
-          name: 'username',
-          type: 'input',
-          validate: (input) => (input.length > 0 ? true : 'Username is required'),
-        })
-      ).username
+      (await input({
+        default: existing?.gitUsername,
+        message: 'Git username for this organization:',
+        validate: (value) => (value.length > 0 ? true : 'Username is required'),
+      }))
 
     const result = await addOrg({gitEmail: email, gitUsername: username, name}, {overwrite: Boolean(existing)})
 

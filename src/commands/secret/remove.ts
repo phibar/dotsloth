@@ -1,6 +1,6 @@
+import {confirm} from '@inquirer/prompts'
 import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
-import Enquirer from 'enquirer'
 import {BaseCommand} from '../../cli/base-command.js'
 import {normalizeSecretName, removeSecret, secretExists} from '../../core/secrets.js'
 
@@ -23,14 +23,9 @@ export default class SecretRemove extends BaseCommand {
     }
 
     if (!flags.force) {
-      const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
-        initial: false,
-        message: `Are you sure you want to delete '${name}'?`,
-        name: 'confirm',
-        type: 'confirm',
-      })
+      const confirmed = await confirm({default: false, message: `Are you sure you want to delete '${name}'?`})
 
-      if (!confirm) {
+      if (!confirmed) {
         this.log(chalk.yellow('Cancelled'))
         return
       }

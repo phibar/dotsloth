@@ -1,6 +1,6 @@
+import {confirm, password} from '@inquirer/prompts'
 import {Args, Flags} from '@oclif/core'
 import chalk from 'chalk'
-import Enquirer from 'enquirer'
 import {BaseCommand} from '../../cli/base-command.js'
 import {normalizeSecretName, secretExists, setSecret} from '../../core/secrets.js'
 
@@ -24,28 +24,15 @@ export default class SecretAdd extends BaseCommand {
 
     const exists = secretExists(name)
     if (exists) {
-      const {confirm} = await Enquirer.prompt<{confirm: boolean}>({
-        initial: false,
-        message: `Secret '${name}' already exists. Overwrite?`,
-        name: 'confirm',
-        type: 'confirm',
-      })
+      const confirmed = await confirm({default: false, message: `Secret '${name}' already exists. Overwrite?`})
 
-      if (!confirm) {
+      if (!confirmed) {
         this.log(chalk.yellow('Cancelled'))
         return
       }
     }
 
-    const value =
-      flags.value ||
-      (
-        await Enquirer.prompt<{value: string}>({
-          message: `Enter value for ${name}:`,
-          name: 'value',
-          type: 'password',
-        })
-      ).value
+    const value = flags.value || (await password({mask: true, message: `Enter value for ${name}:`}))
 
     setSecret(name, value, {overwrite: exists})
     this.log(chalk.green(`✓ Secret '${name}' stored in Keychain`))

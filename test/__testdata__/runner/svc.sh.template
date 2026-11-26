@@ -2,7 +2,8 @@
 # Purpose: Stand in for the svc.sh the runner's config.sh generates, so tests
 # install, start, stop and uninstall a runner without touching launchd.
 # Intention: written by the fake config.sh; keeps the real script's
-# SVC_NAME line and .service record, writes the plist under the test HOME,
+# SVC_NAME line and .service record, writes the plist under the test HOME
+# with the SessionCreate key the real template sets,
 # and marks a loaded agent as a file in $FAKE_LAUNCHD, which the fake
 # launchctl of test/core/runners.test.ts reads.
 
@@ -14,7 +15,7 @@ logs="$HOME/Library/Logs/$SVC_NAME"
 case $1 in
   install)
     mkdir -p "$HOME/Library/LaunchAgents" "$logs"
-    echo plist > "$plist"
+    printf '<key>Label</key>\n<key>SessionCreate</key>\n<true/>\n' > "$plist"
     echo "$plist" > .service
     printf 'Listening for Jobs\nRunning job: e2e\nJob e2e completed\n' > "$logs/stdout.log"
     ;;

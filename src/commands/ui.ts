@@ -4,6 +4,12 @@ import {BaseCommand} from '../cli/base-command.js'
 import {tryRun} from '../lib/exec.js'
 import {startServer} from '../server/index.js'
 
+/**
+ * Purpose: manage dotsloth in the browser.
+ *
+ * Intention: extends BaseCommand; starts the local server and opens the
+ * browser through lib/exec.
+ */
 export default class Ui extends BaseCommand {
   static override description = 'Manage dotsloth in the browser (local web interface)'
   static override examples = [

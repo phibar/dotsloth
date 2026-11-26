@@ -4,6 +4,12 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {normalizeSecretName, secretExists, setSecret} from '../../core/secrets.js'
 
+/**
+ * Purpose: store a secret in the Keychain.
+ *
+ * Intention: extends BaseCommand; uses core/secrets; asks for the value
+ * hidden.
+ */
 export default class SecretAdd extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Secret name (e.g., AWS_ACCESS_KEY_ID)', required: true}),

@@ -2,6 +2,11 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {getClaudeStatus} from '../../core/claude.js'
 
+/**
+ * Purpose: see which Claude Code config this machine shares.
+ *
+ * Intention: extends BaseCommand; uses core/claude.
+ */
 export default class ClaudeStatus extends BaseCommand {
   static override description = 'Show which Claude Code config is shared between machines'
   static override examples = ['<%= config.bin %> <%= command.id %>']

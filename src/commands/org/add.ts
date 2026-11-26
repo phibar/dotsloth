@@ -5,6 +5,12 @@ import {printAutoSync} from '../../cli/autosync.js'
 import {BaseCommand} from '../../cli/base-command.js'
 import {addOrg, findOrg} from '../../core/orgs.js'
 
+/**
+ * Purpose: give a GitHub organisation its git identity.
+ *
+ * Intention: extends BaseCommand; uses core/orgs and cli/autosync; asks
+ * with @inquirer/prompts what the flags leave out.
+ */
 export default class OrgAdd extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Organization name (e.g., phibar)'}),

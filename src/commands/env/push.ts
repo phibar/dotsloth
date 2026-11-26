@@ -4,6 +4,11 @@ import {BaseCommand} from '../../cli/base-command.js'
 import {printEnvTransfer} from '../../cli/env.js'
 import {pushEnv} from '../../core/env.js'
 
+/**
+ * Purpose: back up the env files into the dotsloth store.
+ *
+ * Intention: extends BaseCommand; uses core/env and cli/env.
+ */
 export default class EnvPush extends BaseCommand {
   static override description = 'Copy env files from your repos into the dotsloth store'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']

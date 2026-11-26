@@ -3,6 +3,11 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {exportMail} from '../../core/mail.js'
 
+/**
+ * Purpose: back up Mail's accounts, rules and signatures.
+ *
+ * Intention: extends BaseCommand; uses core/mail.
+ */
 export default class MailExport extends BaseCommand {
   static override description = 'Export Mail accounts, rules and signatures to the dotsloth store'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']

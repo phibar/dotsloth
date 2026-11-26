@@ -3,6 +3,11 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {DEFAULT_INTERVAL_SECONDS, installDaemon} from '../../core/daemon.js'
 
+/**
+ * Purpose: turn on the periodic sync.
+ *
+ * Intention: extends BaseCommand; uses core/daemon.
+ */
 export default class DaemonInstall extends BaseCommand {
   static override description = 'Install the periodic sync agent (runs dotsloth sync on a schedule)'
   static override examples = [

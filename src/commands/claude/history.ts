@@ -9,6 +9,11 @@ import {
   planHistorySync,
 } from '../../core/claude.js'
 
+/**
+ * Purpose: continue a Claude Code conversation on another machine.
+ *
+ * Intention: extends BaseCommand; uses core/claude.
+ */
 export default class ClaudeHistory extends BaseCommand {
   static override args = {
     direction: Args.string({

@@ -4,6 +4,11 @@ import chalk from 'chalk'
 import {printSyncResult} from '../cli/format.js'
 import {runSync} from '../core/sync.js'
 
+/**
+ * Purpose: bring this machine in line with config.json.
+ *
+ * Intention: extends oclif's Command; uses core/sync and cli/format.
+ */
 export default class Sync extends Command {
   static override description = 'Sync configurations from iCloud Drive'
   static override examples = ['<%= config.bin %> <%= command.id %>', '<%= config.bin %> <%= command.id %> --dry-run']

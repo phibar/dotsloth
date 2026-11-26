@@ -5,6 +5,12 @@ import {printAutoSync} from '../../cli/autosync.js'
 import {BaseCommand} from '../../cli/base-command.js'
 import {getOrg, removeOrg} from '../../core/orgs.js'
 
+/**
+ * Purpose: drop an organisation, and its repositories only once confirmed.
+ *
+ * Intention: extends BaseCommand; uses core/orgs and cli/autosync; asks
+ * before it removes.
+ */
 export default class OrgRemove extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Organization name to remove', required: true}),

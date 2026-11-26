@@ -2,6 +2,11 @@ import {Args} from '@oclif/core'
 import {BaseCommand} from '../../cli/base-command.js'
 import {revealSecret} from '../../core/secrets.js'
 
+/**
+ * Purpose: read one secret.
+ *
+ * Intention: extends BaseCommand; uses core/secrets.
+ */
 export default class SecretGet extends BaseCommand {
   static override args = {
     name: Args.string({description: 'Secret name to retrieve', required: true}),

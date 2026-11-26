@@ -2,6 +2,11 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {getMailStatus} from '../../core/mail.js'
 
+/**
+ * Purpose: see how Mail here differs from the backup.
+ *
+ * Intention: extends BaseCommand; uses core/mail.
+ */
 export default class MailStatus extends BaseCommand {
   static override description = 'Compare Mail on this machine with what is in the dotsloth store'
   static override examples = ['<%= config.bin %> <%= command.id %>']

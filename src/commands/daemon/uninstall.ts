@@ -2,6 +2,11 @@ import chalk from 'chalk'
 import {BaseCommand} from '../../cli/base-command.js'
 import {uninstallDaemon} from '../../core/daemon.js'
 
+/**
+ * Purpose: turn the periodic sync off.
+ *
+ * Intention: extends BaseCommand; uses core/daemon.
+ */
 export default class DaemonUninstall extends BaseCommand {
   static override description = 'Remove the periodic sync agent'
   static override examples = ['<%= config.bin %> <%= command.id %>']

@@ -35,3 +35,25 @@ export async function codeOf(promise: Promise<unknown>): Promise<string | undefi
 
   return undefined
 }
+
+/** The code of the CoreError the call throws, or undefined when it returns. */
+export function codeOfCall(fn: () => unknown): string | undefined {
+  try {
+    fn()
+  } catch (error) {
+    return (error as CoreError).code
+  }
+
+  return undefined
+}
+
+/** The code of the CoreError the call throws or rejects with, or undefined. */
+export async function codeOfAwaitedCall(fn: () => unknown): Promise<string | undefined> {
+  try {
+    await fn()
+  } catch (error) {
+    return (error as CoreError).code
+  }
+
+  return undefined
+}

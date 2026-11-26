@@ -2,7 +2,7 @@ import {cleanup, fireEvent, screen, waitFor} from '@testing-library/react'
 import {afterEach, describe, expect, it, vi} from 'vitest'
 
 import {changedHunks, lineDiff} from '../diff.js'
-import {mockApi, renderWithToasts} from '../test-utils.js'
+import {renderWithToasts} from '../test-utils.js'
 import {ConfigPage, validateConfigText} from './config.js'
 
 const CONFIG = {

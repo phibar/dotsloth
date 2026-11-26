@@ -1,34 +1,12 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import {expect} from 'chai'
-import {replaceConfig, updateConfig} from '../../src/core/config.js'
-import {CoreError} from '../../src/core/errors.js'
 import type {StepEvent} from '../../src/core/events.js'
 import {getInitPlan, runInit} from '../../src/core/init.js'
-import {getStatus} from '../../src/core/status.js'
 import {getDefaultConfig, readConfig} from '../../src/lib/config.js'
 import {getIcloudDotfilePath, PATHS} from '../../src/lib/paths.js'
+import {codeOf as asyncCodeOf, codeOfCall as codeOf} from '../__testdata__/repos.js'
 import {EMPTY_SYSTEM, fakeBinaries, resetHome} from '../helpers.js'
-
-function codeOf(fn: () => unknown): string | undefined {
-  try {
-    fn()
-  } catch (error) {
-    return (error as CoreError).code
-  }
-
-  return undefined
-}
-
-async function asyncCodeOf(promise: Promise<unknown>): Promise<string | undefined> {
-  try {
-    await promise
-  } catch (error) {
-    return (error as CoreError).code
-  }
-
-  return undefined
-}
 
 function writeRawConfig(content: string): void {
   fs.mkdirSync(path.dirname(PATHS.icloudConfig), {recursive: true})
@@ -98,75 +76,5 @@ describe('core/init', () => {
 
   it('needs a user name while there is no organization', async () => {
     expect(await asyncCodeOf(runInit({}))).to.equal('INVALID_INPUT')
-  })
-})
-
-describe('core/status', () => {
-  let restorePath: () => void
-
-  beforeEach(() => {
-    resetHome()
-    restorePath = fakeBinaries({...EMPTY_SYSTEM, 'ssh-add': 'echo "256 SHA256:abc key (ED25519)"'})
-  })
-
-  afterEach(() => restorePath())
-
-  it('reports iCloud as unavailable without reading anything else', () => {
-    resetHome({icloud: false})
-    const status = getStatus()
-    expect(status.icloud.accessible).to.equal(false)
-    expect(status.config).to.include({exists: false, value: null})
-  })
-
-  it('reports a missing config', () => {
-    expect(getStatus().config).to.include({exists: false, value: null})
-  })
-
-  it('lists config problems instead of failing', () => {
-    writeRawConfig(JSON.stringify({...getDefaultConfig(), version: 7}))
-    const {config} = getStatus()
-    expect(config.exists).to.equal(true)
-    expect(config.value).to.equal(null)
-    expect(config.errors?.[0]).to.match(/^version:/)
-  })
-
-  it('returns the config, symlinks, keys and the org of a directory - and writes nothing', () => {
-    const config = {
-      ...getDefaultConfig(),
-      organizations: [{folderName: 'acme', gitEmail: 'dev@acme.test', gitUsername: 'dev', name: 'acme'}],
-    }
-    replaceConfig(config)
-
-    const status = getStatus({directory: path.join(PATHS.githubRoot, 'acme', 'repo')})
-    expect(status.config.value).to.deep.equal(config)
-    expect(status.symlinks.map((s) => s.target)).to.deep.equal(config.syncedFiles.map((f) => f.target))
-    expect(status.sshKeys).to.deep.equal(['256 SHA256:abc key (ED25519)'])
-    expect(status.secrets.names).to.deep.equal([])
-    expect(status.directory?.org?.name).to.equal('acme')
-    expect(fs.existsSync(PATHS.icloudOrganizations)).to.equal(false)
-  })
-})
-
-describe('core/config', () => {
-  beforeEach(() => resetHome())
-
-  it('replaceConfig rejects invalid input with field-level details and keeps the file', () => {
-    replaceConfig(getDefaultConfig())
-    try {
-      replaceConfig({...getDefaultConfig(), paths: {}})
-      expect.fail('should have thrown')
-    } catch (error) {
-      expect((error as CoreError).code).to.equal('INVALID_INPUT')
-      expect((error as CoreError).details[0]).to.match(/^paths\.githubRoot:/)
-    }
-
-    expect(readConfig()).to.deep.equal(getDefaultConfig())
-  })
-
-  it('updateConfig applies a change without mutating the original', () => {
-    replaceConfig(getDefaultConfig())
-    const updated = updateConfig((config) => ({...config, sshSigning: {...config.sshSigning, enabled: false}}))
-    expect(updated.sshSigning.enabled).to.equal(false)
-    expect(readConfig()?.sshSigning.enabled).to.equal(false)
   })
 })

@@ -9,7 +9,7 @@ import {JobRunner} from '../../src/server/jobs.js'
 import {jobRoutes} from '../../src/server/routes/jobs.js'
 import {cookieName} from '../../src/server/security.js'
 import {EMPTY_SYSTEM, fakeBinaries, resetHome} from '../helpers.js'
-import {COOKIE, HOST, ORIGIN, PORT, readSse, signedIn, TOKEN, testApp} from './client.js'
+import {COOKIE, ORIGIN, PORT, readSse, signedIn, TOKEN, testApp} from './client.js'
 
 // One app per test: jobs live in its runner, so requests within a test must share it.
 let app = testApp()

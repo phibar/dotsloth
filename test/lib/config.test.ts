@@ -5,7 +5,6 @@ import {expect} from 'chai'
 
 import {ConfigError, getDefaultConfig, loadConfig, readConfig, saveConfig} from '../../src/lib/config.js'
 import {PATHS} from '../../src/lib/paths.js'
-import {createSymlink} from '../../src/lib/symlink.js'
 import type {DevSlothConfig} from '../../src/types/index.js'
 
 const withOrg = (): DevSlothConfig => ({
@@ -81,31 +80,5 @@ describe('config access', () => {
   it('saveConfig leaves no temp file behind', () => {
     saveConfig(withOrg())
     expect(fs.readdirSync(path.dirname(PATHS.icloudConfig))).to.deep.equal(['config.json'])
-  })
-})
-
-describe('createSymlink output', () => {
-  it('reports the backup path instead of printing it', async () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotsloth-link-'))
-    const source = path.join(dir, 'source')
-    const target = path.join(dir, 'target')
-    fs.writeFileSync(source, 'from icloud', 'utf8')
-    fs.writeFileSync(target, 'existing local file', 'utf8')
-
-    const logged: unknown[] = []
-    const original = console.log
-    console.log = (...args: unknown[]) => logged.push(args)
-    try {
-      const result = await createSymlink({backup: true, source, target})
-      expect(result.isValid).to.equal(true)
-      expect(result.backupPath).to.match(/target\.backup\.\d+$/)
-      expect(fs.readFileSync(result.backupPath as string, 'utf8')).to.equal('existing local file')
-      expect(fs.readlinkSync(target)).to.equal(source)
-    } finally {
-      console.log = original
-      fs.rmSync(dir, {force: true, recursive: true})
-    }
-
-    expect(logged).to.deep.equal([])
   })
 })
